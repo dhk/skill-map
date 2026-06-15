@@ -646,7 +646,10 @@ function openSkillsList(filterDomain) {
   let html = `
     <div id="sl-header">
       <input id="sl-filter" type="text" placeholder="filter skills…" oninput="filterSkillsList(this.value)">
-      <div id="sl-count">0 SELECTED · CLICK TO CHOOSE</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+        <div id="sl-count">0 SELECTED · CLICK TO CHOOSE</div>
+        <button onclick="selectAllSkills()" style="font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;padding:2px 8px;border-radius:var(--border-radius);border:1px solid var(--border);background:var(--bg2);color:var(--text-dim);cursor:pointer" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">SELECT ALL</button>
+      </div>
     </div>
     <div id="sl-body">`;
 
@@ -703,6 +706,18 @@ function updateInstallCount() {
     ? [...selectedSkills].map(id => `git clone https://github.com/${id} ~/.claude/skills/${id.split('/')[1]}`).join('\n')
     : '<select skills above>';
   if(copyBtn) copyBtn.disabled = n === 0;
+}
+
+function selectAllSkills() {
+  document.querySelectorAll('.sl-row').forEach(row => {
+    if(row.style.display === 'none') return; // respect active filter
+    if(!selectedSkills.has(row.dataset.id)) {
+      selectedSkills.add(row.dataset.id);
+      row.classList.add('selected');
+      row.querySelector('.sl-check').textContent = '✓';
+    }
+  });
+  updateInstallCount();
 }
 
 function filterSkillsList(q) {
