@@ -99,6 +99,39 @@ body { background:var(--bg2); color:var(--text); font-family:var(--font-mono); o
 .pc-link { color:var(--accent); text-decoration:none; font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; transition:opacity .15s; }
 .pc-link:hover { opacity:.7; }
 
+/* FILTER BAR */
+#filter-bar {
+  position:absolute; bottom:56px; left:50%; transform:translateX(-50%);
+  z-index:15; background:var(--bg); border:1px solid var(--border);
+  border-radius:var(--border-radius); padding:8px 10px;
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  box-shadow:0 2px 8px rgba(0,0,0,.08); max-width:680px;
+}
+#filter-pills { display:flex; gap:4px; flex-wrap:wrap; flex:1; }
+.filter-pill {
+  font-family:var(--font-mono); font-size:9px; letter-spacing:.06em;
+  background:var(--bg3); border:1px solid var(--border); border-radius:2px;
+  padding:2px 8px; color:var(--text); display:flex; align-items:center; gap:4px;
+}
+.filter-pill .pill-x { cursor:pointer; color:var(--text-dim); font-size:10px; }
+.filter-pill .pill-x:hover { color:#dc2626; }
+#filter-actions { display:flex; gap:4px; flex-shrink:0; }
+#filter-apply-btn { border-color:var(--accent); color:var(--accent); background:var(--bg); }
+#filter-apply-btn:hover { background:var(--accent); color:#fff; }
+
+/* PANEL ADD BUTTON */
+#panel-add-btn-wrap {
+  position:sticky; bottom:0;
+  padding:10px 16px; background:var(--bg); border-top:1px solid var(--border);
+}
+#panel-add-btn {
+  width:100%; font-family:var(--font-mono); font-size:10px; letter-spacing:.08em;
+  padding:7px; border-radius:var(--border-radius);
+  border:1px solid var(--accent-blue); color:var(--accent-blue); background:var(--bg);
+  cursor:pointer; transition:all .15s;
+}
+#panel-add-btn:hover { background:var(--accent-blue); color:#fff; }
+
 /* INSTALL PANEL */
 #install-bar {
   position:sticky; bottom:0; left:0; right:0;
@@ -167,7 +200,7 @@ svg { display:block; }
   <button class="btn" id="btn-skills" onclick="setView('skills')">SKILLS</button>
   <button class="btn" id="btn-dhk" onclick="setView('dhk')" style="border-color:#16a34a;color:#16a34a">DHK</button>
   <button class="btn" id="btn-ns" onclick="setView('ns')" style="border-color:#dc2626;color:#dc2626">UNCHARTED</button>
-  <button class="btn" id="btn-list" onclick="openSkillsList()" style="border-color:var(--accent-blue);color:var(--accent-blue)">INSTALL ↗</button>
+  <button class="btn" id="btn-list" onclick="openSkillsListPanel()" style="border-color:var(--accent-blue);color:var(--accent-blue)">INSTALL ↗</button>
 </div>
 
 <div id="legend">
@@ -188,9 +221,20 @@ svg { display:block; }
   <div style="margin-top:4px"><a href="https://github.com/dhk/skill-map" style="color:#475569;font-size:9px;letter-spacing:.08em;text-decoration:none">GITHUB.COM/DHK/SKILL-MAP</a></div>
 </div>
 
+<div id="filter-bar" style="display:none">
+  <div id="filter-pills"></div>
+  <div id="filter-actions">
+    <button class="btn" onclick="applyFilter()" id="filter-apply-btn">APPLY FILTER</button>
+    <button class="btn" onclick="clearFilter()" style="border-color:#dc2626;color:#dc2626">✕ CLEAR</button>
+  </div>
+</div>
+
 <div id="panel">
   <div id="panel-close" onclick="closePanel()">✕ CLOSE</div>
   <div id="panel-content"></div>
+  <div id="panel-add-btn-wrap">
+    <button id="panel-add-btn" onclick="addCurrentToFilter()">＋ ADD TO FILTER</button>
+  </div>
 </div>
 
 <svg id="graph"></svg>
@@ -309,6 +353,7 @@ sim.on('tick',()=>{
 
 // ── PANEL ──────────────────────────────────────────────────────
 function openPanel(d) {
+  currentPanelNode = d;
   const pc = document.getElementById('panel-content');
   let html = '';
 
@@ -418,11 +463,19 @@ function openPanel(d) {
   pc.innerHTML = html;
   document.getElementById('panel').classList.add('open');
   document.getElementById('controls').classList.add('panel-open');
+  document.getElementById('panel-add-btn-wrap').style.display = 'block';
 }
 
 function closePanel() {
+  currentPanelNode = null;
   document.getElementById('panel').classList.remove('open');
   document.getElementById('controls').classList.remove('panel-open');
+}
+
+function openSkillsListPanel() {
+  openSkillsList();
+  // hide ADD TO FILTER for the install list — it has its own selection UX
+  document.getElementById('panel-add-btn-wrap').style.display = 'none';
 }
 
 // ── VIEWS ──────────────────────────────────────────────────────
@@ -487,6 +540,93 @@ function filterNodes(q) {
 setTimeout(()=>{
   svg.transition().duration(900).call(zoom.transform, d3.zoomIdentity.translate(W*.06,H*.06).scale(.88));
 },1400);
+
+// ── FILTER ACCUMULATOR ─────────────────────────────────────────
+const pendingFilter = new Map(); // id -> {id, label, type}
+let currentPanelNode = null;
+
+function addCurrentToFilter() {
+  if(!currentPanelNode) return;
+  const d = currentPanelNode;
+  if(pendingFilter.has(d.id)) return; // already added
+  pendingFilter.set(d.id, { id: d.id, label: d.label || d.title || d.id, type: d.type });
+  renderFilterBar();
+  // Flash the button
+  const btn = document.getElementById('panel-add-btn');
+  if(btn) { btn.textContent = '✓ ADDED'; btn.style.borderColor = 'var(--accent)'; btn.style.color = 'var(--accent)';
+    setTimeout(() => { btn.textContent = '＋ ADD TO FILTER'; btn.style.borderColor = ''; btn.style.color = ''; }, 1200); }
+}
+
+function removeFromFilter(id) {
+  pendingFilter.delete(id);
+  renderFilterBar();
+  if(pendingFilter.size === 0) clearFilter();
+}
+
+function renderFilterBar() {
+  const bar = document.getElementById('filter-bar');
+  const pills = document.getElementById('filter-pills');
+  if(pendingFilter.size === 0) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  pills.innerHTML = [...pendingFilter.values()].map(f =>
+    `<span class="filter-pill"><span>${f.label}</span><span class="pill-x" onclick="removeFromFilter('${f.id.replace(/'/g,"\\'")}')">✕</span></span>`
+  ).join('');
+}
+
+function applyFilter() {
+  // Resolve what each filter item shows
+  const showIds = new Set();
+  pendingFilter.forEach(({id, type}) => {
+    showIds.add(id);
+    if(type === 'domain') {
+      const domLabel = pendingFilter.get(id)?.label;
+      GRAPH.nodes.filter(n => n.domain === domLabel).forEach(n => showIds.add(n.id));
+      GRAPH.links.forEach(l => {
+        const s = typeof l.source === 'object' ? l.source.id : l.source;
+        const t = typeof l.target === 'object' ? l.target.id : l.target;
+        if(s === id) showIds.add(t);
+        if(t === id) showIds.add(s);
+      });
+    }
+    if(type === 'org') {
+      const orgLabel = pendingFilter.get(id)?.label;
+      GRAPH.nodes.filter(n => n.org === orgLabel).forEach(n => showIds.add(n.id));
+      GRAPH.links.forEach(l => {
+        const s = typeof l.source === 'object' ? l.source.id : l.source;
+        const t = typeof l.target === 'object' ? l.target.id : l.target;
+        if(s === id) showIds.add(t);
+        if(t === id) showIds.add(s);
+      });
+    }
+    if(type === 'skill' || type === 'dhk') {
+      GRAPH.links.forEach(l => {
+        const s = typeof l.source === 'object' ? l.source.id : l.source;
+        const t = typeof l.target === 'object' ? l.target.id : l.target;
+        if(s === id) showIds.add(t);
+        if(t === id) showIds.add(s);
+      });
+    }
+    if(type === 'dhk_hub') {
+      GRAPH.nodes.filter(n => n.type === 'dhk').forEach(n => showIds.add(n.id));
+    }
+  });
+
+  node.style('opacity', d => showIds.has(d.id) ? 1 : .04);
+  link.style('opacity', l => {
+    const s = typeof l.source === 'object' ? l.source.id : l.source;
+    const t = typeof l.target === 'object' ? l.target.id : l.target;
+    return (showIds.has(s) && showIds.has(t)) ? .4 : .02;
+  });
+  nsClouds.style('opacity', .04);
+  document.getElementById('stat-n').textContent = `${showIds.size} FILTERED`;
+  closePanel();
+}
+
+function clearFilter() {
+  pendingFilter.clear();
+  document.getElementById('filter-bar').style.display = 'none';
+  setView('all');
+}
 
 // ── SKILLS LIST / INSTALL ───────────────────────────────────────
 const selectedSkills = new Set();
