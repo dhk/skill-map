@@ -1,10 +1,10 @@
 # The Skill Map
 
-![Last Updated](https://img.shields.io/badge/updated-June%202026-9aabb8) ![Skills](https://img.shields.io/badge/skills-1%2C119-16a34a) ![Domains](https://img.shields.io/badge/domains-13-3b82f6) ![Stars](https://img.shields.io/github/stars/dhk/skill-map?style=flat&color=9aabb8)
+![Last Updated](https://img.shields.io/badge/updated-June%202026-9aabb8) ![Skills](https://img.shields.io/badge/skills-1%2C121-16a34a) ![Domains](https://img.shields.io/badge/domains-13-3b82f6) ![Stars](https://img.shields.io/github/stars/dhk/skill-map?style=flat&color=9aabb8)
 
-**A living reference for the Agent Skills ecosystem: 1,119 skills, 13 domains, 5 uncharted territories**
+**A living reference for the Agent Skills ecosystem: 1,121 skills, 13 domains, 5 uncharted territories**
 
-An interactive force-directed map of every published skill in the Claude / agent ecosystem, built from crawling [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) in June 2026. Thirteen domains. Fifty-two organizations. And five territories with zero published skills: the negative space that tells you where the ecosystem is missing something.
+An interactive force-directed map of every published skill in the Claude / agent ecosystem, built from crawling [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) in June 2026. Thirteen domains. Fifty-three organizations. And five territories with zero published skills: the negative space that tells you where the ecosystem is missing something.
 
 [**Open the map →**](https://dhk.github.io/skill-map)
 
@@ -12,7 +12,7 @@ An interactive force-directed map of every published skill in the Claude / agent
 
 ## The Session Layer Gap
 
-Every published skill in this corpus does one thing: it makes Claude better at a task. Write better Terraform. Review smarter contracts. Generate cleaner dbt models. The task layer is well-covered: 1,119 skills and counting.
+Every published skill in this corpus does one thing: it makes Claude better at a task. Write better Terraform. Review smarter contracts. Generate cleaner dbt models. The task layer is well-covered: 1,121 skills and counting.
 
 Nobody has published a skill for how to run a day.
 
@@ -51,9 +51,9 @@ Five territories with zero published skills as of June 2026:
 
 ## Data Sources
 
-- **Skills corpus:** [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills): 1,119 skills across 52 organizations
+- **Skills corpus:** [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills): 1,121 skills across 53 organizations
 - **Crawled:** June 2026
-- **Graph:** 226 nodes, 302 links
+- **Graph:** 229 nodes, 306 links
 - **Domains:** 13 (Developer Tools, Security & Auth, Frontend & Design, Agent Orchestration, Data & Databases, DevOps & Infrastructure, Testing & Debugging, Document Creation, Marketing & Content, Product Management, Finance & Payments, Communication, Media & Creative)
 - **Negative space:** 5 uncharted territories identified by DHK
 
