@@ -4,10 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Skill Map · Agent Skills Ecosystem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@300;400&family=DM+Mono:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <style>
+:root {
+  --accent:     #16a34a;
+  --accent-blue:#2970d6;
+  --font-cond:  'Barlow Condensed', sans-serif;
+  --font-sans:  'Barlow', sans-serif;
+  --font-mono:  'DM Mono', monospace;
+  --border-radius: 4px;
+}
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:#0a0a0f; color:#e2e8f0; font-family:'DM Mono','Courier New',monospace; overflow:hidden; height:100vh; }
+body { background:#0a0a0f; color:#e2e8f0; font-family:var(--font-mono); overflow:hidden; height:100vh; }
 
 #header {
   position:absolute; top:0; left:0; right:0; z-index:10;
@@ -15,30 +26,30 @@ body { background:#0a0a0f; color:#e2e8f0; font-family:'DM Mono','Courier New',mo
   background:linear-gradient(to bottom,#0a0a0f 60%,transparent);
   pointer-events:none;
 }
-#header h1 { font-family:'Arial Narrow',Arial,sans-serif; font-size:20px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#9aabb8; }
-#header .sub { font-size:9px; color:#475569; letter-spacing:.12em; text-transform:uppercase; margin-top:1px; }
+#header h1 { font-family:var(--font-cond); font-size:22px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#9aabb8; }
+#header .sub { font-family:var(--font-mono); font-size:9px; color:#475569; letter-spacing:.12em; text-transform:uppercase; margin-top:2px; }
 
 #controls {
   position:absolute; top:14px; right:24px; z-index:10;
   display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end; max-width:420px;
 }
-.btn { font-family:'DM Mono',monospace; font-size:10px; padding:4px 10px; border-radius:3px; border:1px solid #334155; background:#0f172a; color:#94a3b8; cursor:pointer; letter-spacing:.06em; transition:all .15s; white-space:nowrap; }
+.btn { font-family:var(--font-mono); font-size:10px; padding:4px 10px; border-radius:var(--border-radius); border:1px solid #334155; background:#0f172a; color:#94a3b8; cursor:pointer; letter-spacing:.06em; transition:all .15s; white-space:nowrap; }
 .btn:hover { border-color:#9aabb8; color:#e2e8f0; }
 .btn.active { background:#1e293b; border-color:#9aabb8; color:#f1f5f9; }
 
 #search-wrap { position:absolute; bottom:20px; left:24px; z-index:10; }
-#search { font-family:'DM Mono',monospace; font-size:11px; background:#0f172a; border:1px solid #334155; color:#e2e8f0; padding:6px 12px; border-radius:3px; width:220px; outline:none; }
+#search { font-family:var(--font-mono); font-size:11px; background:#0f172a; border:1px solid #334155; color:#e2e8f0; padding:6px 12px; border-radius:var(--border-radius); width:220px; outline:none; }
 #search:focus { border-color:#9aabb8; }
 #search::placeholder { color:#475569; }
 
-#stats { position:absolute; bottom:20px; right:24px; z-index:10; text-align:right; font-size:9px; color:#475569; letter-spacing:.08em; line-height:1.9; }
+#stats { position:absolute; bottom:20px; right:24px; z-index:10; text-align:right; font-family:var(--font-mono); font-size:9px; color:#475569; letter-spacing:.08em; line-height:1.9; }
 
-#legend { position:absolute; top:64px; left:24px; z-index:10; font-size:9px; color:#475569; letter-spacing:.08em; line-height:2.1; }
+#legend { position:absolute; top:64px; left:24px; z-index:10; font-family:var(--font-mono); font-size:9px; color:#475569; letter-spacing:.08em; line-height:2.1; }
 .lr { display:flex; align-items:center; gap:6px; }
 .ld { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
 .ls { width:8px; height:8px; border-radius:1px; background:#64748b; flex-shrink:0; }
 .ln { width:10px; height:10px; border-radius:50%; border:2px solid #9aabb8; flex-shrink:0; }
-.ldhk { width:9px; height:9px; border-radius:50%; background:#16a34a; flex-shrink:0; }
+.ldhk { width:9px; height:9px; border-radius:50%; background:var(--accent); flex-shrink:0; }
 .lns { width:9px; height:9px; border-radius:50%; border:2px dashed #dc2626; flex-shrink:0; }
 
 /* SIDE PANEL */
@@ -51,26 +62,26 @@ body { background:#0a0a0f; color:#e2e8f0; font-family:'DM Mono','Courier New',mo
 #panel.open { transform:translateX(0); }
 #panel-close {
   position:sticky; top:0; right:0;
-  font-family:'DM Mono',monospace; font-size:10px; padding:10px 16px;
+  font-family:var(--font-mono); font-size:10px; padding:10px 16px;
   background:#0d1117; border-bottom:1px solid #1e293b;
   color:#64748b; cursor:pointer; text-align:right; letter-spacing:.08em;
   z-index:1;
 }
 #panel-close:hover { color:#9aabb8; }
 #panel-content { padding:20px; flex:1; }
-.pc-type { font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:#64748b; margin-bottom:6px; }
-.pc-name { font-size:18px; font-weight:700; font-family:'Arial Narrow',Arial,sans-serif; color:#f1f5f9; margin-bottom:4px; line-height:1.2; }
+.pc-type { font-family:var(--font-mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:#64748b; margin-bottom:6px; }
+.pc-name { font-family:var(--font-cond); font-size:22px; font-weight:700; letter-spacing:.01em; color:#f1f5f9; margin-bottom:4px; line-height:1.2; }
 .pc-avatar { font-size:32px; margin-bottom:10px; }
-.pc-arch { font-size:10px; color:#94a3b8; margin-bottom:14px; font-style:italic; }
-.pc-desc { font-size:11px; color:#94a3b8; line-height:1.7; margin-bottom:14px; }
-.pc-label { font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:#475569; margin-bottom:4px; margin-top:12px; }
-.pc-val { font-size:11px; color:#cbd5e1; line-height:1.6; }
-.pc-quote { font-size:12px; color:#9aabb8; font-style:italic; border-left:2px solid #334155; padding-left:10px; margin:14px 0; line-height:1.6; }
-.pc-unmet { font-size:11px; color:#fbbf24; background:#1c1400; border:1px solid #78350f; border-radius:3px; padding:8px 10px; margin-top:12px; line-height:1.6; }
-.pc-dhk { font-size:11px; color:#16a34a; background:#061207; border:1px solid #14532d; border-radius:3px; padding:8px 10px; margin-top:8px; line-height:1.6; }
-.pc-ns-warn { font-size:13px; color:#dc2626; margin-bottom:10px; }
-.pc-tag { display:inline-block; font-size:9px; padding:2px 7px; border-radius:2px; background:#1e293b; color:#64748b; margin:2px 2px 0 0; letter-spacing:.06em; }
-.pc-tag.dhk { background:#061207; color:#16a34a; border:1px solid #14532d; }
+.pc-arch { font-family:var(--font-sans); font-size:11px; font-weight:300; color:#94a3b8; margin-bottom:14px; font-style:italic; }
+.pc-desc { font-family:var(--font-sans); font-size:12px; font-weight:300; color:#94a3b8; line-height:1.75; margin-bottom:14px; }
+.pc-label { font-family:var(--font-mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:#475569; margin-bottom:4px; margin-top:12px; }
+.pc-val { font-family:var(--font-sans); font-size:12px; font-weight:300; color:#cbd5e1; line-height:1.6; }
+.pc-quote { font-family:var(--font-sans); font-size:13px; font-weight:300; color:#9aabb8; font-style:italic; border-left:3px solid var(--accent); padding-left:12px; margin:14px 0; line-height:1.75; }
+.pc-unmet { font-family:var(--font-sans); font-size:12px; font-weight:300; color:#fbbf24; background:#1c1400; border:1px solid #78350f; border-radius:var(--border-radius); padding:8px 10px; margin-top:12px; line-height:1.6; }
+.pc-dhk { font-family:var(--font-sans); font-size:12px; font-weight:300; color:var(--accent); background:#061207; border:1px solid #14532d; border-radius:var(--border-radius); padding:8px 10px; margin-top:8px; line-height:1.6; }
+.pc-ns-warn { font-family:var(--font-cond); font-size:15px; font-weight:600; color:#dc2626; letter-spacing:.04em; margin-bottom:10px; }
+.pc-tag { display:inline-block; font-family:var(--font-mono); font-size:9px; padding:2px 7px; border-radius:2px; background:#1e293b; color:#64748b; margin:2px 2px 0 0; letter-spacing:.06em; }
+.pc-tag.dhk { background:#061207; color:var(--accent); border:1px solid #14532d; }
 .pc-tag.ns { background:#1c0505; color:#dc2626; border:1px solid #7f1d1d; }
 .pc-divider { border:none; border-top:1px solid #1e293b; margin:14px 0; }
 
