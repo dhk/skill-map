@@ -97,6 +97,48 @@ body { background:var(--bg2); color:var(--text); font-family:var(--font-mono); o
 .pc-link { color:var(--accent); text-decoration:none; font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; transition:opacity .15s; }
 .pc-link:hover { opacity:.7; }
 
+/* INSTALL PANEL */
+#install-bar {
+  position:sticky; bottom:0; left:0; right:0;
+  background:var(--bg); border-top:1px solid var(--border);
+  padding:12px 16px;
+}
+#install-cmd {
+  font-family:var(--font-mono); font-size:10px; color:var(--text-dim);
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:var(--border-radius); padding:8px 10px;
+  word-break:break-all; line-height:1.6; margin-bottom:8px;
+  min-height:36px;
+}
+#install-cmd .cmd-prefix { color:var(--text-dim); }
+#install-cmd .cmd-ids { color:var(--accent); }
+#copy-btn {
+  width:100%; font-family:var(--font-mono); font-size:10px; letter-spacing:.08em;
+  padding:7px; border-radius:var(--border-radius);
+  border:1px solid var(--accent); background:var(--accent); color:#fff;
+  cursor:pointer; transition:opacity .15s;
+}
+#copy-btn:hover { opacity:.85; }
+#copy-btn:disabled { opacity:.4; cursor:default; }
+.sl-domain { font-family:var(--font-mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); padding:10px 16px 4px; border-top:1px solid var(--border-light); margin-top:4px; }
+.sl-domain:first-child { border-top:none; margin-top:0; }
+.sl-row {
+  display:flex; align-items:flex-start; gap:10px; padding:7px 16px;
+  cursor:pointer; transition:background .12s; border-left:3px solid transparent;
+}
+.sl-row:hover { background:var(--bg2); }
+.sl-row.selected { background:var(--bg3); border-left-color:var(--accent); }
+.sl-check { width:14px; height:14px; border:1.5px solid var(--border); border-radius:2px; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; font-size:9px; transition:all .12s; }
+.sl-row.selected .sl-check { background:var(--accent); border-color:var(--accent); color:#fff; }
+.sl-name { font-family:var(--font-mono); font-size:10px; color:var(--text); letter-spacing:.02em; }
+.sl-org { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); }
+.sl-desc { font-family:var(--font-sans); font-size:11px; font-weight:300; color:var(--text-dim); line-height:1.5; margin-top:2px; }
+#sl-filter { font-family:var(--font-mono); font-size:11px; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--border-radius); width:100%; outline:none; margin-bottom:0; }
+#sl-filter:focus { border-color:var(--accent); }
+#sl-filter::placeholder { color:var(--text-dim); }
+#sl-header { padding:12px 16px; border-bottom:1px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:1; }
+#sl-count { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); letter-spacing:.08em; margin-top:6px; }
+
 svg { display:block; }
 .link { stroke-opacity:.18; }
 .link.org { stroke:var(--text-dim); }
@@ -123,6 +165,7 @@ svg { display:block; }
   <button class="btn" id="btn-skills" onclick="setView('skills')">SKILLS</button>
   <button class="btn" id="btn-dhk" onclick="setView('dhk')" style="border-color:#16a34a;color:#16a34a">DHK</button>
   <button class="btn" id="btn-ns" onclick="setView('ns')" style="border-color:#dc2626;color:#dc2626">UNCHARTED</button>
+  <button class="btn" id="btn-list" onclick="openSkillsList()" style="border-color:var(--accent-blue);color:var(--accent-blue)">INSTALL ↗</button>
 </div>
 
 <div id="legend">
@@ -186,23 +229,22 @@ const nsClouds = nsGroup.selectAll('.ns-cloud')
   .on('click', (e,d) => openPanel(d));
 
 nsClouds.append('ellipse')
-  .attr('rx', 55).attr('ry', 30)
-  .attr('fill','#1c0505').attr('fill-opacity',.7)
+  .attr('rx', 70).attr('ry', 36)
+  .attr('fill','#fef2f2').attr('fill-opacity',.92)
   .attr('stroke','#dc2626').attr('stroke-width',1.5)
-  .attr('stroke-dasharray','5,4')
-  .style('filter','drop-shadow(0 0 8px #dc262640)');
+  .attr('stroke-dasharray','6,4');
 
 nsClouds.append('text')
-  .attr('text-anchor','middle').attr('dy',-4)
-  .attr('font-size','11px').attr('fill','#dc2626')
-  .attr('font-family','DM Mono,monospace')
-  .text(d=>d.icon+' '+d.label);
+  .attr('text-anchor','middle').attr('dy',-5)
+  .attr('font-size','11px').attr('fill','#dc2626').attr('font-weight','600')
+  .attr('font-family','Barlow Condensed,sans-serif').attr('letter-spacing','.04em')
+  .text(d=>d.icon+' '+d.label.toUpperCase());
 
 nsClouds.append('text')
   .attr('text-anchor','middle').attr('dy',10)
-  .attr('font-size','8px').attr('fill','#7f1d1d')
-  .attr('letter-spacing','.1em')
-  .text('UNCHARTED');
+  .attr('font-size','8px').attr('fill','#991b1b')
+  .attr('font-family','DM Mono,monospace').attr('letter-spacing','.12em')
+  .text('UNCHARTED · 0 SKILLS');
 
 // ── REGULAR NODES ──────────────────────────────────────────────
 const nodeData = GRAPH.nodes.filter(d=>d.type!=='negative_space');
@@ -443,6 +485,101 @@ function filterNodes(q) {
 setTimeout(()=>{
   svg.transition().duration(900).call(zoom.transform, d3.zoomIdentity.translate(W*.06,H*.06).scale(.88));
 },1400);
+
+// ── SKILLS LIST / INSTALL ───────────────────────────────────────
+const selectedSkills = new Set();
+
+function openSkillsList(filterDomain) {
+  const pc = document.getElementById('panel-content');
+  const allSkills = GRAPH.nodes.filter(n => n.type === 'skill' || n.type === 'dhk');
+
+  // Group by domain
+  const byDomain = {};
+  allSkills.forEach(s => {
+    const dom = s.domain || 'Other';
+    if(!byDomain[dom]) byDomain[dom] = [];
+    byDomain[dom].push(s);
+  });
+
+  let html = `
+    <div id="sl-header">
+      <input id="sl-filter" type="text" placeholder="filter skills…" oninput="filterSkillsList(this.value)">
+      <div id="sl-count">0 SELECTED · CLICK TO CHOOSE</div>
+    </div>
+    <div id="sl-body">`;
+
+  Object.keys(byDomain).sort().forEach(dom => {
+    html += `<div class="sl-domain" data-domain="${dom}">${dom}</div>`;
+    byDomain[dom].sort((a,b)=>a.label.localeCompare(b.label)).forEach(s => {
+      const sel = selectedSkills.has(s.id) ? 'selected' : '';
+      html += `<div class="sl-row ${sel}" data-id="${s.id}" data-label="${s.label}" data-org="${s.org||'dhk'}" data-domain="${dom}" onclick="toggleSkill(this, '${s.id}')">
+        <div class="sl-check">${selectedSkills.has(s.id) ? '✓' : ''}</div>
+        <div>
+          <div class="sl-name">${s.label}</div>
+          <div class="sl-org">${s.org||'dhk'}</div>
+          <div class="sl-desc">${s.description||''}</div>
+        </div>
+      </div>`;
+    });
+  });
+
+  html += `</div>
+    <div id="install-bar">
+      <div id="install-cmd"><span class="cmd-prefix">claude skill add </span><span class="cmd-ids" id="cmd-ids">${selectedSkills.size ? [...selectedSkills].join(' ') : '<select skills above>'}</span></div>
+      <button id="copy-btn" onclick="copyInstall()" ${selectedSkills.size ? '' : 'disabled'}>COPY INSTALL COMMAND</button>
+    </div>`;
+
+  pc.innerHTML = html;
+  document.getElementById('panel').classList.add('open');
+  document.getElementById('controls').classList.add('panel-open');
+  updateInstallCount();
+}
+
+function toggleSkill(el, id) {
+  if(selectedSkills.has(id)) {
+    selectedSkills.delete(id);
+    el.classList.remove('selected');
+    el.querySelector('.sl-check').textContent = '';
+  } else {
+    selectedSkills.add(id);
+    el.classList.add('selected');
+    el.querySelector('.sl-check').textContent = '✓';
+  }
+  updateInstallCount();
+}
+
+function updateInstallCount() {
+  const countEl = document.getElementById('sl-count');
+  const cmdIds = document.getElementById('cmd-ids');
+  const copyBtn = document.getElementById('copy-btn');
+  if(!countEl) return;
+  const n = selectedSkills.size;
+  countEl.textContent = n === 0 ? '0 SELECTED · CLICK TO CHOOSE' : `${n} SKILL${n>1?'S':''} SELECTED`;
+  if(cmdIds) cmdIds.textContent = n ? [...selectedSkills].join(' ') : '<select skills above>';
+  if(copyBtn) copyBtn.disabled = n === 0;
+}
+
+function filterSkillsList(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('.sl-row').forEach(row => {
+    const text = (row.dataset.label + ' ' + row.dataset.org + ' ' + row.dataset.domain).toLowerCase();
+    row.style.display = text.includes(q) ? '' : 'none';
+  });
+  document.querySelectorAll('.sl-domain').forEach(d => {
+    const dom = d.dataset.domain;
+    const anyVisible = [...document.querySelectorAll(`.sl-row[data-domain="${dom}"]`)].some(r => r.style.display !== 'none');
+    d.style.display = anyVisible ? '' : 'none';
+  });
+}
+
+function copyInstall() {
+  if(!selectedSkills.size) return;
+  const cmd = 'claude skill add ' + [...selectedSkills].join(' ');
+  navigator.clipboard.writeText(cmd).then(() => {
+    const btn = document.getElementById('copy-btn');
+    if(btn) { btn.textContent = 'COPIED ✓'; setTimeout(() => { btn.textContent = 'COPY INSTALL COMMAND'; }, 2000); }
+  });
+}
 </script>
 </body>
 </html>
