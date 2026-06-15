@@ -276,9 +276,10 @@ const nsClouds = nsGroup.selectAll('.ns-cloud')
 
 nsClouds.append('ellipse')
   .attr('rx', 70).attr('ry', 36)
-  .attr('fill','#fef2f2').attr('fill-opacity',.92)
-  .attr('stroke','#dc2626').attr('stroke-width',1.5)
-  .attr('stroke-dasharray','6,4');
+  .attr('fill','#fef2f2').attr('fill-opacity',.95)
+  .attr('stroke','#dc2626').attr('stroke-width',2.5)
+  .attr('stroke-dasharray','8,4')
+  .style('filter','drop-shadow(0 0 6px rgba(220,38,38,0.35))');
 
 nsClouds.append('text')
   .attr('text-anchor','middle').attr('dy',-5)
