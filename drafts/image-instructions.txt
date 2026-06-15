@@ -1,0 +1,12 @@
+IMAGE GENERATION PROMPTS
+
+FOR SUBSTACK HEADER IMAGE:
+Dark background (#0a0a0f). Force-directed graph of glowing nodes in cluster colors.
+Green cluster (DHK) separated from the main body. Five red dashed clouds in the
+negative space labeled with their territory names. Style: data visualization meets
+dark mode aesthetic. No text overlay needed. 1600x900px.
+
+FOR TWITTER/X:
+Same as above but 1200x628px. Slightly more contrast on the red clouds.
+Add subtle "THE SKILL MAP · dhk.github.io/skill-map" text at bottom in DM Mono,
+color #9aabb8, small caps, letter-spacing 0.1em.

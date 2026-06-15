@@ -1,0 +1,182 @@
+{
+  "Developer Tools": {
+    "name": "The Platform Engineer",
+    "avatar": "⚙️",
+    "archetype": "Senior IC at a growth-stage startup",
+    "description": "Builds and maintains the internal developer platform. Lives in terminals. Evaluates Claude on whether it saves keystrokes, not whether it's impressive.",
+    "uses_skills_for": "SDK integration, API scaffolding, CLI tooling, keeping up with framework changes without reading docs",
+    "quote": "If I have to explain it to a junior, I'd rather just automate it.",
+    "follows": [
+      "@simonw",
+      "Vercel changelog",
+      "Hacker News"
+    ],
+    "unmet_need": "Skill versioning and dependency management — they need package.json for skills"
+  },
+  "Frontend & Design": {
+    "name": "The Design Engineer",
+    "avatar": "🎨",
+    "archetype": "Full-stack engineer with strong visual instincts",
+    "description": "Sits at the seam between design and engineering. Cares deeply about craft. Uses Claude to close the gap between what designers spec and what engineers ship.",
+    "uses_skills_for": "Component generation, design system enforcement, accessibility audits, CSS that actually works",
+    "quote": "The handoff is where good design goes to die. Claude is my translator.",
+    "follows": [
+      "@addyosmani",
+      "Google Labs Stitch",
+      "shadcn/ui changelog"
+    ],
+    "unmet_need": "No skill for design token management or cross-platform consistency checking"
+  },
+  "Security & Auth": {
+    "name": "The Security Practitioner",
+    "avatar": "🔐",
+    "archetype": "AppSec engineer or indie security researcher",
+    "description": "Treats every codebase as hostile until proven otherwise. Uses Claude for the tedious parts of security work — the pattern matching, the boilerplate auditing — while reserving judgment for themselves.",
+    "uses_skills_for": "Vulnerability scanning, auth flow review, smart contract auditing, secret detection",
+    "quote": "Claude finds what I'd find eventually. It just finds it faster.",
+    "follows": [
+      "Trail of Bits blog",
+      "@tqbf",
+      "CVE feeds"
+    ],
+    "unmet_need": "No skill for prompt injection detection or agent security posture review"
+  },
+  "Agent Orchestration": {
+    "name": "The Agentic Builder",
+    "avatar": "🤖",
+    "archetype": "Early adopter building multi-agent systems",
+    "description": "Was playing with LangChain before it was cool, abandoned it before it was abandoned. Building agent teams now. Deeply interested in how skills compose and how to avoid context collapse.",
+    "uses_skills_for": "Workflow orchestration, subagent coordination, context handoff between agents, MCP server construction",
+    "quote": "The hard part isn't the agent. It's keeping it from going off the rails at step 7.",
+    "follows": [
+      "VoltAgent docs",
+      "@simonw",
+      "Anthropic engineering blog"
+    ],
+    "unmet_need": "No skill for agent observability or failure mode detection"
+  },
+  "Data & Databases": {
+    "name": "The Analytics Engineer",
+    "avatar": "📊",
+    "archetype": "dbt practitioner at a data-forward company",
+    "description": "Thinks in DAGs. Cares about data quality, lineage, and making sure the numbers are right before they go in a dashboard. Uses Claude as a SQL pair programmer who never gets tired.",
+    "uses_skills_for": "Query optimization, schema design, dbt model generation, data quality checks",
+    "quote": "I don't trust SQL I didn't write. But I'll trust SQL Claude wrote if I review it.",
+    "follows": [
+      "dbt Slack",
+      "Tinybird blog",
+      "Mode Analytics"
+    ],
+    "unmet_need": "No skill for dbt-aware code review or data lineage traversal — DHK's territory"
+  },
+  "DevOps & Infrastructure": {
+    "name": "The Infrastructure Operator",
+    "avatar": "🏗️",
+    "archetype": "Platform or SRE engineer at scale",
+    "description": "Makes things not fall over. Operates at the intersection of speed and reliability. Uses Claude to reduce toil on the repetitive parts of infrastructure management.",
+    "uses_skills_for": "Terraform scaffolding, deployment automation, CI/CD debugging, cloud cost review",
+    "quote": "Toil is the enemy. If Claude can do it, Claude should do it.",
+    "follows": [
+      "HashiCorp changelog",
+      "Cloudflare blog",
+      "SRE Weekly"
+    ],
+    "unmet_need": "No skill for incident retrospective generation or runbook automation"
+  },
+  "Document Creation": {
+    "name": "The Knowledge Worker",
+    "avatar": "📄",
+    "archetype": "Operator or analyst at a mid-size company",
+    "description": "Produces a lot of documents. Reports, decks, briefs, emails. Not a developer. Uses Claude to close the gap between what they know and what they can produce polished output of.",
+    "uses_skills_for": "Word documents, Excel models, PowerPoint decks, PDF generation",
+    "quote": "I know what I want to say. Claude helps me say it at scale.",
+    "follows": [
+      "Microsoft 365 updates",
+      "productivity Twitter"
+    ],
+    "unmet_need": "No skill for document versioning, template management, or brand consistency checking across outputs"
+  },
+  "Testing & Debugging": {
+    "name": "The QA Practitioner",
+    "avatar": "🐛",
+    "archetype": "Senior QA engineer or test automation lead",
+    "description": "Finds the edge cases everyone else misses. Uses Claude to scale test coverage and debug the weird stuff faster.",
+    "uses_skills_for": "Test generation, CI debugging, A/B test design and analysis, regression triage",
+    "quote": "Every bug is a test that didn't exist yet.",
+    "follows": [
+      "Playwright changelog",
+      "testing-library docs"
+    ],
+    "unmet_need": "No skill for test coverage gap analysis or flaky test pattern detection"
+  },
+  "Marketing & Content": {
+    "name": "The Growth Practitioner",
+    "avatar": "📣",
+    "archetype": "Head of Growth or solo content operator",
+    "description": "Moves fast, publishes constantly, measures everything. Uses Claude to increase publishing velocity without sacrificing voice.",
+    "uses_skills_for": "SEO optimization, social content scheduling, AI search optimization, launch copy",
+    "quote": "Distribution is the moat. Claude helps me show up everywhere.",
+    "follows": [
+      "Corey Haines",
+      "Typefully",
+      "SparkToro"
+    ],
+    "unmet_need": "No skill for brand voice consistency checking or content calendar management"
+  },
+  "Product Management": {
+    "name": "The Product Thinker",
+    "avatar": "🗺️",
+    "archetype": "Senior PM or founder with PM instincts",
+    "description": "Translates between customer pain and engineering reality. Uses Claude to accelerate the spec-to-ship cycle and think through decisions more rigorously.",
+    "uses_skills_for": "PRD generation, spec-to-implementation, hypothesis formation, pricing analysis, deprecation comms",
+    "quote": "The bottleneck is never the idea. It's always the spec.",
+    "follows": [
+      "Paweł Huryn",
+      "Dean Peters",
+      "Lenny's Newsletter"
+    ],
+    "unmet_need": "No skill for customer interview synthesis or opportunity sizing"
+  },
+  "Finance & Payments": {
+    "name": "The Fintech Builder",
+    "avatar": "💳",
+    "archetype": "Engineer or PM at a payments or crypto company",
+    "description": "Operates in regulated territory. Precision matters. Uses Claude for the technical parts of financial integrations while staying very close to the output.",
+    "uses_skills_for": "Stripe integration, billing analytics, crypto contract auditing, payment flow design",
+    "quote": "Money is where errors hurt most. Claude is useful here, carefully.",
+    "follows": [
+      "Stripe changelog",
+      "a16z crypto",
+      "Coinbase developer blog"
+    ],
+    "unmet_need": "No skill for regulatory compliance checking or audit trail generation"
+  },
+  "Communication": {
+    "name": "The Internal Communicator",
+    "avatar": "💬",
+    "archetype": "Chief of Staff, Ops Lead, or team lead at a scaling company",
+    "description": "Keeps the organization aligned. Writes a lot of internal documents nobody reads and a few that everyone needs to. Uses Claude to make the communication layer less of a bottleneck.",
+    "uses_skills_for": "Status reports, alert routing, email drafting, multi-channel notification setup",
+    "quote": "The work is fine. It's the communication about the work that kills us.",
+    "follows": [
+      "Lenny's Newsletter",
+      "Reforge",
+      "First Round Review"
+    ],
+    "unmet_need": "No skill for meeting synthesis, async update generation, or stakeholder communication cadence management"
+  },
+  "Media & Creative": {
+    "name": "The Creative Technologist",
+    "avatar": "🎬",
+    "archetype": "Creative director with engineering chops, or engineer with creative instincts",
+    "description": "Lives at the intersection of art and code. Uses Claude for generative work — art, video, music, 3D — and to accelerate the production pipeline.",
+    "uses_skills_for": "Generative art, image synthesis, video production, podcast generation, 3D model creation",
+    "quote": "The best creative tools disappear. Claude is getting close.",
+    "follows": [
+      "fal.ai blog",
+      "Replicate changelog",
+      "Runway"
+    ],
+    "unmet_need": "No skill for creative brief synthesis or multi-modal production pipeline management"
+  }
+}

@@ -1,0 +1,56 @@
+TWEET THREAD — The Session Layer
+
+---
+
+1/6
+I crawled 1,119 published Claude skills across 52 orgs and 13 domains and built an interactive map of the ecosystem.
+
+The map: dhk.github.io/skill-map
+
+What it shows is interesting. What it doesn't show is more interesting.
+
+---
+
+2/6
+Every skill in the corpus does the same thing: makes Claude better at a task.
+
+Nobody has published a skill for how to run a day.
+
+That's the task layer vs the session layer. @simonw wrote about Skills before Anthropic shipped them. This gap predates the format.
+
+---
+
+3/6
+Five territories with zero published skills:
+
+- The Session Layer (continuity, rhythm, captain's log)
+- Claude as Personal OS (orchestrated daily workflow)
+- Skill Discovery (no registry, no versioning, the npm problem)
+- Skill Evaluation (no benchmark, ships on vibes)
+- Healthcare & Life Sciences (largest enterprise vertical, zero skills)
+
+---
+
+4/6
+I've been building in the first territory for a year.
+
+captain's-log, close-day, plan-day, reading-list-builder, daily-briefing, snapshot-create, tricorder, weekly-reset.
+
+Started before Anthropic formalized the Skills format in October 2025. There was no category for it then. There still isn't one in the public corpus.
+
+---
+
+5/6
+The session layer is the stickiest use case.
+
+Task-layer skills are fungible. Session-layer infrastructure isn't. It knows your rhythm. It carries your history. It has seen your decisions.
+
+You don't migrate away from something that has been running your day for a year.
+
+---
+
+6/6
+The negative space is open territory.
+
+Full argument on Substack: dhkondata.substack.com
+The map: dhk.github.io/skill-map

@@ -1,0 +1,7 @@
+PULL QUOTES — The Session Layer
+
+1. "Nobody has published a skill for how to run a day."
+
+2. "The session layer is the stickiest use case. It is the one that makes you not switch."
+
+3. "Task-layer skills are fungible. Session-layer infrastructure is not. It knows your rhythm. It carries your history. It has seen your decisions."
