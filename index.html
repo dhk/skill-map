@@ -84,6 +84,8 @@ body { background:#0a0a0f; color:#e2e8f0; font-family:var(--font-mono); overflow
 .pc-tag.dhk { background:#061207; color:var(--accent); border:1px solid #14532d; }
 .pc-tag.ns { background:#1c0505; color:#dc2626; border:1px solid #7f1d1d; }
 .pc-divider { border:none; border-top:1px solid #1e293b; margin:14px 0; }
+.pc-link { color:var(--accent); text-decoration:none; font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; transition:opacity .15s; }
+.pc-link:hover { opacity:.7; }
 
 svg { display:block; }
 .link { stroke-opacity:.12; }
@@ -289,6 +291,7 @@ function openPanel(d) {
     html += `<div class="pc-val">${d.who_lives_here}</div>`;
     if(d.dhk_claim) {
       html += `<div class="pc-dhk">🟢 ${d.dhk_claim}</div>`;
+      html += `<div class="pc-val" style="margin-top:8px"><a href="https://github.com/dhk/skill-map" target="_blank" class="pc-link">github.com/dhk/skill-map</a> · <a href="https://www.dhk.io" target="_blank" class="pc-link">www.dhk.io</a></div>`;
     }
     html += `<div class="pc-label" style="margin-top:14px">STATUS</div>`;
     html += `<span class="pc-tag ns">0 published skills</span>`;
@@ -302,10 +305,16 @@ function openPanel(d) {
     html += `<div class="pc-arch">Head of Data · AI Practitioner · Builder</div>`;
     html += `<div class="pc-desc">${d.description}</div>`;
     html += `<div class="pc-label">WHAT MAKES THIS DIFFERENT</div>`;
-    html += `<div class="pc-val">Every other cluster in this map operates at the task layer. DHK's skills operate at the session layer — the rhythm of how a day is run, not the completion of a specific job.</div>`;
+    html += `<div class="pc-val">Every other cluster in this map operates at the task layer. DHK's skills operate at the session layer: the rhythm of how a day is run, not the completion of a specific job.</div>`;
     html += `<div class="pc-dhk">🟢 Built before Anthropic formalized the Skills format (Oct 2025). First known public implementation of the session layer pattern.</div>`;
-    html += `<div class="pc-label" style="margin-top:14px">LINKS</div>`;
-    html += `<div class="pc-val"><span class="pc-tag dhk">dhkondata.substack.com</span><span class="pc-tag dhk">github.com/dhk</span></div>`;
+    html += `<hr class="pc-divider">`;
+    html += `<div class="pc-label">ABOUT DHK</div>`;
+    html += `<div class="pc-val" style="line-height:2">
+      <a href="https://www.dhk.io" target="_blank" class="pc-link">www.dhk.io</a><br>
+      <a href="mailto:davehk@gmail.com" class="pc-link">davehk@gmail.com</a><br>
+      <a href="https://dhkondata.substack.com" target="_blank" class="pc-link">dhkondata.substack.com</a><br>
+      <a href="https://github.com/dhk/skill-map" target="_blank" class="pc-link">github.com/dhk/skill-map</a>
+    </div>`;
   }
 
   else if(d.type==='dhk') {
@@ -317,18 +326,27 @@ function openPanel(d) {
     html += `<div class="pc-label">DOMAIN</div>`;
     html += `<div class="pc-val">${d.domain}</div>`;
     html += `<div class="pc-dhk">🟢 No equivalent exists in the 1,119-skill public corpus. This is negative space made into practice.</div>`;
+    html += `<hr class="pc-divider">`;
+    html += `<div class="pc-label">SOURCE</div>`;
+    html += `<div class="pc-val"><a href="https://github.com/${d.id}" target="_blank" class="pc-link">github.com/${d.id}</a></div>`;
+    html += `<div class="pc-label" style="margin-top:10px">ABOUT DHK</div>`;
+    html += `<div class="pc-val"><a href="https://www.dhk.io" target="_blank" class="pc-link">www.dhk.io</a> · <a href="https://github.com/dhk/skill-map" target="_blank" class="pc-link">skill-map repo</a></div>`;
   }
 
   else if(d.type==='org') {
+    const orgSlug = d.label;
     html += `<div class="pc-type">ORGANIZATION</div>`;
     html += `<div class="pc-name">${d.label}</div>`;
-    html += `<div class="pc-val">${d.count} skills shown in this map</div>`;
+    html += `<div class="pc-val">${d.count} skills in this map</div>`;
+    html += `<hr class="pc-divider">`;
+    html += `<div class="pc-label">GITHUB</div>`;
+    html += `<div class="pc-val"><a href="https://github.com/${orgSlug}" target="_blank" class="pc-link">github.com/${orgSlug}</a></div>`;
   }
 
   else if(d.type==='skill') {
     html += `<div class="pc-type">SKILL · ${(d.domain||'').toUpperCase()}</div>`;
     html += `<div class="pc-name">${d.label}</div>`;
-    html += `<div class="pc-arch">by ${d.org}</div>`;
+    html += `<div class="pc-arch">by <a href="https://github.com/${d.org}" target="_blank" class="pc-link">${d.org}</a></div>`;
     html += `<hr class="pc-divider">`;
     html += `<div class="pc-desc">${d.description}</div>`;
     const persona = d.domain && PERSONAS[d.domain];
@@ -336,8 +354,11 @@ function openPanel(d) {
       html += `<div class="pc-label">WHO USES THIS</div>`;
       html += `<div class="pc-val">${persona.avatar} ${persona.name} · ${persona.archetype}</div>`;
     }
+    html += `<hr class="pc-divider">`;
     html += `<div class="pc-label">INSTALL</div>`;
-    html += `<span class="pc-tag">${d.id}</span>`;
+    html += `<div class="pc-val" style="margin-bottom:6px"><span class="pc-tag">${d.id}</span></div>`;
+    html += `<div class="pc-label">SOURCE</div>`;
+    html += `<div class="pc-val"><a href="https://github.com/${d.id}" target="_blank" class="pc-link">github.com/${d.id}</a></div>`;
   }
 
   pc.innerHTML = html;
