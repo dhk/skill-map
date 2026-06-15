@@ -40,7 +40,9 @@ body { background:var(--bg2); color:var(--text); font-family:var(--font-mono); o
 #controls {
   position:absolute; top:14px; right:24px; z-index:10;
   display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end; max-width:420px;
+  transition:right .25s ease;
 }
+#controls.panel-open { right:364px; }
 .btn { font-family:var(--font-mono); font-size:10px; padding:4px 10px; border-radius:var(--border-radius); border:1px solid var(--border); background:var(--bg); color:var(--text-dim); cursor:pointer; letter-spacing:.06em; transition:all .15s; white-space:nowrap; }
 .btn:hover { border-color:var(--accent); color:var(--text); }
 .btn.active { background:var(--bg3); border-color:var(--text-dim); color:var(--text); }
@@ -371,10 +373,12 @@ function openPanel(d) {
 
   pc.innerHTML = html;
   document.getElementById('panel').classList.add('open');
+  document.getElementById('controls').classList.add('panel-open');
 }
 
 function closePanel() {
   document.getElementById('panel').classList.remove('open');
+  document.getElementById('controls').classList.remove('panel-open');
 }
 
 // ── VIEWS ──────────────────────────────────────────────────────
