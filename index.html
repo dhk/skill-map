@@ -527,8 +527,10 @@ function openSkillsList(filterDomain) {
 
   html += `</div>
     <div id="install-bar">
-      <div id="install-cmd"><span class="cmd-prefix">claude skill add </span><span class="cmd-ids" id="cmd-ids">${selectedSkills.size ? [...selectedSkills].join(' ') : '<select skills above>'}</span></div>
-      <button id="copy-btn" onclick="copyInstall()" ${selectedSkills.size ? '' : 'disabled'}>COPY INSTALL COMMAND</button>
+      <div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:.08em;margin-bottom:6px">CLONE TO ~/.claude/skills/</div>
+      <div id="install-cmd"><span class="cmd-ids" id="cmd-ids">${selectedSkills.size ? [...selectedSkills].map(id => `git clone https://github.com/${id} ~/.claude/skills/${id.split('/')[1]}`).join('\n') : '<select skills above>'}</span></div>
+      <button id="copy-btn" onclick="copyInstall()" ${selectedSkills.size ? '' : 'disabled'}>COPY CLONE COMMANDS</button>
+      <div style="font-family:var(--font-sans);font-size:10px;font-weight:300;color:var(--text-dim);margin-top:8px;line-height:1.5">No unified registry exists yet. This is one of the five uncharted territories. <a href="https://github.com/VoltAgent/awesome-agent-skills" target="_blank" style="color:var(--accent-blue);text-decoration:none">awesome-agent-skills</a> is the closest thing.</div>
     </div>`;
 
   pc.innerHTML = html;
@@ -557,7 +559,9 @@ function updateInstallCount() {
   if(!countEl) return;
   const n = selectedSkills.size;
   countEl.textContent = n === 0 ? '0 SELECTED · CLICK TO CHOOSE' : `${n} SKILL${n>1?'S':''} SELECTED`;
-  if(cmdIds) cmdIds.textContent = n ? [...selectedSkills].join(' ') : '<select skills above>';
+  if(cmdIds) cmdIds.textContent = n
+    ? [...selectedSkills].map(id => `git clone https://github.com/${id} ~/.claude/skills/${id.split('/')[1]}`).join('\n')
+    : '<select skills above>';
   if(copyBtn) copyBtn.disabled = n === 0;
 }
 
@@ -576,10 +580,10 @@ function filterSkillsList(q) {
 
 function copyInstall() {
   if(!selectedSkills.size) return;
-  const cmd = 'claude skill add ' + [...selectedSkills].join(' ');
+  const cmd = [...selectedSkills].map(id => `git clone https://github.com/${id} ~/.claude/skills/${id.split('/')[1]}`).join('\n');
   navigator.clipboard.writeText(cmd).then(() => {
     const btn = document.getElementById('copy-btn');
-    if(btn) { btn.textContent = 'COPIED ✓'; setTimeout(() => { btn.textContent = 'COPY INSTALL COMMAND'; }, 2000); }
+    if(btn) { btn.textContent = 'COPIED ✓'; setTimeout(() => { btn.textContent = 'COPY CLONE COMMANDS'; }, 2000); }
   });
 }
 </script>
