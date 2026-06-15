@@ -1,0 +1,26 @@
+VALIDATION CHECKLIST — June 2026
+
+[x] GitHub repo live: github.com/dhk/skill-map
+[x] GitHub Pages enabled: dhk.github.io/skill-map (build in progress, ~2 min)
+[ ] Map loads in < 3 seconds — verify after Pages builds
+[ ] All 5 negative space clouds clickable and panels open correctly — verify in browser
+[ ] DHK cluster visible and separate from main graph — verify in browser
+[x] Door-opener doc present: outreach/dhk-session-layer.docx
+[x] Substack draft is 886 words (target 800-1000)
+[x] Tweet thread is 6 tweets, all under 280 chars (verified: 223, 262, 249, 268, 270, 121)
+[ ] Screenshots exist in /screenshots directory — Phase 5 pending
+[x] Pull quotes extracted to drafts/pull-quotes.txt
+[x] README is complete and in DHK voice
+[x] No em-dashes in any prose document (verified clean)
+[x] No serif fonts referenced anywhere
+
+PAGES URL: https://dhk.github.io/skill-map
+REPO URL:  https://github.com/dhk/skill-map
+
+REMAINING (human):
+- Wait ~2 min for Pages to build, then verify map loads
+- Run Phase 5 screenshots (Playwright) once Pages is live
+- Update dhk-session-layer.docx with live URL (Phase 4)
+- Publish Substack draft
+- Post tweet thread
+- Submit PR to VoltAgent/awesome-agent-skills

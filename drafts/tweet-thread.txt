@@ -1,4 +1,4 @@
-TWEET THREAD — The Session Layer
+TWEET THREAD: The Session Layer
 
 ---
 
@@ -23,20 +23,20 @@ That's the task layer vs the session layer. @simonw wrote about Skills before An
 3/6
 Five territories with zero published skills:
 
-- The Session Layer (continuity, rhythm, captain's log)
-- Claude as Personal OS (orchestrated daily workflow)
-- Skill Discovery (no registry, no versioning, the npm problem)
-- Skill Evaluation (no benchmark, ships on vibes)
-- Healthcare & Life Sciences (largest enterprise vertical, zero skills)
+- Session Layer (captain's log, day planning)
+- Claude as Personal OS (orchestrated workflow)
+- Skill Discovery (no registry, no versioning)
+- Skill Evaluation (no benchmark)
+- Healthcare & Life Sciences
 
 ---
 
 4/6
-I've been building in the first territory for a year.
+I've been building in the session layer for a year.
 
 captain's-log, close-day, plan-day, reading-list-builder, daily-briefing, snapshot-create, tricorder, weekly-reset.
 
-Started before Anthropic formalized the Skills format in October 2025. There was no category for it then. There still isn't one in the public corpus.
+Before Anthropic formalized Skills in October 2025. Still no category for it in the public corpus.
 
 ---
 
