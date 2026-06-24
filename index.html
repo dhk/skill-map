@@ -382,7 +382,7 @@ function openPanel(d) {
       html += `<div class="pc-val">${persona.follows.map(f=>`<span class="pc-tag">${f}</span>`).join('')}</div>`;
       html += `<hr class="pc-divider">`;
       html += `<div class="pc-label">PUBLISHED SKILLS</div>`;
-      html += `<div class="pc-val">${d.count} skills tagged to this domain in <a href="https://github.com/VoltAgent/awesome-agent-skills" target="_blank" class="pc-link">awesome-agent-skills</a> (the full 1,119-skill dataset this map is built from)</div>`;
+      html += `<div class="pc-val">${d.count} skills in this domain · sourced from <a href="https://github.com/VoltAgent/awesome-agent-skills" target="_blank" class="pc-link">awesome-agent-skills</a></div>`;
       html += `<div class="pc-unmet">⚠ Unmet need: ${persona.unmet_need}</div>`;
     } else {
       html += `<div class="pc-name">${d.label}</div>`;
