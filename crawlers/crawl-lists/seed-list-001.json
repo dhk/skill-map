@@ -6,108 +6,129 @@
   "repos": [
     {
       "repo": "anthropics/skills",
+      "type": "canonical",
       "tier": "canonical",
-      "notes": "Official Anthropic skills repo — 18 SKILL.md files confirmed"
+      "notes": "Official Anthropic skills repo — always re-fetch regardless of SHA"
     },
     {
       "repo": "foxj77/claude-code-skills",
+      "type": "domain-collection",
       "tier": "high-quality",
-      "notes": "20 SKILL.md files — Kubernetes, GitOps, Helm, cert-manager, ExternalDNS, Kyverno"
+      "notes": "Kubernetes, GitOps, Helm, cert-manager, ExternalDNS, Kyverno"
     },
     {
       "repo": "QuestForTech-Investments/claude-code-skills",
+      "type": "domain-collection",
       "tier": "high-quality",
-      "notes": "24 SKILL.md files — SQL, Azure, GitHub Actions, React/Vite, multi-cloud, playwright"
+      "notes": "SQL, Azure, GitHub Actions, React/Vite, multi-cloud, playwright"
     },
     {
       "repo": "obra/superpowers",
+      "type": "methodology",
       "tier": "high-quality",
-      "notes": "14 SKILL.md files — TDD, debugging, planning, parallel agents, worktrees, code review"
+      "notes": "TDD, debugging, planning, parallel agents, worktrees, code review"
     },
     {
       "repo": "muratcankoylan/Agent-Skills-for-Context-Engineering",
+      "type": "methodology",
       "tier": "high-quality",
-      "notes": "21 SKILL.md files — context engineering, multi-agent, harness, evaluation, memory, tool design"
+      "notes": "Context engineering, multi-agent, harness, evaluation, memory, tool design"
     },
     {
       "repo": "kepano/obsidian-skills",
+      "type": "domain-collection",
       "tier": "high-quality",
-      "notes": "5 SKILL.md files — Obsidian CLI, markdown, bases, canvas, defuddle"
+      "notes": "Obsidian CLI, markdown, bases, canvas, defuddle"
     },
     {
       "repo": "AgriciDaniel/claude-seo",
+      "type": "domain-collection",
       "tier": "high-quality",
-      "notes": "33 SKILL.md files — comprehensive SEO suite with extensions for Ahrefs, Firecrawl, DataForSEO, Bing, SE Ranking"
+      "notes": "Comprehensive SEO suite with extensions for Ahrefs, Firecrawl, DataForSEO, Bing, SE Ranking"
     },
     {
       "repo": "coreyhaines31/marketingskills",
+      "type": "domain-collection",
       "tier": "high-quality",
-      "notes": "46 SKILL.md files confirmed — SMS, ASO, email, popups, copywriting and more"
+      "notes": "SMS, ASO, email, ads, popups, copywriting, CRO, pricing and more"
     },
     {
       "repo": "199-biotechnologies/claude-deep-research-skill",
+      "type": "single-skill",
       "tier": "medium",
-      "notes": "1 SKILL.md — deep research / multi-source citation tracking"
+      "notes": "Deep research / multi-source citation tracking"
     },
     {
       "repo": "github/spec-kit",
+      "type": "embedded",
       "tier": "medium",
-      "notes": "1 SKILL.md — community extension catalog management"
+      "notes": "Skill embedded in larger project — community extension catalog management"
     },
     {
       "repo": "dhk/tricorder",
+      "type": "single-skill",
       "tier": "medium",
-      "notes": "1 SKILL.md — PR review history analysis"
+      "notes": "PR review history analysis"
     },
     {
       "repo": "dhk/adventures-in-ai",
+      "type": "personal-mixed",
       "tier": "medium",
-      "notes": "7 SKILL.md files — git-push-handoff, redpen, run-analytics, personal-podcast, multi-model-review, reading-list-builder"
+      "notes": "git-push-handoff, redpen, run-analytics, personal-podcast, multi-model-review, reading-list-builder"
     },
     {
       "repo": "dhk/captains-log-repo",
+      "type": "single-skill",
       "tier": "medium",
-      "notes": "1 SKILL.md — passive session note-taker"
+      "notes": "Passive session note-taker"
     },
     {
       "repo": "dhk/ivy-archive",
+      "type": "single-skill",
       "tier": "medium",
-      "notes": "1 SKILL.md — context snapshot archiver → NotebookLM"
+      "notes": "Context snapshot archiver → NotebookLM"
     },
     {
       "repo": "travisvn/awesome-claude-skills",
-      "tier": "list-only",
-      "notes": "No SKILL.md files — curated list/index repo, useful for discovering more repos"
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Mine README for outbound repo links → discovery queue"
     },
     {
       "repo": "hesreallyhim/awesome-claude-code",
-      "tier": "list-only",
-      "notes": "No SKILL.md files — index of skills, hooks, commands, plugins"
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Index of skills, hooks, commands, plugins — mine for discovery"
     },
     {
       "repo": "karanb192/awesome-claude-skills",
-      "tier": "list-only",
-      "notes": "No SKILL.md files — issue template only"
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Mine for discovery"
     },
     {
       "repo": "itgoyo/awesome-claude-code-skills",
-      "tier": "list-only",
-      "notes": "No SKILL.md files found"
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Mine for discovery"
     },
     {
       "repo": "onmyway133/awesome-claude-code",
-      "tier": "list-only",
-      "notes": "No SKILL.md files found"
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Mine for discovery"
     },
     {
       "repo": "BehiSecc/awesome-claude-skills",
-      "tier": "list-only",
-      "notes": "No SKILL.md files found"
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Mine for discovery"
     },
     {
       "repo": "simonw/claude-skills",
-      "tier": "list-only",
-      "notes": "No SKILL.md files — redirect/bridging repo"
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Redirect/bridging repo — mine for outbound links"
     }
   ],
   "not_checked": [
