@@ -337,7 +337,7 @@ function showTooltip(e, d) {
     sub = `${d.count} skills in this domain`;
   } else if(d.type==='org') {
     title = d.label;
-    sub = `${d.count||0} skills`;
+    sub = `${d.count||0} skills · github.com/${d.label}`;
   } else if(d.type==='skill') {
     title = d.label;
     sub = d.org;
@@ -393,7 +393,7 @@ node.append('circle')
     return 'none';
   })
   .attr('stroke-width', d=>d.type==='domain'?0:d.type==='dhk_hub'?2:d.type==='org'?1.5:d.type==='dhk'?1:0)
-  .attr('fill-opacity', d=>d.type==='domain'?.13:d.type==='skill'?.7:.9);
+  .attr('fill-opacity', d=>d.type==='domain'?.28:d.type==='skill'?.7:.9);
 
 // Domain labels
 node.filter(d=>d.type==='domain').append('text')
@@ -595,7 +595,10 @@ function openOrgsPanel() {
   orgs.forEach(o => {
     const orgLabel = o.label;
     html += `<div class="org-row" id="orgrow-${orgLabel.replace(/[^a-z0-9]/gi,'_')}" onclick="filterByOrg('${orgLabel.replace(/'/g,"\\'")}')">
-      <span class="org-name">${orgLabel}</span>
+      <div>
+        <div class="org-name">${orgLabel}</div>
+        <div class="tt-sub" style="margin-top:2px"><a href="https://github.com/${orgLabel}" target="_blank" class="pc-link" onclick="event.stopPropagation()">github.com/${orgLabel}</a></div>
+      </div>
       <span class="org-count">${o.count||0} skills</span>
     </div>`;
   });
