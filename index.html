@@ -47,10 +47,35 @@ body { background:var(--bg2); color:var(--text); font-family:var(--font-mono); o
 .btn:hover { border-color:var(--accent); color:var(--text); }
 .btn.active { background:var(--bg3); border-color:var(--text-dim); color:var(--text); }
 
-#search-wrap { position:absolute; bottom:20px; left:24px; z-index:10; }
+#search-wrap { position:absolute; bottom:20px; left:24px; z-index:10; display:flex; align-items:center; gap:6px; }
 #search { font-family:var(--font-mono); font-size:11px; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--border-radius); width:220px; outline:none; }
 #search:focus { border-color:var(--accent); }
 #search::placeholder { color:var(--text-dim); }
+#view-toggle { display:flex; border:1px solid var(--border); border-radius:var(--border-radius); overflow:hidden; }
+.vt-btn { font-family:var(--font-mono); font-size:9px; letter-spacing:.06em; padding:5px 9px; background:var(--bg); color:var(--text-dim); border:none; cursor:pointer; transition:all .12s; }
+.vt-btn.active { background:var(--bg3); color:var(--text); }
+.vt-btn:hover:not(.active) { color:var(--text); }
+
+/* LIST VIEW */
+#list-view {
+  display:none; position:fixed; top:56px; left:0; right:0; bottom:0;
+  background:var(--bg); overflow-y:auto; z-index:9;
+}
+#list-view.open { display:block; }
+#lv-table { width:100%; border-collapse:collapse; }
+#lv-table thead th {
+  font-family:var(--font-mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text-dim); padding:10px 16px; text-align:left;
+  border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--bg); z-index:1;
+}
+#lv-table tbody tr { border-bottom:1px solid var(--border-light); cursor:pointer; transition:background .1s; }
+#lv-table tbody tr:hover { background:var(--bg2); }
+#lv-table tbody td { padding:9px 16px; font-family:var(--font-mono); font-size:10px; vertical-align:middle; }
+.lv-dot { width:8px; height:8px; border-radius:50%; display:inline-block; flex-shrink:0; }
+.lv-name { color:var(--text); }
+.lv-org { color:var(--text-dim); font-size:9px; margin-top:2px; }
+.lv-desc { font-family:var(--font-sans); font-size:11px; font-weight:300; color:var(--text-dim); line-height:1.4; }
+.lv-domain { font-size:9px; color:var(--text-dim); }
 
 #stats { position:absolute; bottom:20px; right:24px; z-index:10; text-align:right; font-family:var(--font-mono); font-size:9px; color:var(--text-dim); letter-spacing:.08em; line-height:1.9; }
 
@@ -241,7 +266,24 @@ svg { display:block; }
 </div>
 
 <div id="search-wrap">
-  <input id="search" type="text" placeholder="search skills, orgs, domains…" oninput="filterNodes(this.value)">
+  <input id="search" type="text" placeholder="search skills, orgs, domains…" oninput="onSearch(this.value)">
+  <div id="view-toggle">
+    <button class="vt-btn active" id="vt-map" onclick="setListMode(false)">MAP</button>
+    <button class="vt-btn" id="vt-list" onclick="setListMode(true)">LIST</button>
+  </div>
+</div>
+
+<div id="list-view">
+  <table id="lv-table">
+    <thead><tr>
+      <th style="width:20px"></th>
+      <th>SKILL</th>
+      <th>ORG</th>
+      <th>DOMAIN</th>
+      <th>DESCRIPTION</th>
+    </tr></thead>
+    <tbody id="lv-body"></tbody>
+  </table>
 </div>
 
 <div id="stats">
@@ -740,8 +782,56 @@ function setView(mode) {
   }
 }
 
+// ── LIST VIEW ───────────────────────────────────────────────────
+let listModeActive = false;
+
+function setListMode(on) {
+  listModeActive = on;
+  document.getElementById('vt-map').classList.toggle('active', !on);
+  document.getElementById('vt-list').classList.toggle('active', on);
+  document.getElementById('list-view').classList.toggle('open', on);
+  document.getElementById('graph').style.display = on ? 'none' : 'block';
+  document.getElementById('legend').style.display = on ? 'none' : '';
+  document.getElementById('stats').style.display = on ? 'none' : '';
+  if(on) renderList(document.getElementById('search').value);
+}
+
+function renderList(q) {
+  q = (q||'').toLowerCase().trim();
+  const allSkills = GRAPH.nodes.filter(n => n.type==='skill' || n.type==='dhk');
+  const domainColors = {};
+  GRAPH.nodes.filter(n=>n.type==='domain').forEach(n=>{ domainColors[n.label]=n.color; });
+
+  const rows = allSkills.filter(d => {
+    if(!q) return true;
+    const owner = d.id ? d.id.split('/')[0] : '';
+    const t = `${d.label} ${d.description||''} ${d.domain||''} ${d.org||''} ${d.id||''} ${owner}`.toLowerCase();
+    return t.includes(q);
+  }).sort((a,b) => (a.domain||'').localeCompare(b.domain||'') || a.label.localeCompare(b.label));
+
+  const tbody = document.getElementById('lv-body');
+  if(!tbody) return;
+  tbody.innerHTML = rows.map(d => {
+    const color = d.type==='dhk' ? '#16a34a' : (domainColors[d.domain] || '#64748b');
+    const desc = (d.description||'').length > 100 ? d.description.slice(0,100)+'…' : (d.description||'');
+    const org = d.type==='dhk' ? 'dhk' : (d.org||'');
+    return `<tr onclick="openPanel(GRAPH.nodes.find(n=>n.id==='${d.id.replace(/'/g,"\\'")}'))">
+      <td><span class="lv-dot" style="background:${color}"></span></td>
+      <td><div class="lv-name">${d.label}</div><div class="lv-org">${org}</div></td>
+      <td class="lv-domain">${d.domain||'Session Layer'}</td>
+      <td class="lv-desc">${desc}</td>
+    </tr>`;
+  }).join('');
+  setLiveCount(rows.length, q ? 'matched' : null);
+}
+
 // ── SEARCH ─────────────────────────────────────────────────────
 // Searches: label, description, domain, org/owner, repo name, full id (owner/repo)
+function onSearch(q) {
+  if(listModeActive) { renderList(q); return; }
+  filterNodes(q);
+}
+
 function filterNodes(q) {
   q = q.toLowerCase().trim();
   if(!q){
