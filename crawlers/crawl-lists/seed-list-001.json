@@ -1,0 +1,147 @@
+{
+  "list_id": "seed-list-001",
+  "description": "Manually curated seed list of known SKILL.md repos — Claude/Anthropic ecosystem",
+  "created": "2026-06-24",
+  "strategy": "repo-scoped",
+  "repos": [
+    {
+      "repo": "anthropics/skills",
+      "type": "canonical",
+      "tier": "canonical",
+      "notes": "Official Anthropic skills repo — always re-fetch regardless of SHA"
+    },
+    {
+      "repo": "foxj77/claude-code-skills",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "Kubernetes, GitOps, Helm, cert-manager, ExternalDNS, Kyverno"
+    },
+    {
+      "repo": "QuestForTech-Investments/claude-code-skills",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "SQL, Azure, GitHub Actions, React/Vite, multi-cloud, playwright"
+    },
+    {
+      "repo": "obra/superpowers",
+      "type": "methodology",
+      "tier": "high-quality",
+      "notes": "TDD, debugging, planning, parallel agents, worktrees, code review"
+    },
+    {
+      "repo": "muratcankoylan/Agent-Skills-for-Context-Engineering",
+      "type": "methodology",
+      "tier": "high-quality",
+      "notes": "Context engineering, multi-agent, harness, evaluation, memory, tool design"
+    },
+    {
+      "repo": "kepano/obsidian-skills",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "Obsidian CLI, markdown, bases, canvas, defuddle"
+    },
+    {
+      "repo": "AgriciDaniel/claude-seo",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "Comprehensive SEO suite with extensions for Ahrefs, Firecrawl, DataForSEO, Bing, SE Ranking"
+    },
+    {
+      "repo": "coreyhaines31/marketingskills",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "SMS, ASO, email, ads, popups, copywriting, CRO, pricing and more"
+    },
+    {
+      "repo": "BbgnsurfTech/claude-skills-collection",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "Includes superpowers, mcp-builder, skill-creator, playwright-skill, ios-simulator-skill"
+    },
+    {
+      "repo": "199-biotechnologies/claude-deep-research-skill",
+      "type": "single-skill",
+      "tier": "medium",
+      "notes": "Deep research / multi-source citation tracking"
+    },
+    {
+      "repo": "github/spec-kit",
+      "type": "embedded",
+      "tier": "medium",
+      "notes": "Skill embedded in larger project — community extension catalog management"
+    },
+    {
+      "repo": "dhk/tricorder",
+      "type": "single-skill",
+      "tier": "medium",
+      "notes": "PR review history analysis"
+    },
+    {
+      "repo": "dhk/adventures-in-ai",
+      "type": "personal-mixed",
+      "tier": "medium",
+      "notes": "git-push-handoff, redpen, run-analytics, personal-podcast, multi-model-review, reading-list-builder"
+    },
+    {
+      "repo": "dhk/captains-log-repo",
+      "type": "single-skill",
+      "tier": "medium",
+      "notes": "Passive session note-taker"
+    },
+    {
+      "repo": "dhk/ivy-archive",
+      "type": "single-skill",
+      "tier": "medium",
+      "notes": "Context snapshot archiver → NotebookLM"
+    },
+    {
+      "repo": "travisvn/awesome-claude-skills",
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Mine README for outbound repo links → discovery queue"
+    },
+    {
+      "repo": "hesreallyhim/awesome-claude-code",
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Index of skills, hooks, commands, plugins — mine for discovery"
+    },
+    {
+      "repo": "karanb192/awesome-claude-skills",
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Mine for discovery"
+    },
+    {
+      "repo": "itgoyo/awesome-claude-code-skills",
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Mine for discovery"
+    },
+    {
+      "repo": "onmyway133/awesome-claude-code",
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Mine for discovery"
+    },
+    {
+      "repo": "BehiSecc/awesome-claude-skills",
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Mine for discovery"
+    },
+    {
+      "repo": "simonw/claude-skills",
+      "type": "index-only",
+      "tier": "index",
+      "notes": "Redirect/bridging repo — mine for outbound links"
+    }
+  ],
+  "not_checked": [
+    "langchain-ai/langgraph",
+    "crewAIInc/crewAI",
+    "langgenius/dify",
+    "n8n-io/n8n",
+    "mendableai/firecrawl"
+  ]
+}
