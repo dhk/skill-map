@@ -3,10 +3,10 @@
   "status": "complete",
   "crawl_date": "2026-06-24",
   "queries_run": [
-    "crawl-list:seed-list-001.json"
+    "crawl-list:seed-list-002.json"
   ],
-  "total_repos": 14,
-  "total_files": 190,
+  "total_repos": 39,
+  "total_files": 5320,
   "errors": 0,
   "repo_breakdown": {
     "anthropics/skills": {
@@ -64,6 +64,149 @@
     "dhk/ivy-archive": {
       "skills": 1,
       "errors": 0
+    },
+    "alirezarezvani/claude-skills": {
+      "skills": 763,
+      "errors": 0
+    },
+    "borghei/claude-skills": {
+      "skills": 340,
+      "errors": 0
+    },
+    "wshobson/agents": {
+      "skills": 156,
+      "errors": 0
+    },
+    "Jeffallan/claude-skills": {
+      "skills": 66,
+      "errors": 0
+    },
+    "daymade/claude-code-skills": {
+      "skills": 68,
+      "errors": 0
+    },
+    "julianobarbosa/claude-code-skills": {
+      "skills": 123,
+      "errors": 0
+    },
+    "flonat/claude-research": {
+      "skills": 50,
+      "errors": 0
+    },
+    "deanpeters/Product-Manager-Skills": {
+      "skills": 54,
+      "errors": 0
+    },
+    "johnlindquist/claude": {
+      "skills": 50,
+      "errors": 0
+    },
+    "freshtechbro/claudedesignskills": {
+      "skills": 90,
+      "errors": 0
+    },
+    "posit-dev/skills": {
+      "skills": 25,
+      "errors": 0
+    },
+    "dmccreary/claude-skills": {
+      "skills": 26,
+      "errors": 0
+    },
+    "FlorianBruniaux/claude-code-ultimate-guide": {
+      "skills": 91,
+      "errors": 0
+    },
+    "Omerr/claude-skills": {
+      "skills": 1,
+      "errors": 0
+    },
+    "ykdojo/claude-code-tips": {
+      "skills": 6,
+      "errors": 0
+    },
+    "microsoft/vscode-docs": {
+      "skills": 7,
+      "errors": 0
+    },
+    "affaan-m/ECC": {
+      "skills": 881,
+      "errors": 0
+    },
+    "mattpocock/skills": {
+      "skills": 35,
+      "errors": 0
+    },
+    "JimLiu/baoyu-skills": {
+      "skills": 22,
+      "errors": 0
+    },
+    "davila7/claude-code-templates": {
+      "skills": 872,
+      "errors": 0
+    },
+    "metaskills/skill-design-guide": {
+      "skills": 1,
+      "errors": 0
+    },
+    "can1357/oh-my-pi": {
+      "skills": 15,
+      "errors": 0
+    },
+    "sebastianwessel/skills": {
+      "skills": 7,
+      "errors": 0
+    },
+    "openai/skills": {
+      "skills": 44,
+      "errors": 0
+    },
+    "BbgnsurfTech/claude-skills-collection": {
+      "skills": 1337,
+      "errors": 0
+    }
+  },
+  "input_quality": {
+    "list_id": "seed-list-002",
+    "list_source": "notebooklm-research",
+    "repos_in_list": 29,
+    "repos_found_skills": 25,
+    "repos_empty": 1,
+    "repos_not_found": 0,
+    "repos_error": 0,
+    "hit_rate": 0.862,
+    "skills_per_hit_repo": 212.8,
+    "total_skills": 5320,
+    "outcomes": {
+      "ComposioHQ/awesome-claude-skills": "index-only",
+      "alirezarezvani/claude-skills": "found",
+      "borghei/claude-skills": "found",
+      "wshobson/agents": "found",
+      "Jeffallan/claude-skills": "found",
+      "daymade/claude-code-skills": "found",
+      "julianobarbosa/claude-code-skills": "found",
+      "flonat/claude-research": "found",
+      "deanpeters/Product-Manager-Skills": "found",
+      "johnlindquist/claude": "found",
+      "freshtechbro/claudedesignskills": "found",
+      "posit-dev/skills": "found",
+      "dmccreary/claude-skills": "found",
+      "angakh/claude-skills-starter": "empty",
+      "FlorianBruniaux/claude-code-ultimate-guide": "found",
+      "Omerr/claude-skills": "found",
+      "ykdojo/claude-code-tips": "found",
+      "microsoft/vscode-docs": "found",
+      "affaan-m/ECC": "found",
+      "mattpocock/skills": "found",
+      "JimLiu/baoyu-skills": "found",
+      "obviousworks/Claude-AI-skills-collection-2026": "index-only",
+      "GetBindu/awesome-claude-code-and-skills": "index-only",
+      "davila7/claude-code-templates": "found",
+      "metaskills/skill-design-guide": "found",
+      "can1357/oh-my-pi": "found",
+      "sebastianwessel/skills": "found",
+      "openai/skills": "found",
+      "BbgnsurfTech/claude-skills-collection": "found"
     }
   }
 }
