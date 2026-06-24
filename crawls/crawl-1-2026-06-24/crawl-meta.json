@@ -1,6 +1,6 @@
 {
   "crawl_id": "crawl-1-2026-06-24",
-  "status": "running",
+  "status": "complete",
   "crawl_date": "2026-06-24",
   "queries_run": [
     "crawl-list:seed-list-001.json"
