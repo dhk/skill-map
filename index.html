@@ -462,6 +462,7 @@ function openPanel(d) {
   }
 
   else if(d.type==='skill') {
+    const inList = selectedSkills.has(d.id);
     html += `<div class="pc-type">SKILL · ${(d.domain||'').toUpperCase()}</div>`;
     html += `<div class="pc-name">${d.label}</div>`;
     html += `<div class="pc-arch">by <a href="https://github.com/${d.org}" target="_blank" class="pc-link">${d.org}</a></div>`;
@@ -473,8 +474,14 @@ function openPanel(d) {
       html += `<div class="pc-val">${persona.avatar} ${persona.name} · ${persona.archetype}</div>`;
     }
     html += `<hr class="pc-divider">`;
-    html += `<div class="pc-label">INSTALL</div>`;
-    html += `<div class="pc-val" style="margin-bottom:6px"><span class="pc-tag">${d.id}</span></div>`;
+    html += `<button id="card-add-btn" onclick="toggleSkillFromCard('${d.id.replace(/'/g,"\\'")}')" style="
+      width:100%; font-family:var(--font-mono); font-size:10px; letter-spacing:.08em;
+      padding:9px; border-radius:var(--border-radius); margin-bottom:10px;
+      border:1px solid ${inList ? 'var(--accent)' : 'var(--border)'};
+      background:${inList ? 'var(--accent)' : 'var(--bg2)'};
+      color:${inList ? '#fff' : 'var(--text-dim)'};
+      cursor:pointer; transition:all .15s;
+    ">${inList ? '✓ IN INSTALL LIST' : '＋ ADD TO INSTALL LIST'}</button>`;
     html += `<div class="pc-label">SOURCE</div>`;
     html += `<div class="pc-val"><a href="https://github.com/${d.id}" target="_blank" class="pc-link">github.com/${d.id}</a></div>`;
   }
@@ -482,7 +489,20 @@ function openPanel(d) {
   pc.innerHTML = html;
   document.getElementById('panel').classList.add('open');
   document.getElementById('controls').classList.add('panel-open');
-  document.getElementById('panel-add-btn-wrap').style.display = 'block';
+  // Hide "ADD TO FILTER" for skill cards — they have their own inline toggle
+  document.getElementById('panel-add-btn-wrap').style.display =
+    (d.type === 'skill') ? 'none' : 'block';
+}
+
+function toggleSkillFromCard(id) {
+  if(selectedSkills.has(id)) {
+    selectedSkills.delete(id);
+  } else {
+    selectedSkills.add(id);
+  }
+  // Refresh the card so button state updates
+  if(currentPanelNode && currentPanelNode.id === id) openPanel(currentPanelNode);
+  updateInstallCount();
 }
 
 function closePanel() {
