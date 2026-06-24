@@ -82,12 +82,14 @@ def walk_repo_tree(gh: Github, repo_full_name: str) -> list[dict]:
     results = []
     for item in tree.tree:
         if item.type == "blob" and Path(item.path).name.upper() == "SKILL.MD":
+            is_gemini = item.path.startswith(".gemini/")
             results.append({
                 "repo_full_name": repo_full_name,
                 "file_path": item.path,
                 "file_sha": item.sha,
                 "file_raw_url": f"https://raw.githubusercontent.com/{repo_full_name}/HEAD/{item.path}",
                 "repo_url": f"https://github.com/{repo_full_name}",
+                "file_format": "gemini" if is_gemini else "claude",
             })
     return results
 
@@ -405,7 +407,7 @@ def crawl(
                     prog.advance(task)
                     continue
 
-                new = 0
+                new = gemini_count = 0
                 for f in found:
                     key = f"{f['repo_full_name']}::{f['file_path']}"
                     if key not in seen_keys:
@@ -413,10 +415,14 @@ def crawl(
                         raw_items.append((
                             f["repo_full_name"], f["file_path"], f["file_sha"],
                             f["file_raw_url"], f["repo_url"], repo_type,
+                            f.get("file_format", "claude"),
                         ))
                         new += 1
+                        if f.get("file_format") == "gemini":
+                            gemini_count += 1
                 repo_outcomes[repo_name] = "found" if found else "empty"
-                console.print(f"  [dim]{repo_name}[/dim] [{repo_type}] → [cyan]{new}[/cyan] SKILL.md file(s)")
+                gemini_note = f" ([yellow]{gemini_count} gemini[/yellow])" if gemini_count else ""
+                console.print(f"  [dim]{repo_name}[/dim] [{repo_type}] → [cyan]{new}[/cyan] SKILL.md file(s){gemini_note}")
                 prog.advance(task)
                 time.sleep(0.3)
 
@@ -444,7 +450,7 @@ def crawl(
                             raw_url = f"https://raw.githubusercontent.com/{repo_full_name}/HEAD/{file_path}"
                             raw_items.append((
                                 repo_full_name, file_path, "",
-                                raw_url, item.repository.html_url, "search",
+                                raw_url, item.repository.html_url, "search", "claude",
                             ))
                             new += 1
                     console.print(f"    page {page}: {new} new ({len(raw_items)} total)")
@@ -457,9 +463,12 @@ def crawl(
             queries_run.append(query)
 
     if dry_run:
-        table = Table("Repo", "Type", "File", title=f"Would fetch {len(raw_items)} file(s)")
-        for repo_full_name, file_path, sha, _, _, rtype in raw_items:
-            table.add_row(repo_full_name, rtype, file_path)
+        claude_count = sum(1 for *_, fmt in raw_items if fmt == "claude")
+        gemini_count = sum(1 for *_, fmt in raw_items if fmt == "gemini")
+        table = Table("Repo", "Type", "Format", "File",
+                      title=f"Would fetch {claude_count} claude + {gemini_count} gemini (no-fetch) = {len(raw_items)} total")
+        for repo_full_name, file_path, sha, _, _, rtype, fmt in raw_items:
+            table.add_row(repo_full_name, rtype, fmt, file_path)
         console.print(table)
         return
 
@@ -500,9 +509,10 @@ def crawl(
     ) as prog:
         task = prog.add_task("Fetching…", total=len(raw_items))
 
-        for repo_full_name, file_path, file_sha, raw_url, repo_url, repo_type in raw_items:
+        for repo_full_name, file_path, file_sha, raw_url, repo_url, repo_type, file_format in raw_items:
             key = f"{repo_full_name}::{file_path}"
             is_canonical = repo_type == "canonical"
+            is_gemini = file_format == "gemini"
 
             # SHA-diff skip — bypass for canonical
             if not is_canonical and key in sha_map and sha_map[key] == file_sha and file_sha:
@@ -516,6 +526,7 @@ def crawl(
                 "repo_full_name": repo_full_name,
                 "repo_url": repo_url,
                 "repo_source": repo_type,
+                "file_format": file_format,
                 "repo_description": "",
                 "repo_stars": 0,
                 "repo_forks": 0,
@@ -525,7 +536,7 @@ def crawl(
                 "file_path": file_path,
                 "file_sha": file_sha,
                 "file_raw_url": raw_url,
-                "skill_md_content": "",
+                "skill_md_content": None if is_gemini else "",
                 "fetch_error": None,
             }
 
@@ -543,19 +554,22 @@ def crawl(
                     continue
             result.update(repo_meta_cache[repo_full_name])
 
-            # Raw file fetch
-            time.sleep(1)
-            try:
-                content, error = fetch_raw(raw_url)
-                if error:
-                    result["fetch_error"] = f"file_content: {error}"
+            # Raw file fetch — skip for gemini-format files (content irrelevant for now)
+            if is_gemini:
+                fetched += 1
+            else:
+                time.sleep(1)
+                try:
+                    content, error = fetch_raw(raw_url)
+                    if error:
+                        result["fetch_error"] = f"file_content: {error}"
+                        errors += 1
+                    else:
+                        result["skill_md_content"] = content
+                        fetched += 1
+                except Exception as e:
+                    result["fetch_error"] = f"file_content: {e}"
                     errors += 1
-                else:
-                    result["skill_md_content"] = content
-                    fetched += 1
-            except Exception as e:
-                result["fetch_error"] = f"file_content: {e}"
-                errors += 1
 
             upsert(results, result_index, result)
             write_data(crawl_dir, crawl_id, crawl_date, results, queries_run)
