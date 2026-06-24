@@ -1,0 +1,183 @@
+{
+  "list_id": "seed-list-002",
+  "description": "Discovered repos from NotebookLM research session — see https://notebooklm.google.com/notebook/8fe09581-baab-43a2-82b7-6e35b370de68",
+  "created": "2026-06-24",
+  "strategy": "repo-scoped",
+  "source": "notebooklm-research",
+  "repos": [
+    {
+      "repo": "ComposioHQ/awesome-claude-skills",
+      "type": "index-only",
+      "tier": "high-quality",
+      "notes": "Curated directory of multi-agent integration templates — mine for discovery"
+    },
+    {
+      "repo": "alirezarezvani/claude-skills",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "345 skills — open-source workspace suite with specialized agents"
+    },
+    {
+      "repo": "borghei/claude-skills",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "338 skills — domain-specific operational strategies and compliance templates"
+    },
+    {
+      "repo": "wshobson/agents",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "156 skills — CI/CD, React modernization, infrastructure management"
+    },
+    {
+      "repo": "Jeffallan/claude-skills",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "66 skills — frontend/backend specialists with standardized YAML frontmatter"
+    },
+    {
+      "repo": "daymade/claude-code-skills",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "66 skills — meta-skills, automated skill generation, API routing"
+    },
+    {
+      "repo": "julianobarbosa/claude-code-skills",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "55 skills — DevOps, systems monitoring, Grafana, AKS debugging"
+    },
+    {
+      "repo": "flonat/claude-research",
+      "type": "domain-collection",
+      "tier": "medium",
+      "notes": "50 skills — academic research, LaTeX drafting, PDF parsing"
+    },
+    {
+      "repo": "deanpeters/Product-Manager-Skills",
+      "type": "domain-collection",
+      "tier": "medium",
+      "notes": "49 skills — SaaS financials, product discovery, workflow chaining"
+    },
+    {
+      "repo": "johnlindquist/claude",
+      "type": "personal-mixed",
+      "tier": "medium",
+      "notes": "41 skills — terminal utilities, parallel computing, database transactions"
+    },
+    {
+      "repo": "freshtechbro/claudedesignskills",
+      "type": "domain-collection",
+      "tier": "medium",
+      "notes": "22 skills — Three.js, WebGL/WebGPU, ScrollTrigger animations"
+    },
+    {
+      "repo": "posit-dev/skills",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "22 skills — R, Quarto, Tidyverse, statistical computing"
+    },
+    {
+      "repo": "dmccreary/claude-skills",
+      "type": "domain-collection",
+      "tier": "medium",
+      "notes": "19 skills — educational pedagogical taxonomies, interactive textbooks"
+    },
+    {
+      "repo": "angakh/claude-skills-starter",
+      "type": "methodology",
+      "tier": "medium",
+      "notes": "11 skills — test coverage, smart commits, local project reporting"
+    },
+    {
+      "repo": "FlorianBruniaux/claude-code-ultimate-guide",
+      "type": "embedded",
+      "tier": "medium",
+      "notes": "5 skills — basic testing, DB queries, API design frameworks"
+    },
+    {
+      "repo": "Omerr/claude-skills",
+      "type": "single-skill",
+      "tier": "medium",
+      "notes": "2 skills — terminal automation, presentation outlines"
+    },
+    {
+      "repo": "ykdojo/claude-code-tips",
+      "type": "personal-mixed",
+      "tier": "medium",
+      "notes": "2 skills — parallel subagents, config file audits"
+    },
+    {
+      "repo": "microsoft/vscode-docs",
+      "type": "embedded",
+      "tier": "low",
+      "notes": "1 skill embedded in giant docs repo — SEO validation; likely sparse"
+    },
+    {
+      "repo": "affaan-m/ECC",
+      "type": "personal-mixed",
+      "tier": "medium",
+      "notes": "Hybrid repo with cross-agent compatibility wrappers"
+    },
+    {
+      "repo": "mattpocock/skills",
+      "type": "domain-collection",
+      "tier": "medium",
+      "notes": "Personal/team development workspace — engineering scripts"
+    },
+    {
+      "repo": "JimLiu/baoyu-skills",
+      "type": "domain-collection",
+      "tier": "medium",
+      "notes": "Browser-controlled content generation, web publishing via Bun"
+    },
+    {
+      "repo": "obviousworks/Claude-AI-skills-collection-2026",
+      "type": "index-only",
+      "tier": "medium",
+      "notes": "Curated index of official capabilities and community testing frameworks"
+    },
+    {
+      "repo": "GetBindu/awesome-claude-code-and-skills",
+      "type": "index-only",
+      "tier": "medium",
+      "notes": "Cross-agent indexing framework — mine for discovery"
+    },
+    {
+      "repo": "davila7/claude-code-templates",
+      "type": "domain-collection",
+      "tier": "medium",
+      "notes": "Research synthesis, bioinformatics, citation validation"
+    },
+    {
+      "repo": "metaskills/skill-design-guide",
+      "type": "methodology",
+      "tier": "medium",
+      "notes": "Meta-skill for building skills — 9-step workflow, frontmatter guide"
+    },
+    {
+      "repo": "can1357/oh-my-pi",
+      "type": "personal-mixed",
+      "tier": "medium",
+      "notes": "File-backed capability packs for system prompts"
+    },
+    {
+      "repo": "sebastianwessel/skills",
+      "type": "domain-collection",
+      "tier": "medium",
+      "notes": "Reusable AI agent skills as self-contained capability packages"
+    },
+    {
+      "repo": "openai/skills",
+      "type": "domain-collection",
+      "tier": "low",
+      "notes": "Skill-creator meta-skill templates — OpenAI repo, may not follow SKILL.md convention"
+    },
+    {
+      "repo": "BbgnsurfTech/claude-skills-collection",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "Skills collection including superpowers, mcp-builder, playwright-skill — referenced in MCP catalog"
+    }
+  ]
+}

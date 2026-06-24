@@ -185,7 +185,8 @@ def write_data(crawl_dir: Path, crawl_id: str, crawl_date: str,
 
 
 def write_meta(crawl_dir: Path, crawl_id: str, crawl_date: str, status: str,
-               results: list[dict], errors: int, queries: list[str]) -> None:
+               results: list[dict], errors: int, queries: list[str],
+               quality: dict | None = None) -> None:
     out = {
         "crawl_id": crawl_id,
         "status": status,
@@ -196,6 +197,8 @@ def write_meta(crawl_dir: Path, crawl_id: str, crawl_date: str, status: str,
         "errors": errors,
         "repo_breakdown": _repo_breakdown(results),
     }
+    if quality:
+        out["input_quality"] = quality
     tmp = crawl_dir / "crawl-meta.json.tmp"
     tmp.write_text(json.dumps(out, indent=2))
     tmp.replace(crawl_dir / "crawl-meta.json")
@@ -256,8 +259,40 @@ def git_commit_push(crawl_id: str) -> None:
 # Crawl-list helpers
 # ---------------------------------------------------------------------------
 
-def load_crawl_list(path: Path) -> list[dict]:
-    return json.loads(path.read_text()).get("repos", [])
+def load_crawl_list(path: Path) -> tuple[list[dict], dict]:
+    raw = json.loads(path.read_text())
+    meta = {k: v for k, v in raw.items() if k != "repos"}
+    return raw.get("repos", []), meta
+
+
+def input_quality_metrics(
+    list_meta: dict,
+    repo_outcomes: dict[str, str],  # repo -> "found" | "empty" | "error" | "not_found"
+    results: list[dict],
+) -> dict:
+    """Summarise how useful a crawl input list was."""
+    repos = list(repo_outcomes.keys())
+    n_total = len(repos)
+    n_found = sum(1 for v in repo_outcomes.values() if v == "found")
+    n_empty = sum(1 for v in repo_outcomes.values() if v == "empty")
+    n_not_found = sum(1 for v in repo_outcomes.values() if v == "not_found")
+    n_error = sum(1 for v in repo_outcomes.values() if v == "error")
+    n_skills = sum(1 for r in results if not r.get("fetch_error"))
+    hit_rate = round(n_found / n_total, 3) if n_total else 0
+    skills_per_hit = round(n_skills / n_found, 1) if n_found else 0
+    return {
+        "list_id": list_meta.get("list_id", ""),
+        "list_source": list_meta.get("source", ""),
+        "repos_in_list": n_total,
+        "repos_found_skills": n_found,
+        "repos_empty": n_empty,
+        "repos_not_found": n_not_found,
+        "repos_error": n_error,
+        "hit_rate": hit_rate,
+        "skills_per_hit_repo": skills_per_hit,
+        "total_skills": n_skills,
+        "outcomes": repo_outcomes,
+    }
 
 
 def process_index_only(repo_name: str, crawl_id: str,
@@ -339,8 +374,11 @@ def crawl(
     seen_keys: set[str] = set()
     queries_run: list[str] = []
 
+    repo_outcomes: dict[str, str] = {}
+    list_meta: dict = {}
+
     if crawl_list:
-        entries = load_crawl_list(crawl_list)
+        entries, list_meta = load_crawl_list(crawl_list)
         all_repos = {e["repo"] for e in entries}
         console.print(f"Mode: [bold]repo-scoped[/bold] — {len(entries)} entries from [cyan]{crawl_list.name}[/cyan]")
 
@@ -353,6 +391,7 @@ def crawl(
 
                 if repo_type == "index-only":
                     process_index_only(repo_name, crawl_id, all_repos, dry_run)
+                    repo_outcomes[repo_name] = "index-only"
                     prog.advance(task)
                     time.sleep(0.3)
                     continue
@@ -360,6 +399,8 @@ def crawl(
                 try:
                     found = walk_repo_tree(gh, repo_name)
                 except GithubException as e:
+                    status_code = getattr(e, "status", 0)
+                    repo_outcomes[repo_name] = "not_found" if status_code == 404 else "error"
                     console.print(f"  [red]Error scanning {repo_name}: {e}[/red]")
                     prog.advance(task)
                     continue
@@ -374,6 +415,7 @@ def crawl(
                             f["file_raw_url"], f["repo_url"], repo_type,
                         ))
                         new += 1
+                repo_outcomes[repo_name] = "found" if found else "empty"
                 console.print(f"  [dim]{repo_name}[/dim] [{repo_type}] → [cyan]{new}[/cyan] SKILL.md file(s)")
                 prog.advance(task)
                 time.sleep(0.3)
@@ -438,7 +480,8 @@ def crawl(
     def handle_interrupt(sig, frame):
         console.print("\n[yellow]Interrupted — saving state…[/yellow]")
         write_data(crawl_dir, crawl_id, crawl_date, results, queries_run)
-        write_meta(crawl_dir, crawl_id, crawl_date, "interrupted", results, errors, queries_run)
+        quality = input_quality_metrics(list_meta, repo_outcomes, results) if list_meta else None
+        write_meta(crawl_dir, crawl_id, crawl_date, "interrupted", results, errors, queries_run, quality)
         sys.exit(1)
 
     signal.signal(signal.SIGINT, handle_interrupt)
@@ -522,8 +565,9 @@ def crawl(
     # -----------------------------------------------------------------------
     # Finalise
     # -----------------------------------------------------------------------
+    quality = input_quality_metrics(list_meta, repo_outcomes, results) if list_meta else None
     write_data(crawl_dir, crawl_id, crawl_date, results, queries_run)
-    write_meta(crawl_dir, crawl_id, crawl_date, "complete", results, errors, queries_run)
+    write_meta(crawl_dir, crawl_id, crawl_date, "complete", results, errors, queries_run, quality)
     write_summary(crawl_dir, crawl_id, crawl_date, results, errors, queries_run)
 
     unique_repos = len({r["repo_full_name"] for r in results})
@@ -537,6 +581,9 @@ def crawl(
     table.add_row("Fetched (new/changed)", str(fetched))
     table.add_row("Skipped (unchanged SHA)", str(skipped))
     table.add_row("Errors", str(errors))
+    if quality:
+        table.add_row("Hit rate", f"{quality['hit_rate']:.0%} ({quality['repos_found_skills']}/{quality['repos_in_list']} repos)")
+        table.add_row("Skills per hit repo", str(quality["skills_per_hit_repo"]))
     table.add_row("Output", str(crawl_dir))
     console.print(table)
 
