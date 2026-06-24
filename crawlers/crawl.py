@@ -93,9 +93,18 @@ def fetch_repo_meta(session: requests.Session, repo_full_name: str) -> dict:
     }
 
 
+_raw_session: requests.Session | None = None
+
+def get_raw_session() -> requests.Session:
+    global _raw_session
+    if _raw_session is None:
+        _raw_session = requests.Session()
+        # raw.githubusercontent.com rejects Bearer/token auth via proxy — use no auth
+    return _raw_session
+
+
 def fetch_file_content(session: requests.Session, raw_url: str) -> tuple[str, str | None]:
-    resp = session.get(raw_url)
-    check_rate_limit(resp)
+    resp = get_raw_session().get(raw_url)
     if resp.status_code != 200:
         return "", f"HTTP {resp.status_code}"
     return resp.text, None
