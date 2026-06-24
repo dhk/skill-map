@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""GitHub SKILL.md crawler."""
+"""GitHub SKILL.md crawler — uses PyGithub, httpx, rich, typer, tenacity."""
 
-import argparse
+from __future__ import annotations
+
 import json
 import os
 import re
@@ -10,14 +11,28 @@ import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 
-import requests
+import httpx
+import typer
+from github import Auth, Github, GithubException, RateLimitExceededException
+from github.ContentFile import ContentFile
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, MofNCompleteColumn
+from rich.table import Table
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
+# ---------------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 CRAWLS_DIR = BASE_DIR / "crawls"
 DISCOVERY_DIR = BASE_DIR / "crawlers" / "discovery-queue"
 
-QUERIES = [
+console = Console()
+app = typer.Typer(help="Crawl GitHub for SKILL.md files.", add_completion=False)
+
+GLOBAL_QUERIES = [
     "filename:SKILL.md",
     "filename:SKILL.md claude",
     "filename:SKILL.md anthropic",
@@ -25,102 +40,101 @@ QUERIES = [
     "filename:SKILLS.md",
 ]
 
-RATE_LIMIT_BUFFER = 10
+
+# ---------------------------------------------------------------------------
+# GitHub helpers — PyGithub handles auth, rate-limit headers, pagination
+# ---------------------------------------------------------------------------
+
+def make_gh(token: str) -> Github:
+    return Github(auth=Auth.Token(token), per_page=100)
 
 
-def get_token() -> str:
-    token = os.environ.get("GITHUB_TOKEN")
-    if not token:
-        print("Error: GITHUB_TOKEN environment variable is not set.", file=sys.stderr)
-        sys.exit(1)
-    return token
-
-
-def make_session(token: str) -> requests.Session:
-    s = requests.Session()
-    s.headers.update({
-        "Authorization": f"token {token}",
-        "Accept": "application/vnd.github.v3+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-    })
-    return s
-
-
-def check_rate_limit(resp: requests.Response) -> None:
-    remaining = int(resp.headers.get("X-RateLimit-Remaining", 999))
-    reset_ts = int(resp.headers.get("X-RateLimit-Reset", 0))
-    if remaining <= RATE_LIMIT_BUFFER and reset_ts:
-        wait = max(0, reset_ts - int(time.time())) + 2
-        print(f"\n  [Rate limit low ({remaining} remaining). Sleeping {wait}s until reset...]")
+def wait_for_rate_limit(gh: Github, resource: str = "search") -> None:
+    rl = gh.get_rate_limit()
+    core = getattr(rl, resource)
+    if core.remaining <= 5:
+        reset = core.reset.replace(tzinfo=timezone.utc)
+        wait = max(0, (reset - datetime.now(timezone.utc)).total_seconds()) + 2
+        console.print(f"  [yellow]Rate limit low ({core.remaining} remaining). Sleeping {wait:.0f}s…[/yellow]")
         time.sleep(wait)
 
 
-def search_code(session: requests.Session, query: str) -> list[dict]:
+@retry(
+    stop=stop_after_attempt(4),
+    wait=wait_exponential(multiplier=2, min=2, max=30),
+    retry=retry_if_exception_type(RateLimitExceededException),
+    reraise=True,
+)
+def search_code_page(gh: Github, query: str, page: int):
+    wait_for_rate_limit(gh, "search")
+    return gh.search_code(query).get_page(page)
+
+
+def walk_repo_tree(gh: Github, repo_full_name: str) -> list[dict]:
+    """Return all SKILL.md blobs with their git SHA via the trees API."""
+    try:
+        repo = gh.get_repo(repo_full_name)
+        tree = repo.get_git_tree(sha="HEAD", recursive=True)
+    except GithubException as e:
+        if e.status == 404:
+            return []
+        raise
     results = []
-    page = 1
-    per_page = 100
-    while True:
-        resp = session.get(
-            "https://api.github.com/search/code",
-            params={"q": query, "per_page": per_page, "page": page},
-        )
-        check_rate_limit(resp)
-        if resp.status_code == 422:
-            print(f"  [Query '{query}' returned 422 — skipping]")
-            break
-        resp.raise_for_status()
-        data = resp.json()
-        items = data.get("items", [])
-        results.extend(items)
-        if len(items) < per_page or len(results) >= data.get("total_count", 0):
-            break
-        page += 1
-        time.sleep(1)
+    for item in tree.tree:
+        if item.type == "blob" and Path(item.path).name.upper() == "SKILL.MD":
+            results.append({
+                "repo_full_name": repo_full_name,
+                "file_path": item.path,
+                "file_sha": item.sha,
+                "file_raw_url": f"https://raw.githubusercontent.com/{repo_full_name}/HEAD/{item.path}",
+                "repo_url": f"https://github.com/{repo_full_name}",
+            })
     return results
 
 
-def fetch_repo_meta(session: requests.Session, repo_full_name: str) -> dict:
-    resp = session.get(f"https://api.github.com/repos/{repo_full_name}")
-    check_rate_limit(resp)
-    resp.raise_for_status()
-    d = resp.json()
+def get_repo_meta(gh: Github, repo_full_name: str) -> dict:
+    repo = gh.get_repo(repo_full_name)
     return {
-        "repo_description": d.get("description") or "",
-        "repo_stars": d.get("stargazers_count", 0),
-        "repo_forks": d.get("forks_count", 0),
-        "repo_topics": d.get("topics", []),
-        "repo_last_pushed": d.get("pushed_at") or "",
-        "repo_owner_type": d.get("owner", {}).get("type") or "",
+        "repo_description": repo.description or "",
+        "repo_stars": repo.stargazers_count,
+        "repo_forks": repo.forks_count,
+        "repo_topics": repo.get_topics(),
+        "repo_last_pushed": repo.pushed_at.isoformat() if repo.pushed_at else "",
+        "repo_owner_type": repo.owner.type,
     }
 
 
-_raw_session: requests.Session | None = None
+# ---------------------------------------------------------------------------
+# Raw file fetch — unauthenticated (auth causes 404 via proxy on raw.gh.com)
+# ---------------------------------------------------------------------------
 
-def get_raw_session() -> requests.Session:
-    global _raw_session
-    if _raw_session is None:
-        # raw.githubusercontent.com rejects Bearer/token auth via proxy — use no auth
-        _raw_session = requests.Session()
-    return _raw_session
-
-
-def fetch_file_content(raw_url: str) -> tuple[str, str | None]:
-    resp = get_raw_session().get(raw_url)
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=1, max=8),
+    retry=retry_if_exception_type(httpx.TransportError),
+    reraise=True,
+)
+def fetch_raw(url: str) -> tuple[str, str | None]:
+    resp = httpx.get(url, timeout=30, follow_redirects=True)
     if resp.status_code != 200:
         return "", f"HTTP {resp.status_code}"
     return resp.text, None
 
 
+# ---------------------------------------------------------------------------
+# Crawl directory helpers
+# ---------------------------------------------------------------------------
+
 def next_crawl_n() -> int:
     CRAWLS_DIR.mkdir(parents=True, exist_ok=True)
-    existing = [d.name for d in CRAWLS_DIR.iterdir() if d.is_dir() and re.match(r"crawl-\d+-", d.name)]
+    existing = [d.name for d in CRAWLS_DIR.iterdir()
+                if d.is_dir() and re.match(r"crawl-\d+-", d.name)]
     if not existing:
         return 1
-    nums = [int(re.match(r"crawl-(\d+)-", n).group(1)) for n in existing]
-    return max(nums) + 1
+    return max(int(re.match(r"crawl-(\d+)-", n).group(1)) for n in existing) + 1
 
 
-def find_today_crawl_dir(crawl_date: str) -> Path | None:
+def find_today_dir(crawl_date: str) -> Path | None:
     if not CRAWLS_DIR.exists():
         return None
     for d in CRAWLS_DIR.iterdir():
@@ -129,443 +143,92 @@ def find_today_crawl_dir(crawl_date: str) -> Path | None:
     return None
 
 
-def load_existing_results(crawl_dir: Path) -> tuple[list[dict], dict[str, str]]:
-    """Returns (results, sha_map) where sha_map is key -> file_sha."""
-    data_file = crawl_dir / "data.json"
-    if not data_file.exists():
+def load_existing(crawl_dir: Path) -> tuple[list[dict], dict[str, str]]:
+    """(results, sha_map{key->sha}) — sha_map only for clean (no-error) entries."""
+    path = crawl_dir / "data.json"
+    if not path.exists():
         return [], {}
-    with open(data_file) as f:
-        data = json.load(f)
+    data = json.loads(path.read_text())
     results = data.get("results", [])
     sha_map = {
         f"{r['repo_full_name']}::{r['file_path']}": r.get("file_sha", "")
-        for r in results
-        if not r.get("fetch_error")
+        for r in results if not r.get("fetch_error")
     }
     return results, sha_map
 
 
-def write_data_json(crawl_dir: Path, crawl_id: str, crawl_date: str,
-                    results: list[dict], queries: list[str]) -> None:
-    unique_repos = len({r["repo_full_name"] for r in results})
-    repo_breakdown = {}
+def _repo_breakdown(results: list[dict]) -> dict:
+    bd: dict[str, dict] = {}
     for r in results:
-        repo_breakdown.setdefault(r["repo_full_name"], {"skills": 0, "errors": 0})
+        bd.setdefault(r["repo_full_name"], {"skills": 0, "errors": 0})
         if r.get("fetch_error"):
-            repo_breakdown[r["repo_full_name"]]["errors"] += 1
+            bd[r["repo_full_name"]]["errors"] += 1
         else:
-            repo_breakdown[r["repo_full_name"]]["skills"] += 1
+            bd[r["repo_full_name"]]["skills"] += 1
+    return bd
+
+
+def write_data(crawl_dir: Path, crawl_id: str, crawl_date: str,
+               results: list[dict], queries: list[str]) -> None:
     out = {
         "crawl_id": crawl_id,
         "crawl_date": crawl_date,
         "crawl_queries": queries,
-        "total_repos": unique_repos,
+        "total_repos": len({r["repo_full_name"] for r in results}),
         "total_files": len(results),
-        "repo_breakdown": repo_breakdown,
+        "repo_breakdown": _repo_breakdown(results),
         "results": results,
     }
     tmp = crawl_dir / "data.json.tmp"
-    with open(tmp, "w") as f:
-        json.dump(out, f, indent=2)
+    tmp.write_text(json.dumps(out, indent=2))
     tmp.replace(crawl_dir / "data.json")
 
 
-def write_meta_json(crawl_dir: Path, crawl_id: str, crawl_date: str, status: str,
-                    results: list[dict], errors: int, queries: list[str]) -> None:
-    unique_repos = len({r["repo_full_name"] for r in results})
-    repo_breakdown = {}
-    for r in results:
-        repo_breakdown.setdefault(r["repo_full_name"], {"skills": 0, "errors": 0})
-        if r.get("fetch_error"):
-            repo_breakdown[r["repo_full_name"]]["errors"] += 1
-        else:
-            repo_breakdown[r["repo_full_name"]]["skills"] += 1
+def write_meta(crawl_dir: Path, crawl_id: str, crawl_date: str, status: str,
+               results: list[dict], errors: int, queries: list[str]) -> None:
     out = {
         "crawl_id": crawl_id,
         "status": status,
         "crawl_date": crawl_date,
         "queries_run": queries,
-        "total_repos": unique_repos,
+        "total_repos": len({r["repo_full_name"] for r in results}),
         "total_files": len(results),
         "errors": errors,
-        "repo_breakdown": repo_breakdown,
+        "repo_breakdown": _repo_breakdown(results),
     }
     tmp = crawl_dir / "crawl-meta.json.tmp"
-    with open(tmp, "w") as f:
-        json.dump(out, f, indent=2)
+    tmp.write_text(json.dumps(out, indent=2))
     tmp.replace(crawl_dir / "crawl-meta.json")
 
 
-def write_summary_md(crawl_dir: Path, crawl_id: str, crawl_date: str,
-                     results: list[dict], errors: int, queries: list[str]) -> None:
+def write_summary(crawl_dir: Path, crawl_id: str, crawl_date: str,
+                  results: list[dict], errors: int, queries: list[str]) -> None:
+    ok = [r for r in results if not r.get("fetch_error")]
     unique_repos = len({r["repo_full_name"] for r in results})
     lines = [
         f"# SKILL.md Crawl: {crawl_id}",
         "",
         f"**Date:** {crawl_date}  ",
         f"**Total repos:** {unique_repos}  ",
-        f"**Total files:** {len(results)}  ",
+        f"**Total files:** {len(ok)}  ",
         f"**Errors:** {errors}  ",
         f"**Queries:** {', '.join(f'`{q}`' for q in queries)}  ",
         "",
-        "| Repo | Source | Stars | Last Pushed | File Path | Description |",
-        "|------|--------|-------|-------------|-----------|-------------|",
+        "| Repo | Type | Stars | Last Pushed | File Path | Description |",
+        "|------|------|-------|-------------|-----------|-------------|",
     ]
-    for r in results:
-        if r.get("fetch_error"):
-            continue
+    for r in ok:
         repo = f"[{r['repo_full_name']}]({r['repo_url']})"
-        source = r.get("repo_source", "")
+        rtype = r.get("repo_source", "")
         stars = r.get("repo_stars", 0)
         pushed = (r.get("repo_last_pushed") or "")[:10]
         path = r.get("file_path", "")
-        desc = (r.get("repo_description") or "").replace("|", "\\|")
-        lines.append(f"| {repo} | {source} | {stars} | {pushed} | `{path}` | {desc} |")
-    with open(crawl_dir / "summary.md", "w") as f:
-        f.write("\n".join(lines) + "\n")
+        desc = (r.get("repo_description") or "").replace("|", "\\|")[:80]
+        lines.append(f"| {repo} | {rtype} | {stars} | {pushed} | `{path}` | {desc} |")
+    (crawl_dir / "summary.md").write_text("\n".join(lines) + "\n")
 
 
-def git_commit_and_push(crawl_id: str) -> None:
-    import subprocess
-    rel = f"crawls/{crawl_id}/"
-    cmds = [
-        ["git", "-C", str(BASE_DIR), "add", rel],
-        ["git", "-C", str(BASE_DIR), "commit", "-m", f"feat: {crawl_id} — SKILL.md sweep"],
-        ["git", "-C", str(BASE_DIR), "push"],
-    ]
-    for cmd in cmds:
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        if result.returncode != 0:
-            print(f"  git error: {result.stderr.strip()}", file=sys.stderr)
-            return
-    print("  [Committed and pushed]")
-
-
-# ---------------------------------------------------------------------------
-# Repo-type handlers
-# ---------------------------------------------------------------------------
-
-def walk_repo_tree(session: requests.Session, repo: str) -> list[dict]:
-    """Return list of {file_path, file_sha, file_raw_url, repo_url} for all SKILL.md blobs."""
-    resp = session.get(f"https://api.github.com/repos/{repo}/git/trees/HEAD?recursive=1")
-    check_rate_limit(resp)
-    if resp.status_code == 404:
-        return []
-    resp.raise_for_status()
-    results = []
-    for item in resp.json().get("tree", []):
-        path = item.get("path", "")
-        if item.get("type") == "blob" and Path(path).name.upper() == "SKILL.MD":
-            results.append({
-                "repo_full_name": repo,
-                "file_path": path,
-                "file_sha": item.get("sha", ""),
-                "file_raw_url": f"https://raw.githubusercontent.com/{repo}/HEAD/{path}",
-                "repo_url": f"https://github.com/{repo}",
-            })
-    return results
-
-
-def process_index_only(session: requests.Session, repo: str, crawl_id: str,
-                       existing_repos: set[str], dry_run: bool) -> list[dict]:
-    """Fetch README, extract GitHub repo links, write discovery queue."""
-    print(f"  [index-only] Parsing {repo} for outbound repo links...")
-    candidates = []
-    for readme_path in ("README.md", "readme.md", "README"):
-        resp = get_raw_session().get(
-            f"https://raw.githubusercontent.com/{repo}/HEAD/{readme_path}"
-        )
-        if resp.status_code == 200:
-            links = re.findall(
-                r"https://github\.com/([a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)",
-                resp.text,
-            )
-            for link in links:
-                # Strip trailing punctuation / fragments
-                link = re.sub(r"[/#\)\]\'\">].*$", "", link)
-                parts = link.split("/")
-                if len(parts) == 2 and link not in existing_repos and link != repo:
-                    candidates.append(link)
-            break
-
-    # Deduplicate
-    seen = set()
-    unique = []
-    for c in candidates:
-        if c not in seen:
-            seen.add(c)
-            unique.append(c)
-
-    print(f"    → {len(unique)} new candidate repo(s) discovered")
-
-    if not dry_run and unique:
-        DISCOVERY_DIR.mkdir(parents=True, exist_ok=True)
-        out_path = DISCOVERY_DIR / f"{crawl_id}-from-{repo.replace('/', '_')}.json"
-        with open(out_path, "w") as f:
-            json.dump({
-                "crawl_id": crawl_id,
-                "source_repo": repo,
-                "source_type": "index-only",
-                "discovered": [{"repo": r, "status": "pending"} for r in unique],
-            }, f, indent=2)
-        print(f"    → Written to {out_path.relative_to(BASE_DIR)}")
-
-    return unique
-
-
-# ---------------------------------------------------------------------------
-# Crawl list loading
-# ---------------------------------------------------------------------------
-
-def load_crawl_list(path: Path) -> list[dict]:
-    with open(path) as f:
-        data = json.load(f)
-    return data.get("repos", [])
-
-
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Crawl GitHub for SKILL.md files.")
-    parser.add_argument("--dry-run", action="store_true", help="Search only; no fetches, no writes, no commits.")
-    parser.add_argument("--crawl-list", type=Path, help="JSON crawl-list file for repo-scoped mode.")
-    args = parser.parse_args()
-
-    token = get_token()
-    session = make_session(token)
-
-    crawl_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-
-    existing_dir = find_today_crawl_dir(crawl_date)
-    if existing_dir:
-        crawl_id = existing_dir.name
-        crawl_dir = existing_dir
-        print(f"Resuming existing crawl: {crawl_id}")
-    else:
-        n = next_crawl_n()
-        crawl_id = f"crawl-{n}-{crawl_date}"
-        crawl_dir = CRAWLS_DIR / crawl_id
-        crawl_dir.mkdir(parents=True, exist_ok=True)
-        print(f"Starting new crawl: {crawl_id}")
-
-    if args.dry_run:
-        print("\n-- DRY RUN MODE --")
-
-    # -----------------------------------------------------------------------
-    # Discovery / search phase
-    # -----------------------------------------------------------------------
-    print("\nSearching GitHub...")
-
-    # raw_items: list of (repo_full_name, file_path, file_sha, raw_url, repo_url, repo_source)
-    raw_items: list[tuple] = []
-    seen_keys: set[str] = set()
-    queries_run: list[str] = []
-
-    if args.crawl_list:
-        repo_entries = load_crawl_list(args.crawl_list)
-        all_repos = {e["repo"] for e in repo_entries}
-        print(f"  Mode: repo-scoped ({len(repo_entries)} entries from {args.crawl_list.name})")
-
-        for entry in repo_entries:
-            repo = entry["repo"]
-            repo_type = entry.get("type", "domain-collection")
-            tier = entry.get("tier", "medium")
-
-            # index-only: mine for discovery, don't crawl for skills
-            if repo_type == "index-only":
-                process_index_only(session, repo, crawl_id, all_repos, args.dry_run)
-                time.sleep(0.5)
-                continue
-
-            print(f"  Scanning tree: {repo} [{repo_type}]")
-            try:
-                found = walk_repo_tree(session, repo)
-            except requests.HTTPError as e:
-                print(f"    [Error: {e}]")
-                continue
-
-            for f in found:
-                key = f"{f['repo_full_name']}::{f['file_path']}"
-                if key not in seen_keys:
-                    seen_keys.add(key)
-                    raw_items.append((
-                        f["repo_full_name"], f["file_path"], f["file_sha"],
-                        f["file_raw_url"], f["repo_url"], repo_type,
-                    ))
-            print(f"    → {len(found)} SKILL.md file(s)")
-            time.sleep(0.5)
-
-        queries_run = [f"crawl-list:{args.crawl_list.name}"]
-
-    else:
-        # Global search mode
-        for query in QUERIES:
-            print(f"  Query: {query}")
-            try:
-                items = search_code(session, query)
-            except requests.HTTPError as e:
-                print(f"  [Search error: {e}]")
-                continue
-            queries_run.append(query)
-            new_count = 0
-            for item in items:
-                repo = item.get("repository", {})
-                repo_full_name = repo.get("full_name", "")
-                file_path = item.get("path", "")
-                key = f"{repo_full_name}::{file_path}"
-                if key in seen_keys:
-                    continue
-                seen_keys.add(key)
-                raw_url = item.get("html_url", "").replace(
-                    "https://github.com/", "https://raw.githubusercontent.com/"
-                ).replace("/blob/", "/")
-                repo_url = repo.get("html_url", f"https://github.com/{repo_full_name}")
-                raw_items.append((repo_full_name, file_path, "", raw_url, repo_url, "search"))
-                new_count += 1
-            print(f"    → {new_count} new results ({len(raw_items)} total unique)")
-            time.sleep(1)
-
-    if args.dry_run:
-        print(f"\n[Dry run] Would fetch {len(raw_items)} file(s):")
-        for repo_full_name, file_path, sha, raw_url, repo_url, source in raw_items:
-            sha_label = f" sha:{sha[:7]}" if sha else ""
-            print(f"  [{source}] {repo_full_name} / {file_path}{sha_label}")
-        return
-
-    # -----------------------------------------------------------------------
-    # Fetch phase — with SHA-diff incrementality
-    # -----------------------------------------------------------------------
-    results, sha_map = load_existing_results(crawl_dir)
-    errors = sum(1 for r in results if r.get("fetch_error"))
-
-    # Index existing results for fast lookup and in-place update
-    result_index: dict[str, int] = {
-        f"{r['repo_full_name']}::{r['file_path']}": i
-        for i, r in enumerate(results)
-    }
-
-    def handle_interrupt(sig, frame):
-        print("\n\n[Interrupted — saving state...]")
-        write_data_json(crawl_dir, crawl_id, crawl_date, results, queries_run)
-        write_meta_json(crawl_dir, crawl_id, crawl_date, "interrupted", results, errors, queries_run)
-        sys.exit(1)
-
-    signal.signal(signal.SIGINT, handle_interrupt)
-    signal.signal(signal.SIGTERM, handle_interrupt)
-
-    write_meta_json(crawl_dir, crawl_id, crawl_date, "running", results, errors, queries_run)
-
-    skipped = 0
-    fetched = 0
-    processed = 0
-
-    print(f"\nFetching file contents for {len(raw_items)} unique result(s)...")
-
-    for repo_full_name, file_path, file_sha, raw_url, repo_url, repo_source in raw_items:
-        key = f"{repo_full_name}::{file_path}"
-        is_canonical = repo_source == "canonical"
-
-        # SHA-diff skip: if we have a clean result with the same SHA, skip unless canonical
-        if not is_canonical and key in sha_map and sha_map[key] == file_sha and file_sha:
-            skipped += 1
-            continue
-
-        print(f"Crawling {repo_full_name} ({repo_url})...")
-
-        result: dict = {
-            "repo_full_name": repo_full_name,
-            "repo_url": repo_url,
-            "repo_source": repo_source,
-            "repo_description": "",
-            "repo_stars": 0,
-            "repo_forks": 0,
-            "repo_topics": [],
-            "repo_last_pushed": "",
-            "repo_owner_type": "",
-            "file_path": file_path,
-            "file_sha": file_sha,
-            "file_raw_url": raw_url,
-            "skill_md_content": "",
-            "fetch_error": None,
-        }
-
-        # Fetch repo metadata (reuse from existing result if SHA unchanged and not canonical)
-        existing_idx = result_index.get(key)
-        if existing_idx is not None and not is_canonical:
-            existing = results[existing_idx]
-            result.update({k: existing[k] for k in (
-                "repo_description", "repo_stars", "repo_forks",
-                "repo_topics", "repo_last_pushed", "repo_owner_type",
-            ) if k in existing})
-        else:
-            try:
-                meta = fetch_repo_meta(session, repo_full_name)
-                result.update(meta)
-            except Exception as e:
-                result["fetch_error"] = f"repo_meta: {e}"
-                errors += 1
-                print(f"  ↳ fetch error (repo meta: {e})")
-                _upsert_result(results, result_index, result)
-                processed += 1
-                write_data_json(crawl_dir, crawl_id, crawl_date, results, queries_run)
-                write_meta_json(crawl_dir, crawl_id, crawl_date, "running", results, errors, queries_run)
-                if processed % 10 == 0:
-                    _print_tally(results, errors, skipped)
-                continue
-
-        # Fetch file content
-        time.sleep(1)
-        try:
-            content, error = fetch_file_content(raw_url)
-            if error:
-                result["fetch_error"] = f"file_content: {error}"
-                errors += 1
-                print(f"  ↳ fetch error ({error})")
-            else:
-                result["skill_md_content"] = content
-                fetched += 1
-                sha_label = f" (sha changed)" if key in sha_map and sha_map[key] != file_sha else ""
-                print(f"  ↳ fetched{sha_label}")
-        except Exception as e:
-            result["fetch_error"] = f"file_content: {e}"
-            errors += 1
-            print(f"  ↳ fetch error ({e})")
-
-        _upsert_result(results, result_index, result)
-        processed += 1
-
-        write_data_json(crawl_dir, crawl_id, crawl_date, results, queries_run)
-        write_meta_json(crawl_dir, crawl_id, crawl_date, "running", results, errors, queries_run)
-
-        if processed % 10 == 0:
-            _print_tally(results, errors, skipped)
-
-    # -----------------------------------------------------------------------
-    # Finalise
-    # -----------------------------------------------------------------------
-    write_data_json(crawl_dir, crawl_id, crawl_date, results, queries_run)
-    write_meta_json(crawl_dir, crawl_id, crawl_date, "complete", results, errors, queries_run)
-    write_summary_md(crawl_dir, crawl_id, crawl_date, results, errors, queries_run)
-
-    unique_repos = len({r["repo_full_name"] for r in results})
-    skills_found = sum(1 for r in results if not r.get("fetch_error"))
-
-    print(f"""
-✓ Crawl complete: {crawl_id}
-  Repos processed: {unique_repos}
-  Skills found:    {skills_found}
-  Fetched (new/changed): {fetched}
-  Skipped (unchanged):   {skipped}
-  Errors:          {errors}
-  Output:          {crawl_dir}/
-""")
-
-    git_commit_and_push(crawl_id)
-
-
-def _upsert_result(results: list[dict], index: dict[str, int], result: dict) -> None:
+def upsert(results: list[dict], index: dict[str, int], result: dict) -> None:
     key = f"{result['repo_full_name']}::{result['file_path']}"
     if key in index:
         results[index[key]] = result
@@ -574,11 +237,311 @@ def _upsert_result(results: list[dict], index: dict[str, int], result: dict) -> 
         results.append(result)
 
 
-def _print_tally(results: list[dict], errors: int, skipped: int) -> None:
+def git_commit_push(crawl_id: str) -> None:
+    import subprocess
+    rel = f"crawls/{crawl_id}/"
+    for cmd in [
+        ["git", "-C", str(BASE_DIR), "add", rel],
+        ["git", "-C", str(BASE_DIR), "commit", "-m", f"feat: {crawl_id} — SKILL.md sweep"],
+        ["git", "-C", str(BASE_DIR), "push"],
+    ]:
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        if r.returncode != 0:
+            console.print(f"  [red]git: {r.stderr.strip()}[/red]")
+            return
+    console.print("  [green]Committed and pushed[/green]")
+
+
+# ---------------------------------------------------------------------------
+# Crawl-list helpers
+# ---------------------------------------------------------------------------
+
+def load_crawl_list(path: Path) -> list[dict]:
+    return json.loads(path.read_text()).get("repos", [])
+
+
+def process_index_only(repo_name: str, crawl_id: str,
+                       all_repos: set[str], dry_run: bool) -> list[str]:
+    """Fetch README, extract GitHub links, write discovery queue."""
+    candidates: list[str] = []
+    for readme in ("README.md", "readme.md", "README"):
+        try:
+            resp = httpx.get(
+                f"https://raw.githubusercontent.com/{repo_name}/HEAD/{readme}",
+                timeout=15, follow_redirects=True,
+            )
+            if resp.status_code == 200:
+                links = re.findall(
+                    r"https://github\.com/([a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)",
+                    resp.text,
+                )
+                seen: set[str] = set()
+                for link in links:
+                    link = re.sub(r"[/#\)\]\'\">].*$", "", link)
+                    if "/" in link and link not in all_repos and link != repo_name and link not in seen:
+                        seen.add(link)
+                        candidates.append(link)
+                break
+        except httpx.RequestError:
+            continue
+
+    console.print(f"    → [cyan]{len(candidates)}[/cyan] new candidate(s)")
+    if not dry_run and candidates:
+        DISCOVERY_DIR.mkdir(parents=True, exist_ok=True)
+        out = DISCOVERY_DIR / f"{crawl_id}-from-{repo_name.replace('/', '_')}.json"
+        out.write_text(json.dumps({
+            "crawl_id": crawl_id,
+            "source_repo": repo_name,
+            "discovered": [{"repo": r, "status": "pending"} for r in candidates],
+        }, indent=2))
+    return candidates
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+@app.command()
+def crawl(
+    crawl_list: Optional[Path] = typer.Option(None, "--crawl-list", help="JSON crawl-list file for repo-scoped mode."),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Search/plan only — no fetches, writes, or commits."),
+):
+    token = os.environ.get("GITHUB_TOKEN")
+    if not token:
+        console.print("[red]Error: GITHUB_TOKEN is not set.[/red]")
+        raise typer.Exit(1)
+
+    gh = make_gh(token)
+    crawl_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    existing_dir = find_today_dir(crawl_date)
+    if existing_dir:
+        crawl_id = existing_dir.name
+        crawl_dir = existing_dir
+        console.print(f"[yellow]Resuming[/yellow] existing crawl: [bold]{crawl_id}[/bold]")
+    else:
+        n = next_crawl_n()
+        crawl_id = f"crawl-{n}-{crawl_date}"
+        crawl_dir = CRAWLS_DIR / crawl_id
+        crawl_dir.mkdir(parents=True, exist_ok=True)
+        console.print(f"[green]Starting[/green] new crawl: [bold]{crawl_id}[/bold]")
+
+    if dry_run:
+        console.print("\n[bold yellow]── DRY RUN ──[/bold yellow]")
+
+    # -----------------------------------------------------------------------
+    # Discovery phase
+    # -----------------------------------------------------------------------
+    console.rule("Discovery")
+
+    # raw_items: (repo_full_name, file_path, file_sha, raw_url, repo_url, repo_type)
+    raw_items: list[tuple] = []
+    seen_keys: set[str] = set()
+    queries_run: list[str] = []
+
+    if crawl_list:
+        entries = load_crawl_list(crawl_list)
+        all_repos = {e["repo"] for e in entries}
+        console.print(f"Mode: [bold]repo-scoped[/bold] — {len(entries)} entries from [cyan]{crawl_list.name}[/cyan]")
+
+        with Progress(SpinnerColumn(), TextColumn("{task.description}"), console=console) as prog:
+            task = prog.add_task("Scanning repos…", total=len(entries))
+            for entry in entries:
+                repo_name = entry["repo"]
+                repo_type = entry.get("type", "domain-collection")
+                prog.update(task, description=f"[dim]{repo_name}[/dim] [{repo_type}]")
+
+                if repo_type == "index-only":
+                    process_index_only(repo_name, crawl_id, all_repos, dry_run)
+                    prog.advance(task)
+                    time.sleep(0.3)
+                    continue
+
+                try:
+                    found = walk_repo_tree(gh, repo_name)
+                except GithubException as e:
+                    console.print(f"  [red]Error scanning {repo_name}: {e}[/red]")
+                    prog.advance(task)
+                    continue
+
+                new = 0
+                for f in found:
+                    key = f"{f['repo_full_name']}::{f['file_path']}"
+                    if key not in seen_keys:
+                        seen_keys.add(key)
+                        raw_items.append((
+                            f["repo_full_name"], f["file_path"], f["file_sha"],
+                            f["file_raw_url"], f["repo_url"], repo_type,
+                        ))
+                        new += 1
+                console.print(f"  [dim]{repo_name}[/dim] [{repo_type}] → [cyan]{new}[/cyan] SKILL.md file(s)")
+                prog.advance(task)
+                time.sleep(0.3)
+
+        queries_run = [f"crawl-list:{crawl_list.name}"]
+
+    else:
+        # Global search via PyGithub
+        console.print("Mode: [bold]global search[/bold]")
+        for query in GLOBAL_QUERIES:
+            console.print(f"  Query: [cyan]{query}[/cyan]")
+            try:
+                page = 0
+                while True:
+                    wait_for_rate_limit(gh, "search")
+                    items = search_code_page(gh, query, page)
+                    if not items:
+                        break
+                    new = 0
+                    for item in items:
+                        repo_full_name = item.repository.full_name
+                        file_path = item.path
+                        key = f"{repo_full_name}::{file_path}"
+                        if key not in seen_keys:
+                            seen_keys.add(key)
+                            raw_url = f"https://raw.githubusercontent.com/{repo_full_name}/HEAD/{file_path}"
+                            raw_items.append((
+                                repo_full_name, file_path, "",
+                                raw_url, item.repository.html_url, "search",
+                            ))
+                            new += 1
+                    console.print(f"    page {page}: {new} new ({len(raw_items)} total)")
+                    if len(items) < 100:
+                        break
+                    page += 1
+                    time.sleep(1)
+            except GithubException as e:
+                console.print(f"  [red]Search error: {e}[/red]")
+            queries_run.append(query)
+
+    if dry_run:
+        table = Table("Repo", "Type", "File", title=f"Would fetch {len(raw_items)} file(s)")
+        for repo_full_name, file_path, sha, _, _, rtype in raw_items:
+            table.add_row(repo_full_name, rtype, file_path)
+        console.print(table)
+        return
+
+    # -----------------------------------------------------------------------
+    # Fetch phase
+    # -----------------------------------------------------------------------
+    console.rule("Fetching")
+
+    results, sha_map = load_existing(crawl_dir)
+    result_index: dict[str, int] = {
+        f"{r['repo_full_name']}::{r['file_path']}": i for i, r in enumerate(results)
+    }
+    errors = sum(1 for r in results if r.get("fetch_error"))
+
+    # Cache repo meta per-repo so we don't re-fetch for every file in the same repo
+    repo_meta_cache: dict[str, dict] = {}
+
+    def handle_interrupt(sig, frame):
+        console.print("\n[yellow]Interrupted — saving state…[/yellow]")
+        write_data(crawl_dir, crawl_id, crawl_date, results, queries_run)
+        write_meta(crawl_dir, crawl_id, crawl_date, "interrupted", results, errors, queries_run)
+        sys.exit(1)
+
+    signal.signal(signal.SIGINT, handle_interrupt)
+    signal.signal(signal.SIGTERM, handle_interrupt)
+
+    write_meta(crawl_dir, crawl_id, crawl_date, "running", results, errors, queries_run)
+
+    skipped = fetched = 0
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        console=console,
+    ) as prog:
+        task = prog.add_task("Fetching…", total=len(raw_items))
+
+        for repo_full_name, file_path, file_sha, raw_url, repo_url, repo_type in raw_items:
+            key = f"{repo_full_name}::{file_path}"
+            is_canonical = repo_type == "canonical"
+
+            # SHA-diff skip — bypass for canonical
+            if not is_canonical and key in sha_map and sha_map[key] == file_sha and file_sha:
+                skipped += 1
+                prog.advance(task)
+                continue
+
+            prog.update(task, description=f"[dim]{repo_full_name}[/dim] / {Path(file_path).parent}")
+
+            result: dict = {
+                "repo_full_name": repo_full_name,
+                "repo_url": repo_url,
+                "repo_source": repo_type,
+                "repo_description": "",
+                "repo_stars": 0,
+                "repo_forks": 0,
+                "repo_topics": [],
+                "repo_last_pushed": "",
+                "repo_owner_type": "",
+                "file_path": file_path,
+                "file_sha": file_sha,
+                "file_raw_url": raw_url,
+                "skill_md_content": "",
+                "fetch_error": None,
+            }
+
+            # Repo meta — cached per repo, re-fetched for canonical
+            if is_canonical or repo_full_name not in repo_meta_cache:
+                try:
+                    repo_meta_cache[repo_full_name] = get_repo_meta(gh, repo_full_name)
+                except GithubException as e:
+                    result["fetch_error"] = f"repo_meta: {e}"
+                    errors += 1
+                    upsert(results, result_index, result)
+                    write_data(crawl_dir, crawl_id, crawl_date, results, queries_run)
+                    write_meta(crawl_dir, crawl_id, crawl_date, "running", results, errors, queries_run)
+                    prog.advance(task)
+                    continue
+            result.update(repo_meta_cache[repo_full_name])
+
+            # Raw file fetch
+            time.sleep(1)
+            try:
+                content, error = fetch_raw(raw_url)
+                if error:
+                    result["fetch_error"] = f"file_content: {error}"
+                    errors += 1
+                else:
+                    result["skill_md_content"] = content
+                    fetched += 1
+            except Exception as e:
+                result["fetch_error"] = f"file_content: {e}"
+                errors += 1
+
+            upsert(results, result_index, result)
+            write_data(crawl_dir, crawl_id, crawl_date, results, queries_run)
+            write_meta(crawl_dir, crawl_id, crawl_date, "running", results, errors, queries_run)
+            prog.advance(task)
+
+    # -----------------------------------------------------------------------
+    # Finalise
+    # -----------------------------------------------------------------------
+    write_data(crawl_dir, crawl_id, crawl_date, results, queries_run)
+    write_meta(crawl_dir, crawl_id, crawl_date, "complete", results, errors, queries_run)
+    write_summary(crawl_dir, crawl_id, crawl_date, results, errors, queries_run)
+
     unique_repos = len({r["repo_full_name"] for r in results})
-    skills = sum(1 for r in results if not r.get("fetch_error"))
-    print(f"[{unique_repos} repos | {skills} skills | {errors} errors | {skipped} skipped]")
+    skills_found = sum(1 for r in results if not r.get("fetch_error"))
+
+    table = Table(title=f"✓ Crawl complete: {crawl_id}")
+    table.add_column("Metric")
+    table.add_column("Value", justify="right")
+    table.add_row("Repos", str(unique_repos))
+    table.add_row("Skills found", str(skills_found))
+    table.add_row("Fetched (new/changed)", str(fetched))
+    table.add_row("Skipped (unchanged SHA)", str(skipped))
+    table.add_row("Errors", str(errors))
+    table.add_row("Output", str(crawl_dir))
+    console.print(table)
+
+    git_commit_push(crawl_id)
 
 
 if __name__ == "__main__":
-    main()
+    app()
