@@ -1,15 +1,69 @@
 {
   "crawl_id": "crawl-1-2026-06-24",
-  "status": "complete",
+  "status": "running",
   "crawl_date": "2026-06-24",
   "queries_run": [
-    "filename:SKILL.md",
-    "filename:SKILL.md claude",
-    "filename:SKILL.md anthropic",
-    "filename:skill.md",
-    "filename:SKILLS.md"
+    "crawl-list:seed-list-001.json"
   ],
   "total_repos": 14,
   "total_files": 190,
-  "errors": 0
+  "errors": 0,
+  "repo_breakdown": {
+    "anthropics/skills": {
+      "skills": 18,
+      "errors": 0
+    },
+    "foxj77/claude-code-skills": {
+      "skills": 19,
+      "errors": 0
+    },
+    "QuestForTech-Investments/claude-code-skills": {
+      "skills": 24,
+      "errors": 0
+    },
+    "obra/superpowers": {
+      "skills": 14,
+      "errors": 0
+    },
+    "muratcankoylan/Agent-Skills-for-Context-Engineering": {
+      "skills": 21,
+      "errors": 0
+    },
+    "kepano/obsidian-skills": {
+      "skills": 5,
+      "errors": 0
+    },
+    "AgriciDaniel/claude-seo": {
+      "skills": 33,
+      "errors": 0
+    },
+    "coreyhaines31/marketingskills": {
+      "skills": 45,
+      "errors": 0
+    },
+    "199-biotechnologies/claude-deep-research-skill": {
+      "skills": 1,
+      "errors": 0
+    },
+    "github/spec-kit": {
+      "skills": 1,
+      "errors": 0
+    },
+    "dhk/tricorder": {
+      "skills": 1,
+      "errors": 0
+    },
+    "dhk/adventures-in-ai": {
+      "skills": 6,
+      "errors": 0
+    },
+    "dhk/captains-log-repo": {
+      "skills": 1,
+      "errors": 0
+    },
+    "dhk/ivy-archive": {
+      "skills": 1,
+      "errors": 0
+    }
+  }
 }
