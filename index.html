@@ -155,8 +155,16 @@ body { background:var(--bg2); color:var(--text); font-family:var(--font-mono); o
 }
 #copy-btn:hover { opacity:.85; }
 #copy-btn:disabled { opacity:.4; cursor:default; }
-.sl-domain { font-family:var(--font-mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); padding:10px 16px 4px; border-top:1px solid var(--border-light); margin-top:4px; }
+.sl-domain {
+  font-family:var(--font-mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text-dim); padding:10px 16px 4px; border-top:1px solid var(--border-light);
+  margin-top:4px; cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+  user-select:none;
+}
+.sl-domain:hover { color:var(--text); }
 .sl-domain:first-child { border-top:none; margin-top:0; }
+.sl-domain-chevron { font-size:8px; transition:transform .15s; }
+.sl-domain.collapsed .sl-domain-chevron { transform:rotate(-90deg); }
 .sl-row {
   display:flex; align-items:flex-start; gap:10px; padding:7px 16px;
   cursor:pointer; transition:background .12s; border-left:3px solid transparent;
@@ -190,7 +198,7 @@ svg { display:block; }
 
 <div id="header">
   <h1>The Skill Map</h1>
-  <div class="sub">1,121 skills · 53 orgs · 13 domains · 5 uncharted territories · Agent Skills Ecosystem 2026</div>
+  <div class="sub"><span id="live-count">1,121</span> skills · 53 orgs · 13 domains · 5 uncharted territories &nbsp;·&nbsp; <a href="https://www.dhk.io" target="_blank" style="color:var(--text-dim);text-decoration:none;letter-spacing:.08em">dhk.io</a> &nbsp;·&nbsp; <a href="https://github.com/dhk/skill-map" target="_blank" style="color:var(--text-dim);text-decoration:none;letter-spacing:.08em">github.com/dhk/skill-map</a> &nbsp;·&nbsp; last crawled June 2026</div>
 </div>
 
 <div id="controls">
@@ -479,6 +487,13 @@ function openSkillsListPanel() {
   document.getElementById('panel-add-btn-wrap').style.display = 'none';
 }
 
+// ── LIVE COUNTER ───────────────────────────────────────────────
+const TOTAL_SKILLS = GRAPH.nodes.filter(d=>d.type==='skill'||d.type==='dhk').length;
+function setLiveCount(n, suffix) {
+  const el = document.getElementById('live-count');
+  if(el) el.textContent = (n === null ? TOTAL_SKILLS : n) + (suffix ? ' '+suffix : '');
+}
+
 // ── VIEWS ──────────────────────────────────────────────────────
 function setView(mode) {
   document.querySelectorAll('#controls .btn').forEach(b=>b.classList.remove('active'));
@@ -490,7 +505,7 @@ function setView(mode) {
     if(mode==='orgs') return d.type==='org'||d.type==='domain'?1:.08;
     if(mode==='skills') return d.type==='skill'||d.type==='domain'?1:.1;
     if(mode==='dhk') return d.type==='dhk'||d.type==='dhk_hub'?1:.06;
-    if(mode==='ns') return .06;
+    if(mode==='ns') return .08;
     return 1;
   });
   nsClouds.style('opacity', d=>{
@@ -498,28 +513,60 @@ function setView(mode) {
     return .15;
   });
   link.style('opacity', d=>{
-    if(mode==='dhk') return d.type==='dhk'?.5:.03;
-    if(mode==='ns') return .02;
-    if(mode==='orgs') return d.type==='org'?.3:.04;
-    if(mode==='skills') return d.type==='domain'?.2:.04;
-    return d.type==='org'?.15:.08;
+    if(mode==='dhk') return d.type==='dhk'?.6:.04;
+    if(mode==='ns') return .04;
+    if(mode==='orgs') return d.type==='org'?.4:.12;
+    if(mode==='skills') return d.type==='domain'?.25:.15;
+    if(mode==='domains') return d.type==='domain'?.3:.1;
+    return d.type==='org'?.2:.12;
   });
-  document.getElementById('stat-n').textContent = mode==='dhk'?'8 DHK SKILLS':mode==='ns'?'5 UNCHARTED ZONES':'226 NODES';
+
+  if(mode==='ns') {
+    // Zoom to the uncharted territory clouds
+    const nsPositions = nsNodes.map(d=>({x:d.x,y:d.y})).filter(p=>p.x&&p.y);
+    if(nsPositions.length) {
+      const xs=nsPositions.map(p=>p.x), ys=nsPositions.map(p=>p.y);
+      const x0=Math.min(...xs)-120, x1=Math.max(...xs)+120;
+      const y0=Math.min(...ys)-80,  y1=Math.max(...ys)+80;
+      const scale=Math.min(W/(x1-x0), H/(y1-y0), 1.4)*.8;
+      const tx=W/2-scale*(x0+x1)/2, ty=H/2-scale*(y0+y1)/2;
+      svg.transition().duration(700).call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(scale));
+    }
+    document.getElementById('stat-n').textContent='5 UNCHARTED ZONES';
+    setLiveCount(0, 'published skills');
+  } else if(mode==='dhk') {
+    document.getElementById('stat-n').textContent='8 DHK SKILLS';
+    setLiveCount(8);
+  } else {
+    const visible = GRAPH.nodes.filter(d=>{
+      if(mode==='all') return d.type==='skill'||d.type==='dhk';
+      if(mode==='domains') return false;
+      if(mode==='orgs') return false;
+      if(mode==='skills') return d.type==='skill'||d.type==='dhk';
+      return d.type==='skill'||d.type==='dhk';
+    }).length;
+    document.getElementById('stat-n').textContent = '229 NODES';
+    setLiveCount(visible || null);
+  }
 }
 
 // ── SEARCH ─────────────────────────────────────────────────────
+// Searches: label, description, domain, org/owner, repo name, full id (owner/repo)
 function filterNodes(q) {
   q = q.toLowerCase().trim();
   if(!q){
     node.style('opacity',1);
     nsClouds.style('opacity',1);
-    link.style('opacity',d=>d.type==='org'?.15:.08);
-    document.getElementById('stat-n').textContent='226 NODES';
+    link.style('opacity',d=>d.type==='org'?.2:.12);
+    document.getElementById('stat-n').textContent='229 NODES';
+    setLiveCount(null);
     return;
   }
   const matched=new Set();
   GRAPH.nodes.forEach(d=>{
-    const t=`${d.label} ${d.description||''} ${d.domain||''} ${d.org||''} ${d.title||''}`.toLowerCase();
+    // id is "owner/repo" for skills — split to match owner name alone
+    const owner = d.id ? d.id.split('/')[0] : '';
+    const t=`${d.label} ${d.description||''} ${d.domain||''} ${d.org||''} ${d.title||''} ${d.id||''} ${owner}`.toLowerCase();
     if(t.includes(q)) matched.add(d.id);
   });
   const linked=new Set();
@@ -535,7 +582,9 @@ function filterNodes(q) {
     const t=typeof l.target==='object'?l.target.id:l.target;
     return(matched.has(s)||matched.has(t))?.4:.02;
   });
+  const skillMatches = GRAPH.nodes.filter(d=>(d.type==='skill'||d.type==='dhk')&&matched.has(d.id)).length;
   document.getElementById('stat-n').textContent=`${matched.size} MATCHED`;
+  setLiveCount(skillMatches, 'matched');
 }
 
 setTimeout(()=>{
@@ -619,14 +668,18 @@ function applyFilter() {
     return (showIds.has(s) && showIds.has(t)) ? .4 : .02;
   });
   nsClouds.style('opacity', .04);
+  const skillsShown = GRAPH.nodes.filter(d=>(d.type==='skill'||d.type==='dhk')&&showIds.has(d.id)).length;
   document.getElementById('stat-n').textContent = `${showIds.size} FILTERED`;
+  setLiveCount(skillsShown, 'filtered');
   closePanel();
 }
 
 function clearFilter() {
   pendingFilter.clear();
   document.getElementById('filter-bar').style.display = 'none';
+  document.getElementById('search').value = '';
   setView('all');
+  setLiveCount(null);
 }
 
 // ── SKILLS LIST / INSTALL ───────────────────────────────────────
@@ -655,10 +708,15 @@ function openSkillsList(filterDomain) {
     <div id="sl-body">`;
 
   Object.keys(byDomain).sort().forEach(dom => {
-    html += `<div class="sl-domain" data-domain="${dom}">${dom}</div>`;
+    const count = byDomain[dom].length;
+    const domKey = dom.replace(/[^a-z0-9]/gi,'_');
+    html += `<div class="sl-domain" id="sl-dom-${domKey}" data-domain="${dom}" onclick="toggleDomain('${domKey}')">
+      <span>${dom} <span style="opacity:.5">(${count})</span></span>
+      <span class="sl-domain-chevron">▼</span>
+    </div>`;
     byDomain[dom].sort((a,b)=>a.label.localeCompare(b.label)).forEach(s => {
       const sel = selectedSkills.has(s.id) ? 'selected' : '';
-      html += `<div class="sl-row ${sel}" data-id="${s.id}" data-label="${s.label}" data-org="${s.org||'dhk'}" data-domain="${dom}" onclick="toggleSkill(this, '${s.id}')">
+      html += `<div class="sl-row ${sel}" data-id="${s.id}" data-label="${s.label}" data-org="${s.org||'dhk'}" data-domain="${dom}" data-domkey="${domKey}" onclick="toggleSkill(this, '${s.id}')">
         <div class="sl-check">${selectedSkills.has(s.id) ? '✓' : ''}</div>
         <div>
           <div class="sl-name">${s.label}</div>
@@ -724,13 +782,22 @@ function selectAllSkills() {
 function filterSkillsList(q) {
   q = q.toLowerCase();
   document.querySelectorAll('.sl-row').forEach(row => {
-    const text = (row.dataset.label + ' ' + row.dataset.org + ' ' + row.dataset.domain).toLowerCase();
+    const text = (row.dataset.label + ' ' + row.dataset.org + ' ' + row.dataset.domain + ' ' + row.dataset.id).toLowerCase();
     row.style.display = text.includes(q) ? '' : 'none';
   });
   document.querySelectorAll('.sl-domain').forEach(d => {
     const dom = d.dataset.domain;
     const anyVisible = [...document.querySelectorAll(`.sl-row[data-domain="${dom}"]`)].some(r => r.style.display !== 'none');
     d.style.display = anyVisible ? '' : 'none';
+  });
+}
+
+function toggleDomain(domKey) {
+  const header = document.getElementById('sl-dom-'+domKey);
+  if(!header) return;
+  const collapsed = header.classList.toggle('collapsed');
+  document.querySelectorAll(`.sl-row[data-domkey="${domKey}"]`).forEach(row => {
+    row.style.display = collapsed ? 'none' : '';
   });
 }
 
