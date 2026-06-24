@@ -1,0 +1,15 @@
+{
+  "crawl_id": "crawl-1-2026-06-24",
+  "status": "running",
+  "crawl_date": "2026-06-24",
+  "queries_run": [
+    "filename:SKILL.md",
+    "filename:SKILL.md claude",
+    "filename:SKILL.md anthropic",
+    "filename:skill.md",
+    "filename:SKILLS.md"
+  ],
+  "total_repos": 200,
+  "total_files": 200,
+  "errors": 200
+}
