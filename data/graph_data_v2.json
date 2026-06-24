@@ -94,7 +94,7 @@
       "type": "domain",
       "color": "#14b8a6",
       "size": 13,
-      "count": 25
+      "count": 27
     },
     {
       "id": "domain:Product Management",
@@ -2145,6 +2145,34 @@
       "description": "One of the largest enterprise verticals for AI adoption. Zero published skills in the corpus. HIPAA, HL7, FHIR, prior auth, formulary — all dark matter.",
       "who_lives_here": "Health tech engineers, clinical informaticists, prior auth automation builders",
       "dhk_claim": "DHK works in healthcare AI at Infinitus. This is the next territory."
+    },
+    {
+      "id": "org:Xquik-dev",
+      "label": "Xquik-dev",
+      "type": "org",
+      "color": "#64748b",
+      "size": 8,
+      "count": 2
+    },
+    {
+      "id": "Xquik-dev/x-twitter-scraper",
+      "label": "x-twitter-scraper",
+      "type": "skill",
+      "color": "#14b8a6",
+      "size": 5,
+      "org": "Xquik-dev",
+      "domain": "Marketing & Content",
+      "description": "Tweet search, profile tweets, follower export, media, posting, replies, and MCP workflows"
+    },
+    {
+      "id": "Xquik-dev/tweetclaw",
+      "label": "tweetclaw",
+      "type": "skill",
+      "color": "#14b8a6",
+      "size": 5,
+      "org": "Xquik-dev",
+      "domain": "Marketing & Content",
+      "description": "Post tweets, replies, and DMs; search, monitor, and run giveaways through OpenClaw"
     }
   ],
   "links": [
@@ -3657,6 +3685,26 @@
       "source": "dhk/weekly-reset",
       "target": "dhk:hub",
       "type": "dhk"
+    },
+    {
+      "source": "Xquik-dev/x-twitter-scraper",
+      "target": "domain:Marketing & Content",
+      "type": "domain"
+    },
+    {
+      "source": "Xquik-dev/x-twitter-scraper",
+      "target": "org:Xquik-dev",
+      "type": "org"
+    },
+    {
+      "source": "Xquik-dev/tweetclaw",
+      "target": "domain:Marketing & Content",
+      "type": "domain"
+    },
+    {
+      "source": "Xquik-dev/tweetclaw",
+      "target": "org:Xquik-dev",
+      "type": "org"
     }
   ]
 }
