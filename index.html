@@ -281,6 +281,7 @@ svg { display:block; }
       <th>ORG</th>
       <th>DOMAIN</th>
       <th>DESCRIPTION</th>
+      <th style="width:120px"></th>
     </tr></thead>
     <tbody id="lv-body"></tbody>
   </table>
@@ -815,14 +816,43 @@ function renderList(q) {
     const color = d.type==='dhk' ? '#16a34a' : (domainColors[d.domain] || '#64748b');
     const desc = (d.description||'').length > 100 ? d.description.slice(0,100)+'…' : (d.description||'');
     const org = d.type==='dhk' ? 'dhk' : (d.org||'');
-    return `<tr onclick="openPanel(GRAPH.nodes.find(n=>n.id==='${d.id.replace(/'/g,"\\'")}'))">
+    const safeId = d.id.replace(/'/g,"\\'");
+    const inList = selectedSkills.has(d.id);
+    return `<tr onclick="openPanel(GRAPH.nodes.find(n=>n.id==='${safeId}'))">
       <td><span class="lv-dot" style="background:${color}"></span></td>
       <td><div class="lv-name">${d.label}</div><div class="lv-org">${org}</div></td>
       <td class="lv-domain">${d.domain||'Session Layer'}</td>
       <td class="lv-desc">${desc}</td>
+      <td onclick="event.stopPropagation()">
+        <button id="lvbtn-${d.id.replace(/[^a-z0-9]/gi,'_')}" onclick="toggleSkillInList('${safeId}', this)" style="
+          font-family:var(--font-mono); font-size:9px; letter-spacing:.06em;
+          padding:4px 8px; border-radius:var(--border-radius); cursor:pointer; white-space:nowrap;
+          border:1px solid ${inList ? 'var(--accent)' : 'var(--border)'};
+          background:${inList ? 'var(--accent)' : 'var(--bg)'};
+          color:${inList ? '#fff' : 'var(--text-dim)'};
+          transition:all .12s;
+        ">${inList ? '✓ IN LIST' : '＋ ADD'}</button>
+      </td>
     </tr>`;
   }).join('');
   setLiveCount(rows.length, q ? 'matched' : null);
+}
+
+function toggleSkillInList(id, btn) {
+  if(selectedSkills.has(id)) {
+    selectedSkills.delete(id);
+    btn.textContent = '＋ ADD';
+    btn.style.background = 'var(--bg)';
+    btn.style.borderColor = 'var(--border)';
+    btn.style.color = 'var(--text-dim)';
+  } else {
+    selectedSkills.add(id);
+    btn.textContent = '✓ IN LIST';
+    btn.style.background = 'var(--accent)';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = '#fff';
+  }
+  updateInstallCount();
 }
 
 // ── SEARCH ─────────────────────────────────────────────────────
