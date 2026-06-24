@@ -558,7 +558,7 @@ def crawl(
             if is_gemini:
                 fetched += 1
             else:
-                time.sleep(1)
+                time.sleep(0.1)
                 try:
                     content, error = fetch_raw(raw_url)
                     if error:
