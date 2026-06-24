@@ -53,6 +53,12 @@
       "notes": "SMS, ASO, email, ads, popups, copywriting, CRO, pricing and more"
     },
     {
+      "repo": "BbgnsurfTech/claude-skills-collection",
+      "type": "domain-collection",
+      "tier": "high-quality",
+      "notes": "Includes superpowers, mcp-builder, skill-creator, playwright-skill, ios-simulator-skill"
+    },
+    {
       "repo": "199-biotechnologies/claude-deep-research-skill",
       "type": "single-skill",
       "tier": "medium",
