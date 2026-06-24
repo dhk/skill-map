@@ -1,10 +1,10 @@
 # The Skill Map
 
-![Last Updated](https://img.shields.io/badge/updated-June%202026-9aabb8) ![Skills](https://img.shields.io/badge/skills-1%2C121-16a34a) ![Domains](https://img.shields.io/badge/domains-13-3b82f6) ![Stars](https://img.shields.io/github/stars/dhk/skill-map?style=flat&color=9aabb8)
+![Last Updated](https://img.shields.io/badge/updated-June%202026-9aabb8) ![Skills](https://img.shields.io/badge/skills-4%2C902-16a34a) ![Repos](https://img.shields.io/badge/repos-39-3b82f6) ![Stars](https://img.shields.io/github/stars/dhk/skill-map?style=flat&color=9aabb8)
 
-**A living reference for the Agent Skills ecosystem: 1,121 skills, 13 domains, 5 uncharted territories**
+**A living reference for the Agent Skills ecosystem: 4,902 skills across 39 repositories, 13 domains, 5 uncharted territories**
 
-An interactive force-directed map of every published skill in the Claude / agent ecosystem, built from crawling [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) in June 2026. Thirteen domains. Fifty-three organizations. And five territories with zero published skills: the negative space that tells you where the ecosystem is missing something.
+An interactive force-directed graph of the Claude / agent skills ecosystem, backed by a crawler that has swept 39 public repositories and collected 4,902 SKILL.md files in full. Thirteen domains. Hundreds of organizations. And five territories with zero published skills: the negative space that tells you where the ecosystem is missing something.
 
 [**Open the map →**](https://dhk.github.io/skill-map)
 
@@ -12,7 +12,7 @@ An interactive force-directed map of every published skill in the Claude / agent
 
 ## The Session Layer Gap
 
-Every published skill in this corpus does one thing: it makes Claude better at a task. Write better Terraform. Review smarter contracts. Generate cleaner dbt models. The task layer is well-covered: 1,121 skills and counting.
+Every published skill in this corpus does one thing: it makes Claude better at a task. Write better Terraform. Review smarter contracts. Generate cleaner dbt models. The task layer is well-covered: 4,902 skills and counting.
 
 Nobody has published a skill for how to run a day.
 
