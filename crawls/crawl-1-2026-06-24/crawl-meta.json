@@ -1,6 +1,6 @@
 {
   "crawl_id": "crawl-1-2026-06-24",
-  "status": "running",
+  "status": "complete",
   "crawl_date": "2026-06-24",
   "queries_run": [
     "filename:SKILL.md",
@@ -9,7 +9,7 @@
     "filename:skill.md",
     "filename:SKILLS.md"
   ],
-  "total_repos": 386,
-  "total_files": 402,
-  "errors": 402
+  "total_repos": 399,
+  "total_files": 580,
+  "errors": 580
 }
