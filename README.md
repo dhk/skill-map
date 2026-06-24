@@ -51,9 +51,26 @@ Five territories with zero published skills as of June 2026:
 
 ## Data Sources
 
-- **Skills corpus:** [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills): 1,121 skills across 53 organizations
-- **Crawled:** June 2026
-- **Graph:** 229 nodes, 306 links
+The map is built from two layers of data:
+
+**Interactive graph** (what you see at the link above): 1,121 skills across 53 organizations, sourced from [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) — a curated index of published agent skills. 229 nodes, 306 links, 13 domains.
+
+**Raw corpus** (powering future analysis): a GitHub crawler has swept 39 repositories and collected 4,902 Claude-format SKILL.md files in full — plus 418 Gemini-format files catalogued by metadata. That's the actual content of the skills, not just the index entries.
+
+### Largest repositories in the corpus
+
+| Repository | Skills | Stars | Focus |
+|---|---|---|---|
+| [BbgnsurfTech/claude-skills-collection](https://github.com/BbgnsurfTech/claude-skills-collection) | 1,337 | 20 | Comprehensive skills + plugins collection |
+| [affaan-m/ECC](https://github.com/affaan-m/ECC) | 881 | 221k | Agent harness + skills, multi-framework |
+| [davila7/claude-code-templates](https://github.com/davila7/claude-code-templates) | 872 | 28k | Claude Code configuration and templates |
+| [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) | 345 | 19k | 337 skills across 30+ agent types |
+| [borghei/claude-skills](https://github.com/borghei/claude-skills) | 340 | 300 | 338 skills across 16 domains |
+| [wshobson/agents](https://github.com/wshobson/agents) | 156 | 37k | Multi-harness plugin marketplace |
+
+- **Crawler:** [`crawlers/crawl.py`](crawlers/crawl.py) — repo-scoped git tree walks, SHA-diff incrementality, source quality metrics
+- **Seed lists:** [`crawlers/crawl-lists/`](crawlers/crawl-lists/) — curated and research-sourced repo lists
+- **Last crawled:** June 2026
 - **Domains:** 13 (Developer Tools, Security & Auth, Frontend & Design, Agent Orchestration, Data & Databases, DevOps & Infrastructure, Testing & Debugging, Document Creation, Marketing & Content, Product Management, Finance & Payments, Communication, Media & Creative)
 - **Negative space:** 5 uncharted territories identified by DHK
 
