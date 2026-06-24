@@ -8,8 +8,8 @@
     "filename:skill.md",
     "filename:SKILLS.md"
   ],
-  "total_repos": 385,
-  "total_files": 390,
+  "total_repos": 386,
+  "total_files": 402,
   "results": [
     {
       "repo_full_name": "eze-is/web-access",
@@ -6246,6 +6246,198 @@
       "repo_owner_type": "Organization",
       "file_path": "Skills.md",
       "file_raw_url": "https://raw.githubusercontent.com/Gates-Of-Time/eqemu-wiki/f37853f02474d4d018efd2b5e54c5600196de639/Skills.md",
+      "skill_md_content": "",
+      "fetch_error": "file_content: HTTP 404"
+    },
+    {
+      "repo_full_name": "anthropics/skills",
+      "repo_url": "https://github.com/anthropics/skills",
+      "repo_description": "Public repository for Agent Skills",
+      "repo_stars": 154691,
+      "repo_forks": 18218,
+      "repo_topics": [
+        "agent-skills"
+      ],
+      "repo_last_pushed": "2026-06-09T20:35:19Z",
+      "repo_owner_type": "Organization",
+      "file_path": "skills/algorithmic-art/SKILL.md",
+      "file_raw_url": "https://raw.githubusercontent.com/anthropics/skills/HEAD/skills/algorithmic-art/SKILL.md",
+      "skill_md_content": "",
+      "fetch_error": "file_content: HTTP 404"
+    },
+    {
+      "repo_full_name": "anthropics/skills",
+      "repo_url": "https://github.com/anthropics/skills",
+      "repo_description": "Public repository for Agent Skills",
+      "repo_stars": 154691,
+      "repo_forks": 18218,
+      "repo_topics": [
+        "agent-skills"
+      ],
+      "repo_last_pushed": "2026-06-09T20:35:19Z",
+      "repo_owner_type": "Organization",
+      "file_path": "skills/brand-guidelines/SKILL.md",
+      "file_raw_url": "https://raw.githubusercontent.com/anthropics/skills/HEAD/skills/brand-guidelines/SKILL.md",
+      "skill_md_content": "",
+      "fetch_error": "file_content: HTTP 404"
+    },
+    {
+      "repo_full_name": "anthropics/skills",
+      "repo_url": "https://github.com/anthropics/skills",
+      "repo_description": "Public repository for Agent Skills",
+      "repo_stars": 154691,
+      "repo_forks": 18218,
+      "repo_topics": [
+        "agent-skills"
+      ],
+      "repo_last_pushed": "2026-06-09T20:35:19Z",
+      "repo_owner_type": "Organization",
+      "file_path": "skills/canvas-design/SKILL.md",
+      "file_raw_url": "https://raw.githubusercontent.com/anthropics/skills/HEAD/skills/canvas-design/SKILL.md",
+      "skill_md_content": "",
+      "fetch_error": "file_content: HTTP 404"
+    },
+    {
+      "repo_full_name": "anthropics/skills",
+      "repo_url": "https://github.com/anthropics/skills",
+      "repo_description": "Public repository for Agent Skills",
+      "repo_stars": 154691,
+      "repo_forks": 18218,
+      "repo_topics": [
+        "agent-skills"
+      ],
+      "repo_last_pushed": "2026-06-09T20:35:19Z",
+      "repo_owner_type": "Organization",
+      "file_path": "skills/claude-api/SKILL.md",
+      "file_raw_url": "https://raw.githubusercontent.com/anthropics/skills/HEAD/skills/claude-api/SKILL.md",
+      "skill_md_content": "",
+      "fetch_error": "file_content: HTTP 404"
+    },
+    {
+      "repo_full_name": "anthropics/skills",
+      "repo_url": "https://github.com/anthropics/skills",
+      "repo_description": "Public repository for Agent Skills",
+      "repo_stars": 154691,
+      "repo_forks": 18218,
+      "repo_topics": [
+        "agent-skills"
+      ],
+      "repo_last_pushed": "2026-06-09T20:35:19Z",
+      "repo_owner_type": "Organization",
+      "file_path": "skills/doc-coauthoring/SKILL.md",
+      "file_raw_url": "https://raw.githubusercontent.com/anthropics/skills/HEAD/skills/doc-coauthoring/SKILL.md",
+      "skill_md_content": "",
+      "fetch_error": "file_content: HTTP 404"
+    },
+    {
+      "repo_full_name": "anthropics/skills",
+      "repo_url": "https://github.com/anthropics/skills",
+      "repo_description": "Public repository for Agent Skills",
+      "repo_stars": 154691,
+      "repo_forks": 18218,
+      "repo_topics": [
+        "agent-skills"
+      ],
+      "repo_last_pushed": "2026-06-09T20:35:19Z",
+      "repo_owner_type": "Organization",
+      "file_path": "skills/docx/SKILL.md",
+      "file_raw_url": "https://raw.githubusercontent.com/anthropics/skills/HEAD/skills/docx/SKILL.md",
+      "skill_md_content": "",
+      "fetch_error": "file_content: HTTP 404"
+    },
+    {
+      "repo_full_name": "anthropics/skills",
+      "repo_url": "https://github.com/anthropics/skills",
+      "repo_description": "Public repository for Agent Skills",
+      "repo_stars": 154692,
+      "repo_forks": 18218,
+      "repo_topics": [
+        "agent-skills"
+      ],
+      "repo_last_pushed": "2026-06-09T20:35:19Z",
+      "repo_owner_type": "Organization",
+      "file_path": "skills/frontend-design/SKILL.md",
+      "file_raw_url": "https://raw.githubusercontent.com/anthropics/skills/HEAD/skills/frontend-design/SKILL.md",
+      "skill_md_content": "",
+      "fetch_error": "file_content: HTTP 404"
+    },
+    {
+      "repo_full_name": "anthropics/skills",
+      "repo_url": "https://github.com/anthropics/skills",
+      "repo_description": "Public repository for Agent Skills",
+      "repo_stars": 154692,
+      "repo_forks": 18218,
+      "repo_topics": [
+        "agent-skills"
+      ],
+      "repo_last_pushed": "2026-06-09T20:35:19Z",
+      "repo_owner_type": "Organization",
+      "file_path": "skills/internal-comms/SKILL.md",
+      "file_raw_url": "https://raw.githubusercontent.com/anthropics/skills/HEAD/skills/internal-comms/SKILL.md",
+      "skill_md_content": "",
+      "fetch_error": "file_content: HTTP 404"
+    },
+    {
+      "repo_full_name": "anthropics/skills",
+      "repo_url": "https://github.com/anthropics/skills",
+      "repo_description": "Public repository for Agent Skills",
+      "repo_stars": 154692,
+      "repo_forks": 18218,
+      "repo_topics": [
+        "agent-skills"
+      ],
+      "repo_last_pushed": "2026-06-09T20:35:19Z",
+      "repo_owner_type": "Organization",
+      "file_path": "skills/mcp-builder/SKILL.md",
+      "file_raw_url": "https://raw.githubusercontent.com/anthropics/skills/HEAD/skills/mcp-builder/SKILL.md",
+      "skill_md_content": "",
+      "fetch_error": "file_content: HTTP 404"
+    },
+    {
+      "repo_full_name": "anthropics/skills",
+      "repo_url": "https://github.com/anthropics/skills",
+      "repo_description": "Public repository for Agent Skills",
+      "repo_stars": 154692,
+      "repo_forks": 18218,
+      "repo_topics": [
+        "agent-skills"
+      ],
+      "repo_last_pushed": "2026-06-09T20:35:19Z",
+      "repo_owner_type": "Organization",
+      "file_path": "skills/pdf/SKILL.md",
+      "file_raw_url": "https://raw.githubusercontent.com/anthropics/skills/HEAD/skills/pdf/SKILL.md",
+      "skill_md_content": "",
+      "fetch_error": "file_content: HTTP 404"
+    },
+    {
+      "repo_full_name": "anthropics/skills",
+      "repo_url": "https://github.com/anthropics/skills",
+      "repo_description": "Public repository for Agent Skills",
+      "repo_stars": 154692,
+      "repo_forks": 18218,
+      "repo_topics": [
+        "agent-skills"
+      ],
+      "repo_last_pushed": "2026-06-09T20:35:19Z",
+      "repo_owner_type": "Organization",
+      "file_path": "skills/pptx/SKILL.md",
+      "file_raw_url": "https://raw.githubusercontent.com/anthropics/skills/HEAD/skills/pptx/SKILL.md",
+      "skill_md_content": "",
+      "fetch_error": "file_content: HTTP 404"
+    },
+    {
+      "repo_full_name": "anthropics/skills",
+      "repo_url": "https://github.com/anthropics/skills",
+      "repo_description": "Public repository for Agent Skills",
+      "repo_stars": 154692,
+      "repo_forks": 18218,
+      "repo_topics": [
+        "agent-skills"
+      ],
+      "repo_last_pushed": "2026-06-09T20:35:19Z",
+      "repo_owner_type": "Organization",
+      "file_path": "skills/skill-creator/SKILL.md",
+      "file_raw_url": "https://raw.githubusercontent.com/anthropics/skills/HEAD/skills/skill-creator/SKILL.md",
       "skill_md_content": "",
       "fetch_error": "file_content: HTTP 404"
     }

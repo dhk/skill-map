@@ -205,9 +205,39 @@ def git_commit_and_push(crawl_id: str) -> None:
     print("  [Committed and pushed]")
 
 
+def search_repo_files(session: requests.Session, repo: str) -> list[dict]:
+    """Search a specific repo for all SKILL.md files via contents API tree walk."""
+    results = []
+    # Use git trees API to find all SKILL.md files efficiently
+    resp = session.get(f"https://api.github.com/repos/{repo}/git/trees/HEAD?recursive=1")
+    check_rate_limit(resp)
+    if resp.status_code == 404:
+        return []
+    resp.raise_for_status()
+    tree = resp.json().get("tree", [])
+    for item in tree:
+        path = item.get("path", "")
+        if item.get("type") == "blob" and Path(path).name.upper() == "SKILL.MD":
+            raw_url = f"https://raw.githubusercontent.com/{repo}/HEAD/{path}"
+            results.append({
+                "repo_full_name": repo,
+                "file_path": path,
+                "file_raw_url": raw_url,
+                "repo_url": f"https://github.com/{repo}",
+            })
+    return results
+
+
+def load_crawl_list(path: Path) -> list[str]:
+    with open(path) as f:
+        data = json.load(f)
+    return [r["repo"] for r in data.get("repos", []) if r.get("tier") != "list-only"]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Crawl GitHub for SKILL.md files.")
     parser.add_argument("--dry-run", action="store_true", help="Search only, no fetches or writes.")
+    parser.add_argument("--crawl-list", type=Path, help="JSON crawl-list file to target specific repos instead of global search.")
     args = parser.parse_args()
 
     token = get_token()
@@ -236,30 +266,50 @@ def main() -> None:
     seen_keys: set[str] = set()
     raw_items: list[tuple[str, str, str, str]] = []  # (repo_full_name, file_path, raw_url, repo_url)
 
-    for query in QUERIES:
-        print(f"  Query: {query}")
-        try:
-            items = search_code(session, query)
-        except requests.HTTPError as e:
-            print(f"  [Search error: {e}]")
-            continue
-        new_count = 0
-        for item in items:
-            repo = item.get("repository", {})
-            repo_full_name = repo.get("full_name", "")
-            file_path = item.get("path", "")
-            key = f"{repo_full_name}::{file_path}"
-            if key in seen_keys:
+    if args.crawl_list:
+        # Repo-scoped mode: walk each repo's git tree
+        target_repos = load_crawl_list(args.crawl_list)
+        print(f"  Mode: repo-scoped ({len(target_repos)} repos from {args.crawl_list.name})")
+        for repo_full_name in target_repos:
+            print(f"  Scanning tree: {repo_full_name}")
+            try:
+                found = search_repo_files(session, repo_full_name)
+            except requests.HTTPError as e:
+                print(f"    [Error: {e}]")
                 continue
-            seen_keys.add(key)
-            raw_url = item.get("html_url", "").replace(
-                "https://github.com/", "https://raw.githubusercontent.com/"
-            ).replace("/blob/", "/")
-            repo_url = repo.get("html_url", f"https://github.com/{repo_full_name}")
-            raw_items.append((repo_full_name, file_path, raw_url, repo_url))
-            new_count += 1
-        print(f"    → {new_count} new results ({len(raw_items)} total unique)")
-        time.sleep(1)
+            for f in found:
+                key = f"{f['repo_full_name']}::{f['file_path']}"
+                if key not in seen_keys:
+                    seen_keys.add(key)
+                    raw_items.append((f["repo_full_name"], f["file_path"], f["file_raw_url"], f["repo_url"]))
+            print(f"    → {len(found)} SKILL.md file(s) found")
+            time.sleep(0.5)
+    else:
+        # Global search mode
+        for query in QUERIES:
+            print(f"  Query: {query}")
+            try:
+                items = search_code(session, query)
+            except requests.HTTPError as e:
+                print(f"  [Search error: {e}]")
+                continue
+            new_count = 0
+            for item in items:
+                repo = item.get("repository", {})
+                repo_full_name = repo.get("full_name", "")
+                file_path = item.get("path", "")
+                key = f"{repo_full_name}::{file_path}"
+                if key in seen_keys:
+                    continue
+                seen_keys.add(key)
+                raw_url = item.get("html_url", "").replace(
+                    "https://github.com/", "https://raw.githubusercontent.com/"
+                ).replace("/blob/", "/")
+                repo_url = repo.get("html_url", f"https://github.com/{repo_full_name}")
+                raw_items.append((repo_full_name, file_path, raw_url, repo_url))
+                new_count += 1
+            print(f"    → {new_count} new results ({len(raw_items)} total unique)")
+            time.sleep(1)
 
     if args.dry_run:
         print(f"\n[Dry run] Would fetch {len(raw_items)} file(s) across repos:")
