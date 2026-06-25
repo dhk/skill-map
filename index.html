@@ -924,7 +924,7 @@ function removePill(i) {
 function nodeSearchText(d) {
   const owner = d.id ? d.id.split('/')[0] : '';
   const persona = (d.domain && PERSONAS[d.domain]) || {};
-  return `${d.label} ${d.description||''} ${d.domain||''} ${d.org||''} ${d.title||''} ${d.id||''} ${owner} ${persona.name||''} ${persona.archetype||''} ${persona.unmet_need||''}`.toLowerCase();
+  return `${d.label} ${d.description||''} ${d.domain||''} ${d.org||''} ${d.title||''} ${d.id||''} ${owner} ${persona.name||''} ${persona.archetype||''}`.toLowerCase();
 }
 
 function nodeMatches(d, pills, typing) {
