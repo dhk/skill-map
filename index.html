@@ -686,25 +686,25 @@ const node = g.append('g').selectAll('.node')
 
 node.append('circle')
   .attr('r', d=>d.size)
-  .attr('fill', d=>{
+  .style('fill', d=>{
     if(d.type==='domain') return d.color;
     if(d.type==='org') return '#a8a59c';
     if(d.type==='dhk'||d.type==='dhk_hub') return '#16a34a';
     return d.color;
   })
-  .attr('stroke', d=>{
+  .style('stroke', d=>{
     if(d.type==='domain') return '#fff';
     if(d.type==='org') return 'none';
     if(d.type==='dhk'||d.type==='dhk_hub') return '#16a34a';
     return 'none';
   })
-  .attr('stroke-width', d=>d.type==='domain'?1.5:d.type==='dhk_hub'?2:0)
-  .attr('fill-opacity', d=>d.type==='domain'?.85:d.type==='skill'?.82:d.type==='org'?.7:.9);
+  .style('stroke-width', d=>d.type==='domain'?'1.5px':d.type==='dhk_hub'?'2px':'0')
+  .style('fill-opacity', d=>d.type==='domain'?.85:d.type==='skill'?.82:d.type==='org'?.7:.9);
 
 // Domain labels
 node.filter(d=>d.type==='domain').append('text')
   .attr('text-anchor','middle').attr('dy',d=>d.size+11)
-  .attr('font-size','8px').attr('letter-spacing','.1em').attr('fill',d=>d.color)
+  .attr('font-size','8px').attr('letter-spacing','.1em').style('fill',d=>d.color)
   .attr('font-family','DM Mono,monospace').text(d=>d.label.toUpperCase());
 
 // Org labels
