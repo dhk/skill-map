@@ -848,6 +848,9 @@ function toggleCluster() {
 }
 
 function setView(mode) {
+  // If in list mode, switch back to map first
+  if(listModeActive) setListMode(false);
+
   document.querySelectorAll('#controls .btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('btn-'+mode).classList.add('active');
   document.getElementById('btn-cluster').classList.toggle('active', clusterActive);
