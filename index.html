@@ -48,9 +48,30 @@ body { background:var(--bg2); color:var(--text); font-family:var(--font-mono); o
 .btn.active { background:var(--bg3); border-color:var(--text-dim); color:var(--text); }
 
 #search-wrap { position:absolute; bottom:20px; left:24px; z-index:10; display:flex; align-items:center; gap:6px; }
-#search { font-family:var(--font-mono); font-size:11px; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:var(--border-radius); width:220px; outline:none; }
-#search:focus { border-color:var(--accent); }
-#search::placeholder { color:var(--text-dim); }
+#pill-box {
+  display:flex; align-items:center; flex-wrap:wrap; gap:4px;
+  background:var(--bg); border:1px solid var(--border); border-radius:var(--border-radius);
+  padding:4px 8px; min-width:220px; max-width:420px; cursor:text;
+  transition:border-color .15s;
+}
+#pill-box:focus-within { border-color:var(--accent); }
+#pill-input { font-family:var(--font-mono); font-size:11px; background:transparent; border:none; outline:none; color:var(--text); min-width:100px; flex:1; padding:2px 4px; }
+#pill-input::placeholder { color:var(--text-dim); }
+.pill {
+  display:flex; align-items:center; gap:3px;
+  font-family:var(--font-mono); font-size:9px; letter-spacing:.04em;
+  background:var(--bg3); border:1px solid var(--border); border-radius:2px;
+  padding:2px 6px; color:var(--text); white-space:nowrap;
+}
+.pill-x { cursor:pointer; color:var(--text-dim); font-size:10px; line-height:1; margin-left:1px; }
+.pill-x:hover { color:#dc2626; }
+#ao-toggle {
+  font-family:var(--font-mono); font-size:9px; letter-spacing:.06em;
+  padding:4px 8px; border-radius:var(--border-radius);
+  border:1px solid var(--border); background:var(--bg); color:var(--text-dim);
+  cursor:pointer; transition:all .12s; white-space:nowrap;
+}
+#ao-toggle:hover { border-color:var(--accent); color:var(--text); }
 #view-toggle { display:flex; border:1px solid var(--border); border-radius:var(--border-radius); overflow:hidden; }
 .vt-btn { font-family:var(--font-mono); font-size:9px; letter-spacing:.06em; padding:5px 9px; background:var(--bg); color:var(--text-dim); border:none; cursor:pointer; transition:all .12s; }
 .vt-btn.active { background:var(--bg3); color:var(--text); }
@@ -266,7 +287,12 @@ svg { display:block; }
 </div>
 
 <div id="search-wrap">
-  <input id="search" type="text" placeholder="search skills, orgs, domains…" oninput="onSearch(this.value)">
+  <div id="pill-box" onclick="document.getElementById('pill-input').focus()">
+    <span id="pill-container"></span>
+    <input id="pill-input" type="text" placeholder="add keyword + enter…" autocomplete="off"
+      onkeydown="pillKeyDown(event)" oninput="pillLiveSearch(this.value)">
+  </div>
+  <button id="ao-toggle" onclick="toggleAO()">OR</button>
   <div id="view-toggle">
     <button class="vt-btn active" id="vt-map" onclick="setListMode(false)">MAP</button>
     <button class="vt-btn" id="vt-list" onclick="setListMode(true)">LIST</button>
@@ -797,7 +823,7 @@ function setListMode(on) {
   document.getElementById('graph').style.display = on ? 'none' : 'block';
   document.getElementById('legend').style.display = on ? 'none' : '';
   document.getElementById('stats').style.display = on ? 'none' : '';
-  if(on) renderList(document.getElementById('search').value);
+  if(on) renderList(document.getElementById('pill-input').value.trim().toLowerCase());
 }
 
 function renderList(q) {
@@ -806,13 +832,8 @@ function renderList(q) {
   const domainColors = {};
   GRAPH.nodes.filter(n=>n.type==='domain').forEach(n=>{ domainColors[n.label]=n.color; });
 
-  const rows = allSkills.filter(d => {
-    if(!q) return true;
-    const owner = d.id ? d.id.split('/')[0] : '';
-    const persona = (d.domain && PERSONAS[d.domain]) || {};
-    const t = `${d.label} ${d.description||''} ${d.domain||''} ${d.org||''} ${d.id||''} ${owner} ${persona.name||''} ${persona.archetype||''} ${persona.unmet_need||''}`.toLowerCase();
-    return t.includes(q);
-  }).sort((a,b) => (a.domain||'').localeCompare(b.domain||'') || a.label.localeCompare(b.label));
+  const rows = allSkills.filter(d => nodeMatches(d, searchPills, q))
+    .sort((a,b) => (a.domain||'').localeCompare(b.domain||'') || a.label.localeCompare(b.label));
 
   const tbody = document.getElementById('lv-body');
   if(!tbody) return;
@@ -859,30 +880,80 @@ function toggleSkillInList(id, btn) {
   updateInstallCount();
 }
 
-// ── SEARCH ─────────────────────────────────────────────────────
-// Searches: label, description, domain, org/owner, repo name, full id (owner/repo)
-function onSearch(q) {
-  if(listModeActive) { renderList(q); return; }
-  filterNodes(q);
+// ── PILL SEARCH ─────────────────────────────────────────────────
+let searchPills = [];
+let searchMode = 'OR'; // 'OR' | 'AND'
+
+function toggleAO() {
+  searchMode = searchMode === 'OR' ? 'AND' : 'OR';
+  document.getElementById('ao-toggle').textContent = searchMode;
+  applyPillSearch();
 }
 
-function filterNodes(q) {
-  q = q.toLowerCase().trim();
-  if(!q){
+function pillKeyDown(e) {
+  const input = e.target;
+  if(e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = input.value.trim().replace(/,$/, '');
+    if(val) { searchPills.push(val.toLowerCase()); renderPills(); input.value = ''; applyPillSearch(); }
+  } else if(e.key === 'Backspace' && input.value === '' && searchPills.length) {
+    searchPills.pop(); renderPills(); applyPillSearch();
+  }
+}
+
+function pillLiveSearch(val) {
+  // Live filter while typing (before committing to a pill)
+  applyPillSearch(val.toLowerCase().trim());
+}
+
+function renderPills() {
+  const container = document.getElementById('pill-container');
+  container.innerHTML = searchPills.map((p, i) =>
+    `<span class="pill">${p}<span class="pill-x" onclick="removePill(${i})">×</span></span>`
+  ).join('');
+  const input = document.getElementById('pill-input');
+  input.placeholder = searchPills.length ? '' : 'add keyword + enter…';
+}
+
+function removePill(i) {
+  searchPills.splice(i, 1);
+  renderPills();
+  applyPillSearch();
+}
+
+function nodeSearchText(d) {
+  const owner = d.id ? d.id.split('/')[0] : '';
+  const persona = (d.domain && PERSONAS[d.domain]) || {};
+  return `${d.label} ${d.description||''} ${d.domain||''} ${d.org||''} ${d.title||''} ${d.id||''} ${owner} ${persona.name||''} ${persona.archetype||''} ${persona.unmet_need||''}`.toLowerCase();
+}
+
+function nodeMatches(d, pills, typing) {
+  const allTerms = typing ? [...pills, typing] : pills;
+  if(!allTerms.length) return true;
+  const t = nodeSearchText(d);
+  return searchMode === 'OR'
+    ? allTerms.some(p => t.includes(p))
+    : allTerms.every(p => t.includes(p));
+}
+
+function applyPillSearch(typing) {
+  if(listModeActive) { renderList(typing); return; }
+  filterNodes(typing);
+}
+
+function filterNodes(typing) {
+  const allTerms = typing ? [...searchPills, typing] : [...searchPills];
+  if(!allTerms.length){
     node.style('opacity',1);
     nsClouds.style('opacity',1);
-    link.style('stroke-opacity',d=>d.type==='org'?.2:.12);
+    link.style('stroke-opacity',d=>d.type==='org'?.3:.18);
     document.getElementById('stat-n').textContent='229 NODES';
     setLiveCount(null);
     return;
   }
   const matched=new Set();
   GRAPH.nodes.forEach(d=>{
-    // id is "owner/repo" for skills — split to match owner name alone
-    const owner = d.id ? d.id.split('/')[0] : '';
-    const persona = (d.domain && PERSONAS[d.domain]) || {};
-    const t=`${d.label} ${d.description||''} ${d.domain||''} ${d.org||''} ${d.title||''} ${d.id||''} ${owner} ${persona.name||''} ${persona.archetype||''} ${persona.unmet_need||''}`.toLowerCase();
-    if(t.includes(q)) matched.add(d.id);
+    if(nodeMatches(d, searchPills, typing)) matched.add(d.id);
   });
   const linked=new Set();
   GRAPH.links.forEach(l=>{
@@ -992,7 +1063,9 @@ function applyFilter() {
 function clearFilter() {
   pendingFilter.clear();
   document.getElementById('filter-bar').style.display = 'none';
-  document.getElementById('search').value = '';
+  document.getElementById('pill-input').value = '';
+  searchPills = [];
+  renderPills();
   setView('all');
   setLiveCount(null);
 }
