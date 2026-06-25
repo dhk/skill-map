@@ -37,25 +37,29 @@ body { background:var(--bg2); color:var(--text); font-family:var(--font-mono); o
 #header h1 { font-family:var(--font-cond); font-size:22px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text); }
 #header .sub { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); letter-spacing:.12em; text-transform:uppercase; margin-top:2px; }
 
-#controls {
-  position:absolute; top:14px; right:24px; z-index:10;
-  display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end; max-width:420px;
-  transition:right .25s ease;
+/* BOTTOM BAR — single unified nav/search strip */
+#bottom-bar {
+  position:fixed; bottom:0; left:0; right:0; z-index:10;
+  background:var(--bg); border-top:1px solid var(--border);
+  display:flex; align-items:center; gap:0; height:44px;
+  padding:0 12px;
 }
-#controls.panel-open { right:364px; }
+#view-btns { display:flex; align-items:center; gap:4px; flex-shrink:0; padding-right:10px; border-right:1px solid var(--border); }
+#search-area { display:flex; align-items:center; gap:6px; flex:1; padding:0 10px; }
+#action-btns { display:flex; align-items:center; gap:4px; flex-shrink:0; padding-left:10px; border-left:1px solid var(--border); }
+
 .btn { font-family:var(--font-mono); font-size:10px; padding:4px 10px; border-radius:var(--border-radius); border:1px solid var(--border); background:var(--bg); color:var(--text-dim); cursor:pointer; letter-spacing:.06em; transition:all .15s; white-space:nowrap; }
 .btn:hover { border-color:var(--accent); color:var(--text); }
 .btn.active { background:var(--bg3); border-color:var(--text-dim); color:var(--text); }
 
-#search-wrap { position:absolute; bottom:20px; left:24px; z-index:10; display:flex; align-items:center; gap:6px; }
 #pill-box {
   display:flex; align-items:center; flex-wrap:wrap; gap:4px;
-  background:var(--bg); border:1px solid var(--border); border-radius:var(--border-radius);
-  padding:4px 8px; min-width:220px; max-width:420px; cursor:text;
+  background:var(--bg2); border:1px solid var(--border); border-radius:var(--border-radius);
+  padding:3px 8px; flex:1; cursor:text; max-height:36px; overflow:hidden;
   transition:border-color .15s;
 }
 #pill-box:focus-within { border-color:var(--accent); }
-#pill-input { font-family:var(--font-mono); font-size:11px; background:transparent; border:none; outline:none; color:var(--text); min-width:100px; flex:1; padding:2px 4px; }
+#pill-input { font-family:var(--font-mono); font-size:11px; background:transparent; border:none; outline:none; color:var(--text); min-width:120px; flex:1; padding:2px 4px; }
 #pill-input::placeholder { color:var(--text-dim); }
 .pill {
   display:flex; align-items:center; gap:3px;
@@ -79,7 +83,7 @@ body { background:var(--bg2); color:var(--text); font-family:var(--font-mono); o
 
 /* LIST VIEW */
 #list-view {
-  display:none; position:fixed; top:56px; left:0; right:0; bottom:0;
+  display:none; position:fixed; top:56px; left:0; right:0; bottom:44px;
   background:var(--bg); overflow-y:auto; z-index:9;
 }
 #list-view.open { display:block; }
@@ -98,7 +102,7 @@ body { background:var(--bg2); color:var(--text); font-family:var(--font-mono); o
 .lv-desc { font-family:var(--font-sans); font-size:11px; font-weight:300; color:var(--text-dim); line-height:1.4; }
 .lv-domain { font-size:9px; color:var(--text-dim); }
 
-#stats { position:absolute; bottom:20px; right:24px; z-index:10; text-align:right; font-family:var(--font-mono); font-size:9px; color:var(--text-dim); letter-spacing:.08em; line-height:1.9; }
+#stats { position:fixed; bottom:52px; right:20px; z-index:10; text-align:right; font-family:var(--font-mono); font-size:9px; color:var(--text-dim); letter-spacing:.08em; line-height:1.9; pointer-events:none; }
 
 #legend { position:absolute; top:64px; left:24px; z-index:10; font-family:var(--font-mono); font-size:9px; color:var(--text-dim); letter-spacing:.08em; line-height:2.1; }
 .lr { display:flex; align-items:center; gap:6px; }
@@ -147,7 +151,7 @@ body { background:var(--bg2); color:var(--text); font-family:var(--font-mono); o
 
 /* FILTER BAR */
 #filter-bar {
-  position:absolute; bottom:56px; left:50%; transform:translateX(-50%);
+  position:fixed; bottom:52px; left:50%; transform:translateX(-50%);
   z-index:15; background:var(--bg); border:1px solid var(--border);
   border-radius:var(--border-radius); padding:8px 10px;
   display:flex; align-items:center; gap:8px; flex-wrap:wrap;
@@ -272,17 +276,6 @@ svg { display:block; }
   <div class="sub"><span id="live-count">1,121</span> skills · 53 orgs · 13 domains · 5 uncharted territories &nbsp;·&nbsp; <a href="https://www.dhk.io" target="_blank" style="color:var(--text-dim);text-decoration:none;letter-spacing:.08em">dhk.io</a> &nbsp;·&nbsp; <a href="https://github.com/dhk/skill-map" target="_blank" style="color:var(--text-dim);text-decoration:none;letter-spacing:.08em">github.com/dhk/skill-map</a> &nbsp;·&nbsp; last crawled June 2026 &nbsp;·&nbsp; <span id="version-badge">v1.0.0.1</span></div>
 </div>
 
-<div id="controls">
-  <button class="btn active" id="btn-all" onclick="setView('all')">ALL</button>
-  <button class="btn" id="btn-domains" onclick="setView('domains')">BY DOMAIN</button>
-  <button class="btn" id="btn-cluster" onclick="toggleCluster()" title="Pull skills into tight domain clusters">CLUSTER</button>
-  <button class="btn" id="btn-orgs" onclick="openOrgsPanel()">ORGS</button>
-  <button class="btn" id="btn-skills" onclick="setView('skills')">SKILLS</button>
-  <button class="btn" id="btn-dhk" onclick="setView('dhk')" style="border-color:#16a34a;color:#16a34a">DHK</button>
-  <button class="btn" id="btn-ns" onclick="setView('ns')" style="border-color:#dc2626;color:#dc2626">UNCHARTED</button>
-  <button class="btn" id="btn-list" onclick="openSkillsListPanel()" style="border-color:var(--accent-blue);color:var(--accent-blue)">INSTALL ↗</button>
-  <button class="btn" onclick="openAddSkillModal()" style="border-color:#16a34a;color:#16a34a">＋ ADD</button>
-</div>
 
 <div id="legend">
   <div class="lr"><div class="ln"></div> DOMAIN CLUSTER</div>
@@ -292,16 +285,31 @@ svg { display:block; }
   <div class="lr"><div class="lns"></div> UNCHARTED TERRITORY</div>
 </div>
 
-<div id="search-wrap">
-  <div id="pill-box" onclick="document.getElementById('pill-input').focus()">
-    <span id="pill-container"></span>
-    <input id="pill-input" type="text" placeholder="add keyword + enter…" autocomplete="off"
-      onkeydown="pillKeyDown(event)" oninput="pillLiveSearch(this.value)">
+<div id="bottom-bar">
+  <div id="view-btns">
+    <button class="btn active" id="btn-all" onclick="setView('all')">ALL</button>
+    <button class="btn" id="btn-domains" onclick="setView('domains')">BY DOMAIN</button>
+    <button class="btn" id="btn-cluster" onclick="toggleCluster()" title="Pull skills into tight domain clusters">CLUSTER</button>
+    <button class="btn" id="btn-orgs" onclick="openOrgsPanel()">ORGS</button>
+    <button class="btn" id="btn-skills" onclick="setView('skills')">SKILLS</button>
+    <button class="btn" id="btn-dhk" onclick="setView('dhk')" style="border-color:#16a34a;color:#16a34a">DHK</button>
+    <button class="btn" id="btn-ns" onclick="setView('ns')" style="border-color:#dc2626;color:#dc2626">UNCHARTED</button>
   </div>
-  <button id="ao-toggle" onclick="toggleAO()">OR</button>
-  <div id="view-toggle">
-    <button class="vt-btn active" id="vt-map" onclick="setListMode(false)">MAP</button>
-    <button class="vt-btn" id="vt-list" onclick="setListMode(true)">LIST</button>
+  <div id="search-area">
+    <div id="pill-box" onclick="document.getElementById('pill-input').focus()">
+      <span id="pill-container"></span>
+      <input id="pill-input" type="text" placeholder="search skills, orgs, domains, or paste github.com/…" autocomplete="off"
+        onkeydown="pillKeyDown(event)" oninput="pillLiveSearch(this.value)">
+    </div>
+    <button id="ao-toggle" onclick="toggleAO()">OR</button>
+  </div>
+  <div id="action-btns">
+    <div id="view-toggle">
+      <button class="vt-btn active" id="vt-map" onclick="setListMode(false)">MAP</button>
+      <button class="vt-btn" id="vt-list" onclick="setListMode(true)">LIST</button>
+    </div>
+    <button class="btn" id="btn-list" onclick="openSkillsListPanel()" style="border-color:var(--accent-blue);color:var(--accent-blue)">INSTALL ↗</button>
+    <button class="btn" onclick="openAddSkillModal()" style="border-color:#16a34a;color:#16a34a">＋ ADD</button>
   </div>
 </div>
 
@@ -703,7 +711,7 @@ function openPanel(d) {
 
   pc.innerHTML = html;
   document.getElementById('panel').classList.add('open');
-  document.getElementById('controls').classList.add('panel-open');
+  
   // Hide "ADD TO FILTER" for skill cards — they have their own inline toggle
   document.getElementById('panel-add-btn-wrap').style.display =
     (d.type === 'skill') ? 'none' : 'block';
@@ -729,16 +737,16 @@ function closePanel() {
     nsClouds.style('opacity', 1);
     setLiveCount(null);
   }
-  document.querySelectorAll('#controls .btn').forEach(b=>b.classList.remove('active'));
+  
   document.getElementById('btn-all').classList.add('active');
   document.getElementById('panel').classList.remove('open');
-  document.getElementById('controls').classList.remove('panel-open');
+  
 }
 
 let activeOrg = null;
 
 function openOrgsPanel() {
-  document.querySelectorAll('#controls .btn').forEach(b=>b.classList.remove('active'));
+  
   document.getElementById('btn-orgs').classList.add('active');
 
   const orgs = GRAPH.nodes.filter(n => n.type === 'org')
@@ -767,7 +775,7 @@ function openOrgsPanel() {
   pc.innerHTML = html;
   document.getElementById('panel-add-btn-wrap').style.display = 'none';
   document.getElementById('panel').classList.add('open');
-  document.getElementById('controls').classList.add('panel-open');
+  
   activeOrg = null;
 }
 
@@ -852,7 +860,7 @@ function setView(mode) {
   // If in list mode, switch back to map first
   if(listModeActive) setListMode(false);
 
-  document.querySelectorAll('#controls .btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#view-btns .btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('btn-'+mode).classList.add('active');
   document.getElementById('btn-cluster').classList.toggle('active', clusterActive);
 
@@ -1326,7 +1334,7 @@ function openSkillsList(filterDomain) {
 
   pc.innerHTML = html;
   document.getElementById('panel').classList.add('open');
-  document.getElementById('controls').classList.add('panel-open');
+  
   updateInstallCount();
 }
 
