@@ -603,7 +603,10 @@ function openPanel(d) {
       html += `<div class="pc-val">${persona.follows.map(f=>`<span class="pc-tag">${f}</span>`).join('')}</div>`;
       html += `<hr class="pc-divider">`;
       html += `<div class="pc-label">PUBLISHED SKILLS</div>`;
-      html += `<div class="pc-val">${d.count} skills in this domain · sourced from <a href="https://github.com/VoltAgent/awesome-agent-skills" target="_blank" class="pc-link">awesome-agent-skills</a></div>`;
+      html += `<div class="pc-val">
+        <a href="#" class="pc-link" onclick="event.preventDefault();showDomainSkills('${d.label.replace(/'/g,"\\'")}')">${d.count} skills in this domain</a>
+        · sourced from <a href="https://github.com/VoltAgent/awesome-agent-skills" target="_blank" class="pc-link">awesome-agent-skills</a>
+      </div>`;
       html += `<div class="pc-unmet">⚠ Unmet need: ${persona.unmet_need}</div>`;
     } else {
       html += `<div class="pc-name">${d.label}</div>`;
@@ -888,6 +891,16 @@ function setView(mode) {
   } else if(mode==='dhk') {
     document.getElementById('stat-n').textContent='8 DHK SKILLS';
     setLiveCount(8);
+    // Zoom to DHK cluster
+    const dhkPts = GRAPH.nodes.filter(d=>(d.type==='dhk'||d.type==='dhk_hub')&&d.x!=null);
+    if(dhkPts.length) {
+      const xs=dhkPts.map(d=>d.x), ys=dhkPts.map(d=>d.y);
+      const x0=Math.min(...xs)-80, x1=Math.max(...xs)+80;
+      const y0=Math.min(...ys)-60, y1=Math.max(...ys)+60;
+      const scale=Math.min(W/(x1-x0), H/(y1-y0), 2.5)*.8;
+      const tx=W/2-scale*(x0+x1)/2, ty=H/2-scale*(y0+y1)/2;
+      svg.transition().duration(700).call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(scale));
+    }
   } else {
     const visible = GRAPH.nodes.filter(d=>{
       if(mode==='all') return d.type==='skill'||d.type==='dhk';
@@ -975,6 +988,7 @@ let listModeActive = false;
 
 function setListMode(on) {
   listModeActive = on;
+  if(!on) listDomainFilter = null;
   document.getElementById('vt-map').classList.toggle('active', !on);
   document.getElementById('vt-list').classList.toggle('active', on);
   document.getElementById('list-view').classList.toggle('open', on);
@@ -984,13 +998,36 @@ function setListMode(on) {
   if(on) renderList(document.getElementById('pill-input').value.trim().toLowerCase());
 }
 
+let listDomainFilter = null; // when set, list view shows only this domain
+
+function showDomainSkills(domainLabel) {
+  listDomainFilter = domainLabel;
+  closePanel();
+  setListMode(true);
+}
+
 function renderList(q) {
   q = (q||'').toLowerCase().trim();
-  const allSkills = GRAPH.nodes.filter(n => n.type==='skill' || n.type==='dhk');
+  let allSkills = GRAPH.nodes.filter(n => n.type==='skill' || n.type==='dhk');
+  if(listDomainFilter) allSkills = allSkills.filter(n => n.domain === listDomainFilter);
   const domainColors = {};
   GRAPH.nodes.filter(n=>n.type==='domain').forEach(n=>{ domainColors[n.label]=n.color; });
 
-  const rows = allSkills.filter(d => nodeMatches(d, searchPills, q))
+  // Show/update domain filter badge if active
+  const lv = document.getElementById('list-view');
+  let badge = document.getElementById('lv-domain-badge');
+  if(listDomainFilter) {
+    if(!badge) {
+      badge = document.createElement('div');
+      badge.id = 'lv-domain-badge';
+      badge.style.cssText = 'font-family:var(--font-mono);font-size:10px;padding:6px 16px 0;display:flex;align-items:center;gap:8px;color:var(--text-dim)';
+      lv.insertBefore(badge, lv.firstChild);
+    }
+    badge.innerHTML = `<span style="letter-spacing:.06em">DOMAIN: <strong style="color:var(--text)">${listDomainFilter}</strong></span>
+      <span onclick="listDomainFilter=null;renderList('')" style="cursor:pointer;color:#dc2626;font-size:11px" title="Clear filter">✕ clear</span>`;
+  } else if(badge) { badge.remove(); }
+
+  const rows = allSkills.filter(d => !q || nodeMatches(d, searchPills, q))
     .sort((a,b) => (a.domain||'').localeCompare(b.domain||'') || a.label.localeCompare(b.label));
 
   const tbody = document.getElementById('lv-body');
