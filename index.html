@@ -179,6 +179,10 @@ body { background:var(--bg2); color:var(--text); font-family:var(--font-mono); o
 #panel-add-btn:hover { background:var(--accent-blue); color:#fff; }
 
 /* INSTALL PANEL */
+.as-label { display:block;font-family:var(--font-mono);font-size:8px;letter-spacing:.08em;color:var(--text-dim);margin:10px 0 3px; }
+.as-input { width:100%;box-sizing:border-box;font-family:var(--font-mono);font-size:10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--border-radius);padding:6px 8px;color:var(--text);outline:none; }
+.as-input:focus { border-color:var(--accent); }
+.skill-private { stroke:#16a34a !important; stroke-width:1.5px !important; stroke-dasharray:3,2 !important; }
 #install-bar {
   position:sticky; bottom:0; left:0; right:0;
   background:var(--bg); border-top:1px solid var(--border);
@@ -271,11 +275,13 @@ svg { display:block; }
 <div id="controls">
   <button class="btn active" id="btn-all" onclick="setView('all')">ALL</button>
   <button class="btn" id="btn-domains" onclick="setView('domains')">BY DOMAIN</button>
+  <button class="btn" id="btn-cluster" onclick="toggleCluster()" title="Pull skills into tight domain clusters">CLUSTER</button>
   <button class="btn" id="btn-orgs" onclick="openOrgsPanel()">ORGS</button>
   <button class="btn" id="btn-skills" onclick="setView('skills')">SKILLS</button>
   <button class="btn" id="btn-dhk" onclick="setView('dhk')" style="border-color:#16a34a;color:#16a34a">DHK</button>
   <button class="btn" id="btn-ns" onclick="setView('ns')" style="border-color:#dc2626;color:#dc2626">UNCHARTED</button>
   <button class="btn" id="btn-list" onclick="openSkillsListPanel()" style="border-color:var(--accent-blue);color:var(--accent-blue)">INSTALL ↗</button>
+  <button class="btn" onclick="openAddSkillModal()" style="border-color:#16a34a;color:#16a34a">＋ ADD</button>
 </div>
 
 <div id="legend">
@@ -337,6 +343,39 @@ svg { display:block; }
 </div>
 
 <div id="tooltip"></div>
+
+<div id="add-skill-modal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);align-items:center;justify-content:center">
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--border-radius);padding:24px;width:420px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;color:var(--text)">ADD PRIVATE SKILL</div>
+      <span onclick="closeAddSkillModal()" style="cursor:pointer;color:var(--text-dim);font-size:14px">✕</span>
+    </div>
+    <div style="font-family:var(--font-sans);font-size:11px;color:var(--text-dim);margin-bottom:16px;line-height:1.5">
+      Add a skill from a private repo or local path. It will appear on the map and persist in your browser.
+      <br><br>
+      <span style="color:#16a34a;font-family:var(--font-mono);font-size:10px">To crawl locally:</span>
+      <code style="display:block;background:var(--bg2);padding:6px 8px;border-radius:2px;font-size:9px;margin-top:4px;color:var(--text)">python crawlers/crawl.py local --path ~/.claude/skills/</code>
+    </div>
+    <div id="add-skill-form">
+      <label class="as-label">SKILL NAME</label>
+      <input id="as-label" class="as-input" placeholder="e.g. my-skill">
+      <label class="as-label">AUTHOR / ORG</label>
+      <input id="as-org" class="as-input" placeholder="e.g. github-username">
+      <label class="as-label">DOMAIN</label>
+      <select id="as-domain" class="as-input"></select>
+      <label class="as-label">DESCRIPTION</label>
+      <textarea id="as-desc" class="as-input" rows="2" placeholder="What does this skill do?"></textarea>
+      <label class="as-label">REPO OR LOCAL PATH (optional)</label>
+      <input id="as-url" class="as-input" placeholder="e.g. github.com/you/skill or ~/.claude/skills/my-skill">
+      <button onclick="submitAddSkill()" style="
+        width:100%;margin-top:12px;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;
+        padding:9px;border-radius:var(--border-radius);border:1px solid #16a34a;
+        background:#16a34a;color:#fff;cursor:pointer">ADD TO MAP</button>
+      <div id="as-error" style="font-family:var(--font-mono);font-size:9px;color:#dc2626;margin-top:6px;display:none"></div>
+    </div>
+  </div>
+</div>
+
 <svg id="graph"></svg>
 
 <script>
@@ -352,6 +391,24 @@ const zoom = d3.zoom().scaleExtent([.15,5]).on('zoom', e => g.attr('transform', 
 svg.call(zoom);
 
 // ── FORCE SIM ──────────────────────────────────────────────────
+// Build domain node lookup for cluster force
+const domainNodeMap = {};
+GRAPH.nodes.filter(n=>n.type==='domain').forEach(n=>{ domainNodeMap[n.label]=n; });
+
+let clusterActive = false;
+
+function clusterForce(alpha) {
+  if(!clusterActive) return;
+  const strength = 0.25;
+  GRAPH.nodes.forEach(d => {
+    if(d.type !== 'skill' && d.type !== 'dhk') return;
+    const dn = domainNodeMap[d.domain];
+    if(!dn || dn === d) return;
+    d.vx -= (d.x - dn.x) * alpha * strength;
+    d.vy -= (d.y - dn.y) * alpha * strength;
+  });
+}
+
 const sim = d3.forceSimulation(GRAPH.nodes)
   .force('link', d3.forceLink(GRAPH.links).id(d=>d.id)
     .distance(d => d.type==='dhk'?50 : d.type==='org'?65:95)
@@ -360,6 +417,7 @@ const sim = d3.forceSimulation(GRAPH.nodes)
     d.type==='domain'?-700 : d.type==='dhk_hub'?-400 : d.type==='org'?-120 : d.type==='negative_space'?-200 : -45))
   .force('center', d3.forceCenter(W/2, H/2))
   .force('collision', d3.forceCollide().radius(d=>d.size+5))
+  .force('cluster', clusterForce)
   .alphaDecay(.012);
 
 // ── LINKS ──────────────────────────────────────────────────────
@@ -406,6 +464,8 @@ function showTooltip(e, d) {
   if(d.type==='domain') {
     title = d.label;
     sub = `${d.count} skills in this domain`;
+    const p = PERSONAS[d.label];
+    if(p && p.unmet_need) unmet = p.unmet_need;
   } else if(d.type==='org') {
     title = d.label;
     sub = `${d.count||0} skills · github.com/${d.label}`;
@@ -413,8 +473,6 @@ function showTooltip(e, d) {
     title = d.label;
     sub = d.org;
     desc = d.description || '';
-    const p = d.domain && PERSONAS[d.domain];
-    if(p && p.unmet_need) unmet = p.unmet_need;
   } else if(d.type==='dhk') {
     title = d.label;
     sub = `DHK · Session Layer · ${d.status}`;
@@ -781,9 +839,16 @@ function setLiveCount(n, suffix) {
 }
 
 // ── VIEWS ──────────────────────────────────────────────────────
+function toggleCluster() {
+  clusterActive = !clusterActive;
+  document.getElementById('btn-cluster').classList.toggle('active', clusterActive);
+  sim.alpha(0.4).restart();
+}
+
 function setView(mode) {
   document.querySelectorAll('#controls .btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('btn-'+mode).classList.add('active');
+  document.getElementById('btn-cluster').classList.toggle('active', clusterActive);
 
   node.style('opacity', d=>{
     if(mode==='all') return 1;
@@ -835,6 +900,75 @@ function setView(mode) {
     setLiveCount(visible || null);
   }
 }
+
+// ── PRIVATE SKILL ADD ───────────────────────────────────────────
+const PRIVATE_SKILLS_KEY = 'skillmap_private_skills';
+
+function loadPrivateSkills() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PRIVATE_SKILLS_KEY) || '[]');
+    saved.forEach(s => injectPrivateSkill(s, false));
+  } catch(e) {}
+}
+
+function injectPrivateSkill(skill, restart = true) {
+  const domainNode = GRAPH.nodes.find(n => n.type === 'domain' && n.label === skill.domain);
+  const color = domainNode ? domainNode.color : '#16a34a';
+  const node_data = { id: skill.id, label: skill.label, type: 'skill', color,
+    size: 5, org: skill.org, domain: skill.domain, description: skill.desc,
+    _private: true, _url: skill.url };
+  // Avoid duplicates
+  if(GRAPH.nodes.find(n => n.id === skill.id)) return;
+  GRAPH.nodes.push(node_data);
+  // Add org node if needed
+  const orgId = `org:${skill.org}`;
+  if(!GRAPH.nodes.find(n => n.id === orgId)) {
+    GRAPH.nodes.push({ id: orgId, label: skill.org, type: 'org', color: '#64748b', size: 7, count: 1 });
+    GRAPH.links.push({ source: skill.id, target: orgId, type: 'org' });
+  }
+  if(domainNode) GRAPH.links.push({ source: skill.id, target: `domain:${skill.domain}`, type: 'domain' });
+  domainNodeMap[skill.org] = node_data;
+  if(restart) {
+    // Rebuild simulation nodes/links
+    sim.nodes(GRAPH.nodes);
+    sim.force('link').links(GRAPH.links);
+    // Re-render nodes
+    location.reload(); // simplest — full re-init with new GRAPH
+  }
+}
+
+function openAddSkillModal() {
+  // Populate domain dropdown
+  const sel = document.getElementById('as-domain');
+  sel.innerHTML = Object.keys(PERSONAS).map(d => `<option value="${d}">${d}</option>`).join('');
+  document.getElementById('add-skill-modal').style.display = 'flex';
+  document.getElementById('as-label').focus();
+}
+
+function closeAddSkillModal() {
+  document.getElementById('add-skill-modal').style.display = 'none';
+  document.getElementById('as-error').style.display = 'none';
+}
+
+function submitAddSkill() {
+  const label = document.getElementById('as-label').value.trim();
+  const org   = document.getElementById('as-org').value.trim();
+  const domain= document.getElementById('as-domain').value;
+  const desc  = document.getElementById('as-desc').value.trim();
+  const url   = document.getElementById('as-url').value.trim();
+  const err   = document.getElementById('as-error');
+  if(!label || !org) { err.textContent = 'Name and author are required.'; err.style.display='block'; return; }
+  const id = `${org}/${label}`;
+  const skill = { id, label, org, domain, desc, url };
+  // Persist
+  const saved = JSON.parse(localStorage.getItem(PRIVATE_SKILLS_KEY) || '[]');
+  if(!saved.find(s => s.id === id)) { saved.push(skill); localStorage.setItem(PRIVATE_SKILLS_KEY, JSON.stringify(saved)); }
+  closeAddSkillModal();
+  injectPrivateSkill(skill, true);
+}
+
+// Load private skills on init
+loadPrivateSkills();
 
 // ── LIST VIEW ───────────────────────────────────────────────────
 let listModeActive = false;

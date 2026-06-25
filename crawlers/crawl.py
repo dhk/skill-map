@@ -335,6 +335,57 @@ def process_index_only(repo_name: str, crawl_id: str,
 
 
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Local crawl — reads SKILL.md files from a local directory tree
+# ---------------------------------------------------------------------------
+
+@app.command()
+def local(
+    path: Path = typer.Argument(..., help="Root directory to scan (e.g. ~/.claude/skills/)"),
+    org: str = typer.Option("local", "--org", help="Org/author label to assign to discovered skills"),
+    out: Optional[Path] = typer.Option(None, "--out", help="Output JSON file (default: crawls/local-<date>.json)"),
+):
+    """Crawl a local directory tree for SKILL.md files and emit a skill JSON file."""
+    path = path.expanduser().resolve()
+    if not path.exists():
+        console.print(f"[red]Path does not exist: {path}[/red]")
+        raise typer.Exit(1)
+
+    crawl_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    out_path = out or (BASE_DIR / "crawls" / f"local-{crawl_date}.json")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    results = []
+    skill_files = list(path.rglob("SKILL.md")) + list(path.rglob("skill.md"))
+    console.print(f"Found [bold]{len(skill_files)}[/bold] SKILL.md files under {path}")
+
+    for sf in skill_files:
+        content = sf.read_text(errors="replace")
+        # Extract title from first # heading
+        title_match = re.search(r'^#\s+(.+)', content, re.MULTILINE)
+        label = title_match.group(1).strip() if title_match else sf.parent.name
+        # Extract description from first paragraph after heading
+        desc_match = re.search(r'^#[^\n]*\n+([^#\n][^\n]+)', content, re.MULTILINE)
+        description = desc_match.group(1).strip() if desc_match else ""
+        skill_id = f"{org}/{sf.parent.name}"
+        results.append({
+            "id": skill_id,
+            "label": sf.parent.name,
+            "org": org,
+            "description": description,
+            "skill_md_url": str(sf),
+            "repo_url": str(sf.parent),
+            "crawl_date": crawl_date,
+            "source": "local",
+        })
+        console.print(f"  [green]✓[/green] {skill_id} — {description[:60]}")
+
+    out_path.write_text(json.dumps(results, indent=2))
+    console.print(f"\n[bold green]Done.[/bold green] {len(results)} skills → {out_path}")
+    console.print("\n[dim]To add these to the map, run:[/dim]")
+    console.print(f"  [cyan]python crawlers/build_graph.py --include {out_path}[/cyan]")
+
+
 # CLI
 # ---------------------------------------------------------------------------
 
