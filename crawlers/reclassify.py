@@ -193,12 +193,13 @@ for l in graph['links']:
         continue
     new_links.append(l)
 
-# Add new domain links for skills
-skill_nodes = [n for n in new_nodes if n['type'] == 'skill']
-for n in skill_nodes:
-    nd = n['domain']
-    new_links.append({'source': n['id'], 'target': f'domain:{nd}', 'type':'domain'})
-    # org link preserved from original
+# Add new domain links for skills and dhk nodes (so they cluster into their domain)
+for n in new_nodes:
+    if n['type'] == 'skill':
+        new_links.append({'source': n['id'], 'target': f'domain:{n["domain"]}', 'type':'domain'})
+    elif n['type'] in ('dhk', 'dhk_hub'):
+        nd = n.get('domain', 'Session Layer')
+        new_links.append({'source': n['id'], 'target': f'domain:{nd}', 'type':'domain'})
 
 # org links are already in new_links from the non-domain original links
 
