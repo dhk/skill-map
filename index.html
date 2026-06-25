@@ -270,7 +270,7 @@ svg { display:block; }
 
 <div id="controls">
   <button class="btn active" id="btn-all" onclick="setView('all')">ALL</button>
-  <button class="btn" id="btn-domains" onclick="setView('domains')">DOMAINS</button>
+  <button class="btn" id="btn-domains" onclick="setView('domains')">BY DOMAIN</button>
   <button class="btn" id="btn-orgs" onclick="openOrgsPanel()">ORGS</button>
   <button class="btn" id="btn-skills" onclick="setView('skills')">SKILLS</button>
   <button class="btn" id="btn-dhk" onclick="setView('dhk')" style="border-color:#16a34a;color:#16a34a">DHK</button>
@@ -320,10 +320,11 @@ svg { display:block; }
 </div>
 
 <div id="filter-bar" style="display:none">
+  <span style="font-family:var(--font-mono);font-size:8px;letter-spacing:.08em;color:var(--text-dim);white-space:nowrap">NODE FILTER</span>
   <div id="filter-pills"></div>
   <div id="filter-actions">
-    <button class="btn" onclick="applyFilter()" id="filter-apply-btn">APPLY FILTER</button>
-    <button class="btn" onclick="clearFilter()" style="border-color:#dc2626;color:#dc2626">✕ CLEAR</button>
+    <button class="btn" onclick="applyFilter()" id="filter-apply-btn">APPLY</button>
+    <button class="btn" onclick="clearFilter()" style="border-color:#dc2626;color:#dc2626">✕</button>
   </div>
 </div>
 
@@ -507,6 +508,29 @@ function openPanel(d) {
   let html = '';
 
   if(d.type==='domain') {
+    // Highlight this domain's skills in the graph and zoom to them
+    const domLabel = d.label;
+    const domSkills = new Set(GRAPH.nodes.filter(n=>(n.type==='skill'||n.type==='dhk')&&n.domain===domLabel).map(n=>n.id));
+    domSkills.add(d.id);
+    node.style('opacity', n => domSkills.has(n.id) ? 1 : n.type==='domain' ? .25 : .07);
+    nsClouds.style('opacity', .05);
+    link.style('stroke-opacity', l => {
+      const s = typeof l.source==='object'?l.source.id:l.source;
+      const t = typeof l.target==='object'?l.target.id:l.target;
+      return (domSkills.has(s)||domSkills.has(t)) && l.type==='domain' ? .5 : .05;
+    });
+    setLiveCount(domSkills.size - 1, 'skills');
+    // Zoom to cluster
+    const pts = GRAPH.nodes.filter(n=>domSkills.has(n.id)&&n.x!=null);
+    if(pts.length) {
+      const xs=pts.map(n=>n.x), ys=pts.map(n=>n.y);
+      const x0=Math.min(...xs)-80, x1=Math.max(...xs)+80;
+      const y0=Math.min(...ys)-60, y1=Math.max(...ys)+60;
+      const scale=Math.min(W/(x1-x0), H/(y1-y0), 2)*.8;
+      const tx=W/2-scale*(x0+x1)/2, ty=H/2-scale*(y0+y1)/2;
+      svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(scale));
+    }
+
     const persona = PERSONAS[d.label];
     html += `<div class="pc-type">DOMAIN CLUSTER</div>`;
     if(persona) {
@@ -763,7 +787,7 @@ function setView(mode) {
 
   node.style('opacity', d=>{
     if(mode==='all') return 1;
-    if(mode==='domains') return d.type==='domain'?1:.2;
+    if(mode==='domains') return d.type==='domain'||d.type==='skill'||d.type==='dhk'?1:.15;
     if(mode==='orgs') return d.type==='org'||d.type==='domain'?1:.2;
     if(mode==='skills') return d.type==='skill'||d.type==='domain'?1:.2;
     if(mode==='dhk') return d.type==='dhk'||d.type==='dhk_hub'?1:.1;
@@ -779,7 +803,7 @@ function setView(mode) {
     if(mode==='ns') return .06;
     if(mode==='orgs') return d.type==='org'?.5:.2;
     if(mode==='skills') return d.type==='domain'?.4:.22;
-    if(mode==='domains') return d.type==='domain'?.45:.22;
+    if(mode==='domains') return d.type==='domain'?.5:d.type==='org'?.05:.08;
     return d.type==='org'?.3:.18;
   });
 
@@ -802,7 +826,7 @@ function setView(mode) {
   } else {
     const visible = GRAPH.nodes.filter(d=>{
       if(mode==='all') return d.type==='skill'||d.type==='dhk';
-      if(mode==='domains') return false;
+      if(mode==='domains') return d.type==='skill'||d.type==='dhk';
       if(mode==='orgs') return false;
       if(mode==='skills') return d.type==='skill'||d.type==='dhk';
       return d.type==='skill'||d.type==='dhk';
