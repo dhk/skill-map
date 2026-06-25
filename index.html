@@ -874,42 +874,37 @@ function setView(mode) {
     return d.type==='org'?.3:.18;
   });
 
+  // Determine which nodes to zoom to for each mode
+  const zoomFilter = {
+    all:     d => d.x != null,
+    domains: d => (d.type==='domain'||d.type==='skill'||d.type==='dhk') && d.x != null,
+    orgs:    d => (d.type==='org'||d.type==='domain') && d.x != null,
+    skills:  d => (d.type==='skill'||d.type==='dhk') && d.x != null,
+    dhk:     d => (d.type==='dhk'||d.type==='dhk_hub') && d.x != null,
+    ns:      d => d.type==='negative_space' && d.x != null,
+  };
+  const pts = GRAPH.nodes.filter(zoomFilter[mode] || (d=>d.x!=null));
+  if(pts.length) {
+    const pad = mode==='dhk' ? 80 : mode==='ns' ? 120 : 60;
+    const xs=pts.map(d=>d.x), ys=pts.map(d=>d.y);
+    const x0=Math.min(...xs)-pad, x1=Math.max(...xs)+pad;
+    const y0=Math.min(...ys)-pad, y1=Math.max(...ys)+pad;
+    const maxScale = mode==='dhk' ? 2.5 : mode==='ns' ? 1.4 : 1.2;
+    const scale=Math.min(W/(x1-x0), H/(y1-y0), maxScale)*.85;
+    const tx=W/2-scale*(x0+x1)/2, ty=H/2-scale*(y0+y1)/2;
+    svg.transition().duration(600).call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(scale));
+  }
+
   if(mode==='ns') {
-    // Zoom to the uncharted territory clouds
-    const nsPositions = nsNodes.map(d=>({x:d.x,y:d.y})).filter(p=>p.x&&p.y);
-    if(nsPositions.length) {
-      const xs=nsPositions.map(p=>p.x), ys=nsPositions.map(p=>p.y);
-      const x0=Math.min(...xs)-120, x1=Math.max(...xs)+120;
-      const y0=Math.min(...ys)-80,  y1=Math.max(...ys)+80;
-      const scale=Math.min(W/(x1-x0), H/(y1-y0), 1.4)*.8;
-      const tx=W/2-scale*(x0+x1)/2, ty=H/2-scale*(y0+y1)/2;
-      svg.transition().duration(700).call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(scale));
-    }
     document.getElementById('stat-n').textContent='5 UNCHARTED ZONES';
     setLiveCount(0, 'published skills');
   } else if(mode==='dhk') {
     document.getElementById('stat-n').textContent='8 DHK SKILLS';
     setLiveCount(8);
-    // Zoom to DHK cluster
-    const dhkPts = GRAPH.nodes.filter(d=>(d.type==='dhk'||d.type==='dhk_hub')&&d.x!=null);
-    if(dhkPts.length) {
-      const xs=dhkPts.map(d=>d.x), ys=dhkPts.map(d=>d.y);
-      const x0=Math.min(...xs)-80, x1=Math.max(...xs)+80;
-      const y0=Math.min(...ys)-60, y1=Math.max(...ys)+60;
-      const scale=Math.min(W/(x1-x0), H/(y1-y0), 2.5)*.8;
-      const tx=W/2-scale*(x0+x1)/2, ty=H/2-scale*(y0+y1)/2;
-      svg.transition().duration(700).call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(scale));
-    }
   } else {
-    const visible = GRAPH.nodes.filter(d=>{
-      if(mode==='all') return d.type==='skill'||d.type==='dhk';
-      if(mode==='domains') return d.type==='skill'||d.type==='dhk';
-      if(mode==='orgs') return false;
-      if(mode==='skills') return d.type==='skill'||d.type==='dhk';
-      return d.type==='skill'||d.type==='dhk';
-    }).length;
-    document.getElementById('stat-n').textContent = '229 NODES';
-    setLiveCount(visible || null);
+    const count = GRAPH.nodes.filter(d=>d.type==='skill'||d.type==='dhk').length;
+    document.getElementById('stat-n').textContent = count + ' SKILLS';
+    setLiveCount(mode==='orgs' ? null : count);
   }
 }
 
