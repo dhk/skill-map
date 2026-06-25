@@ -961,12 +961,12 @@ function filterNodes(typing) {
     const t=typeof l.target==='object'?l.target.id:l.target;
     if(matched.has(s)||matched.has(t)){linked.add(s);linked.add(t);}
   });
-  node.style('opacity',d=>matched.has(d.id)?1:linked.has(d.id)?.35:.04);
-  nsClouds.style('opacity',d=>matched.has(d.id)?1:.04);
+  node.style('opacity',d=>matched.has(d.id)?1:linked.has(d.id)?.4:.12);
+  nsClouds.style('opacity',d=>matched.has(d.id)?1:.08);
   link.style('stroke-opacity',l=>{
     const s=typeof l.source==='object'?l.source.id:l.source;
     const t=typeof l.target==='object'?l.target.id:l.target;
-    return(matched.has(s)||matched.has(t))?.4:.02;
+    return(matched.has(s)||matched.has(t))?.45:.06;
   });
   const skillMatches = GRAPH.nodes.filter(d=>(d.type==='skill'||d.type==='dhk')&&matched.has(d.id)).length;
   document.getElementById('stat-n').textContent=`${matched.size} MATCHED`;
