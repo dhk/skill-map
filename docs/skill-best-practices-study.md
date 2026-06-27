@@ -19,6 +19,8 @@ Anthropic gold standard, three ways:
 | [just-add-these-skills.md](just-add-these-skills.md) | The general-purpose set + practice-level changes for skills you already have. |
 | [skill-types.md](skill-types.md) | Quality sliced by skill type — which kinds are written well vs badly. |
 | [skill-author-checklist.md](skill-author-checklist.md) | The human authoring checklist, tagged with what's machine-checkable vs needs judgment. |
+| [curiosities.md](curiosities.md) | **The oddities** — popular-but-undiscoverable, viral copies, coercive tone, risky-no-guardrails, delightful names. |
+| [incremental-crawl-system.md](incremental-crawl-system.md) | How re-crawls recompute every finding + track what changed / is new / is odd. |
 | [llm-judge-tuning.md](llm-judge-tuning.md) | Why the LLM judge scored Anthropic "weak," the fix, and the maturity (commit-count) finding. |
 | [update-from-anthropic.md](update-from-anthropic.md) | Specific Anthropic skills that miss Anthropic's own rubric, and what to use instead. |
 | [article-series.md](article-series.md) | A planned 5-part article series built on this study. |
