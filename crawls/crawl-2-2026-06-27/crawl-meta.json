@@ -1,0 +1,39 @@
+{
+  "crawl_id": "crawl-2-2026-06-27",
+  "status": "complete",
+  "crawl_date": "2026-06-27",
+  "queries_run": [
+    "crawl-list:seed-list-003.md"
+  ],
+  "total_repos": 2,
+  "total_files": 51,
+  "errors": 0,
+  "repo_breakdown": {
+    "rohitg00/awesome-claude-code-toolkit": {
+      "skills": 40,
+      "errors": 0
+    },
+    "mksglu/context-mode": {
+      "skills": 11,
+      "errors": 0
+    }
+  },
+  "input_quality": {
+    "list_id": "seed-list-003",
+    "list_source": "community-roundup",
+    "repos_in_list": 4,
+    "repos_found_skills": 2,
+    "repos_empty": 2,
+    "repos_not_found": 0,
+    "repos_error": 0,
+    "hit_rate": 0.5,
+    "skills_per_hit_repo": 25.5,
+    "total_skills": 51,
+    "outcomes": {
+      "rohitg00/awesome-claude-code-toolkit": "found",
+      "quemsah/awesome-claude-plugins": "empty",
+      "langgptai/awesome-claude-prompts": "empty",
+      "mksglu/context-mode": "found"
+    }
+  }
+}
