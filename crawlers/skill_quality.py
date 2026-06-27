@@ -46,6 +46,16 @@ WHEN_PATTERNS = [
     r'\bapply (this|when)\b',
     r'\binvoke',
 ]
+# Phrases that signal an anti-trigger ("when NOT to use"). Surfaced by the
+# tuned LLM judge as a real gap even canonical skills miss; a complete
+# description states what, when, AND when not (prevents false-positive retrieval).
+ANTI_TRIGGER_PATTERNS = [
+    r'\b(do not|don\'t|not|never|avoid)\s+(use|apply|invoke|trigger)',
+    r'\bnot (for|intended|meant|suitable|appropriate|when)\b',
+    r'\b(rather than|instead of|as opposed to)\b',
+    r'\b(except|unless|excluding)\b',
+    r'\bnot\b.{0,40}\b(standalone|google sheets|word docs?|simple|read-only)\b',
+]
 # Verbs that signal the description says WHAT the skill does.
 WHAT_PATTERNS = [
     r'\b(creat|generat|build|analyz|extract|transform|convert|writ|review|'
@@ -110,6 +120,8 @@ def _metrics(parsed, dir_name=None):
         'desc_words': len(desc.split()),
         'desc_has_when': any(re.search(p, desc, re.I) for p in WHEN_PATTERNS),
         'desc_has_what': any(re.search(p, desc, re.I) for p in WHAT_PATTERNS),
+        'desc_has_anti_trigger': any(re.search(p, desc, re.I)
+                                     for p in ANTI_TRIGGER_PATTERNS),
         'body_words': len(words),
         'h2': _count(body, r'^## '),
         'h3': _count(body, r'^### '),
@@ -138,12 +150,13 @@ def _score_triggering(m):
         return 0
     s = 0
     w = m['desc_words']
-    if w >= DESC_LOW_WORDS:       s += 30
-    elif w >= DESC_MIN_WORDS:     s += 18
-    else:                         s += 5
+    if w >= DESC_LOW_WORDS:       s += 25
+    elif w >= DESC_MIN_WORDS:     s += 15
+    else:                         s += 4
     if w > DESC_HIGH_WORDS:       s -= 10          # bloated trigger string
-    if m['desc_has_what']:        s += 30
-    if m['desc_has_when']:        s += 40          # the highest-value signal
+    if m['desc_has_what']:        s += 25
+    if m['desc_has_when']:        s += 35          # the highest-value signal
+    if m['desc_has_anti_trigger']: s += 15         # when NOT to use (the rare polish)
     return max(0, min(100, s))
 
 
@@ -204,6 +217,8 @@ def score_skill(md, dir_name=None):
         flags.append('no-when-trigger')
     if m['has_description'] and m['desc_words'] < DESC_MIN_WORDS:
         flags.append('thin-description')
+    if m['has_description'] and not m['desc_has_anti_trigger']:
+        flags.append('no-anti-trigger')
     if m['body_words'] < BODY_STUB_WORDS:
         flags.append('stub-body')
     if m['body_words'] > BODY_LONG_WORDS and m['ref_files'] == 0:

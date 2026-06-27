@@ -6,13 +6,19 @@ Anthropic gold standard (see [best-practices.md](best-practices.md)). One crawl,
 
 ## The headline numbers
 
-- **Corpus median quality: 76.2 / 100** — a solid B-minus ecosystem.
-- **Grade distribution:** A 1,751 · B 1,104 · C 1,197 · D 796 · F 54.
-- **Only 43% of skills tell Claude *when* to use them.** The single most common
-  defect, by a wide margin: **2,770 skills have no WHEN-trigger** in their
-  description.
+- **Corpus median quality: 73.5 / 100** — a solid B-minus ecosystem.
+- **Grade distribution:** A 1,276 · B 1,428 · C 1,347 · D 797 · F 54.
+- **Only 2.2% of skills state when *not* to use them** (the anti-trigger note) —
+  the rarest practice in the ecosystem and now the #1 defect (4,771 skills). Even
+  the canonical repos mostly miss it. See [the rubric](best-practices.md) and
+  [judge-tuning](llm-judge-tuning.md) for why it matters.
+- **Only 43% tell Claude *when* to use them at all** — 2,770 skills have no
+  WHEN-trigger.
 - **Only 27% use progressive disclosure** (link to reference files instead of
   inlining everything).
+
+(Quality numbers here reflect the v2 rubric, which scores the anti-trigger note;
+it lowered every signature ~3–4 points uniformly without changing the rankings.)
 
 ## Lesson 1 — The ecosystem's quality problem is concentrated, not spread
 
@@ -20,12 +26,12 @@ Quality does **not** degrade evenly. It collapses in one place: **mega-collectio
 
 | Signature | Repos | Skills | Median quality | % with WHEN-trigger |
 |---|---|---|---|---|
-| canonical-reference | 5 | 118 | **89.5** | 82% |
-| domain-pack | 11 | 370 | **89.0** | 74% |
-| marketplace | 6 | 594 | **87.0** | 81% |
-| single-skill | 7 | 7 | 87.0 | 71% |
-| boutique | 5 | 38 | 84.5 | 74% |
-| **mega-collection** | 5 | **3,775** | **69.4** | **33%** |
+| canonical-reference | 5 | 118 | **85.0** | 82% |
+| domain-pack | 11 | 370 | **85.0** | 74% |
+| marketplace | 6 | 594 | **82.5** | 81% |
+| single-skill | 7 | 7 | 85.0 | 71% |
+| boutique | 5 | 38 | 80.0 | 74% |
+| **mega-collection** | 5 | **3,775** | **68.2** | **33%** |
 
 Mega-collections are **77% of all skills in the corpus** but have the lowest
 median and barely a third carry a WHEN-trigger. Everything that *isn't* a
@@ -71,6 +77,7 @@ is the **frontmatter discipline and the trigger** — the parts that make a skil
 
 | Defect | Skills affected | % of corpus |
 |---|---|---|
+| no anti-trigger ("when NOT to use") | 4,771 | 97% |
 | no WHEN-trigger | 2,770 | 56% |
 | thin description (<8 words) | 1,732 | 35% |
 | nonstandard frontmatter | 1,119 | 23% |

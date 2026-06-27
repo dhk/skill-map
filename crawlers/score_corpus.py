@@ -52,6 +52,7 @@ def main():
             'desc_words': sc['metrics']['desc_words'],
             'body_words': sc['metrics']['body_words'],
             'desc_has_when': sc['metrics']['desc_has_when'],
+            'desc_has_anti': sc['metrics']['desc_has_anti_trigger'],
             'ref_files': sc['metrics']['ref_files'],
         }
         per_skill.append(rec)
@@ -137,6 +138,7 @@ def main():
         'mean_quality': round(st.mean(allov), 1),
         'grade_dist': _grade_dist(per_skill),
         'pct_with_when': round(100 * sum(r['desc_has_when'] for r in per_skill) / len(per_skill), 1),
+        'pct_with_anti_trigger': round(100 * sum(r['desc_has_anti'] for r in per_skill) / len(per_skill), 1),
         'pct_uses_refs': round(100 * sum(r['ref_files'] > 0 for r in per_skill) / len(per_skill), 1),
         'flag_freq': sorted(allflag.items(), key=lambda x: -x[1]),
     }

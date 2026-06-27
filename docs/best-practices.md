@@ -59,7 +59,9 @@ surfaced one practice even the canonical skills usually skip: stating when *not*
 to invoke the skill. `anthropics/skills/xlsx` does this well ("not for Word docs,
 Google Sheets, or standalone scripts") and it measurably prevents false-positive
 retrieval on adjacent tasks. A complete description states **what**, **when**, and
-**when not**. The heuristic scorer doesn't yet require it; the judge does.
+**when not**. The scorer now rewards it (worth 15 of the triggering axis's 100
+points) — and it reveals just how rare it is: **only 2.2% of the entire corpus
+has one**, making it the single most common defect (4,771 skills).
 
 ### 3. Progressive disclosure — 20%
 - a real body (not a stub)
