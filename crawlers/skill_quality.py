@@ -1,0 +1,227 @@
+"""
+skill_quality.py — Score any SKILL.md against the Anthropic gold-standard rubric.
+
+The rubric is derived empirically from the canonical reference skills
+(anthropics/skills, openai/skills). See docs/best-practices.md for the
+narrative; the thresholds encoded here are the machine-readable version.
+
+Four weighted dimensions (each 0–100), combined into an overall score:
+
+  frontmatter   (25%)  name/description present, valid slug, valid YAML,
+                       license/metadata, no junk keys
+  triggering    (30%)  description says WHAT + WHEN (the "Use this when…"
+                       pattern Anthropic models), healthy length
+  disclosure    (20%)  progressive disclosure — body present, token economy,
+                       links to reference files instead of dumping everything
+  structure     (25%)  headings, examples/code where appropriate, steps/bullets,
+                       not a stub
+
+Public API:
+    parse_skill(md)        -> dict(frontmatter, body, raw)
+    score_skill(md, name)  -> dict(scores, overall, grade, flags, metrics)
+
+Usable standalone (`python crawlers/skill_quality.py path/to/SKILL.md`) and
+imported by audit_repo.py / score_corpus.py.
+"""
+import re
+import sys
+import json
+
+# ── Thresholds (derived from canonical reference skills) ──────────────
+# anthropics/skills: desc median 43 words, body median ~1194 words,
+# name+description always present, license common, headings standard.
+DESC_MIN_WORDS = 8       # below this a description can't say what+when
+DESC_LOW_WORDS = 14      # canonical descriptions rarely shorter
+DESC_HIGH_WORDS = 80     # above this it's bloated for a trigger string
+BODY_STUB_WORDS = 40     # below this the body is a stub, not a skill
+BODY_LONG_WORDS = 2200   # above this without reference files = poor disclosure
+
+# Phrases that signal a "when to use" trigger in the description.
+WHEN_PATTERNS = [
+    r'\buse (this|it|when|for)\b',
+    r'\bwhen (you|the user|users|a user|asked|working|building|creating|dealing)\b',
+    r'\bfor (creating|building|generating|analyzing|writing|working|when)\b',
+    r'\bif (you|the user|asked)\b',
+    r'\btrigger',
+    r'\bapply (this|when)\b',
+    r'\binvoke',
+]
+# Verbs that signal the description says WHAT the skill does.
+WHAT_PATTERNS = [
+    r'\b(creat|generat|build|analyz|extract|transform|convert|writ|review|'
+    r'test|deploy|configur|manag|automat|format|pars|validat|search|'
+    r'design|render|process|summar|translat|debug|refactor|audit|'
+    r'integrat|orchestrat|edit|read|fetch|scrap|classif|optimiz)\w*\b',
+]
+
+VALID_SLUG = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
+# Keys the canonical corpus actually uses; anything else is "junk".
+KNOWN_KEYS = {
+    'name', 'description', 'license', 'metadata', 'allowed-tools',
+    'allowed_tools', 'version', 'author', 'tags', 'model', 'argument-hint',
+    'disable-model-invocation', 'title',
+}
+
+
+def parse_skill(md):
+    """Split a SKILL.md into frontmatter (dict) and body (str)."""
+    md = md or ''
+    fm = {}
+    body = md
+    if md.lstrip().startswith('---'):
+        m = re.match(r'^\s*---\s*\n(.*?)\n---\s*\n?(.*)$', md, re.S)
+        if m:
+            body = m.group(2)
+            for line in m.group(1).splitlines():
+                mm = re.match(r'^([A-Za-z0-9_-]+):\s*(.*)$', line)
+                if mm:
+                    val = mm.group(2).strip().strip('"\'')
+                    fm[mm.group(1).strip()] = val
+    return {'frontmatter': fm, 'body': body, 'raw': md,
+            'has_yaml': bool(fm) or md.lstrip().startswith('---')}
+
+
+def _count(body, pattern, flags=re.M):
+    return len(re.findall(pattern, body, flags))
+
+
+def _metrics(parsed, dir_name=None):
+    fm = parsed['frontmatter']
+    body = parsed['body']
+    desc = fm.get('description', '')
+    words = body.split()
+    ref_files = _count(
+        body, r'\]\(([^)]+\.(?:md|py|sh|js|ts|txt|json|ya?ml|csv))\)')
+    ref_files += _count(body, r'(?:see|read|refer to|reference)\s+[`\'"]?'
+                              r'[\w./-]+\.(?:md|py|sh|txt)', re.I)
+    return {
+        'has_name': bool(fm.get('name')),
+        'has_description': bool(desc),
+        'name': fm.get('name', ''),
+        'name_valid_slug': bool(VALID_SLUG.match(fm.get('name', ''))),
+        'name_matches_dir': (dir_name is None or
+                             fm.get('name', '') == dir_name),
+        'has_yaml': parsed['has_yaml'],
+        'has_license': 'license' in fm,
+        'has_metadata': 'metadata' in fm,
+        'has_allowed_tools': any(k in fm for k in
+                                 ('allowed-tools', 'allowed_tools')),
+        'junk_keys': [k for k in fm if k not in KNOWN_KEYS],
+        'desc_words': len(desc.split()),
+        'desc_has_when': any(re.search(p, desc, re.I) for p in WHEN_PATTERNS),
+        'desc_has_what': any(re.search(p, desc, re.I) for p in WHAT_PATTERNS),
+        'body_words': len(words),
+        'h2': _count(body, r'^## '),
+        'h3': _count(body, r'^### '),
+        'code_blocks': _count(body, r'```') // 2,
+        'bullets': _count(body, r'^\s*[-*] '),
+        'numbered_steps': _count(body, r'^\s*\d+\. '),
+        'ref_files': ref_files,
+    }
+
+
+def _score_frontmatter(m):
+    s = 0
+    if m['has_name']:           s += 30
+    if m['has_description']:    s += 30
+    if m['has_yaml']:           s += 10
+    if m['name_valid_slug']:    s += 12
+    if m['name_matches_dir']:   s += 8
+    if m['has_license'] or m['has_metadata']: s += 10
+    if not m['junk_keys']:      s += 0   # neutral; junk only penalizes below
+    s -= min(10, 5 * len(m['junk_keys']))
+    return max(0, min(100, s))
+
+
+def _score_triggering(m):
+    if not m['has_description']:
+        return 0
+    s = 0
+    w = m['desc_words']
+    if w >= DESC_LOW_WORDS:       s += 30
+    elif w >= DESC_MIN_WORDS:     s += 18
+    else:                         s += 5
+    if w > DESC_HIGH_WORDS:       s -= 10          # bloated trigger string
+    if m['desc_has_what']:        s += 30
+    if m['desc_has_when']:        s += 40          # the highest-value signal
+    return max(0, min(100, s))
+
+
+def _score_disclosure(m):
+    bw = m['body_words']
+    if bw < BODY_STUB_WORDS:
+        return 15 if bw > 0 else 0                 # stub
+    s = 60                                          # has a real body
+    if m['ref_files'] >= 1:       s += 25          # links out for depth
+    if m['ref_files'] >= 3:       s += 15
+    if bw > BODY_LONG_WORDS and m['ref_files'] == 0:
+        s -= 25                                     # dumps everything inline
+    return max(0, min(100, s))
+
+
+def _score_structure(m):
+    if m['body_words'] < BODY_STUB_WORDS:
+        return 10
+    s = 0
+    if m['h2'] + m['h3'] >= 1:    s += 25
+    if m['h2'] + m['h3'] >= 3:    s += 15
+    if m['code_blocks'] >= 1:     s += 20
+    if m['bullets'] + m['numbered_steps'] >= 3: s += 20
+    if m['numbered_steps'] >= 1:  s += 10          # procedural guidance
+    if m['body_words'] >= 120:    s += 10
+    return max(0, min(100, s))
+
+
+WEIGHTS = {'frontmatter': .25, 'triggering': .30,
+           'disclosure': .20, 'structure': .25}
+
+
+def _grade(overall):
+    if overall >= 85: return 'A'
+    if overall >= 70: return 'B'
+    if overall >= 55: return 'C'
+    if overall >= 40: return 'D'
+    return 'F'
+
+
+def score_skill(md, dir_name=None):
+    """Score a raw SKILL.md string. dir_name enables name==dir checking."""
+    parsed = parse_skill(md)
+    m = _metrics(parsed, dir_name)
+    scores = {
+        'frontmatter': _score_frontmatter(m),
+        'triggering':  _score_triggering(m),
+        'disclosure':  _score_disclosure(m),
+        'structure':   _score_structure(m),
+    }
+    overall = round(sum(scores[k] * WEIGHTS[k] for k in scores), 1)
+    flags = []
+    if not m['has_name']:        flags.append('missing-name')
+    if not m['has_description']: flags.append('missing-description')
+    if not m['name_valid_slug'] and m['has_name']:
+        flags.append('non-slug-name')
+    if m['has_description'] and not m['desc_has_when']:
+        flags.append('no-when-trigger')
+    if m['has_description'] and m['desc_words'] < DESC_MIN_WORDS:
+        flags.append('thin-description')
+    if m['body_words'] < BODY_STUB_WORDS:
+        flags.append('stub-body')
+    if m['body_words'] > BODY_LONG_WORDS and m['ref_files'] == 0:
+        flags.append('no-progressive-disclosure')
+    if m['junk_keys']:
+        flags.append('nonstandard-frontmatter')
+    return {'overall': overall, 'grade': _grade(overall),
+            'scores': scores, 'flags': flags, 'metrics': m}
+
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print('usage: python skill_quality.py path/to/SKILL.md', file=sys.stderr)
+        sys.exit(1)
+    with open(sys.argv[1]) as f:
+        md = f.read()
+    dir_name = None
+    parts = sys.argv[1].replace('\\', '/').split('/')
+    if len(parts) >= 2:
+        dir_name = parts[-2]
+    print(json.dumps(score_skill(md, dir_name), indent=2))

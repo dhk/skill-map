@@ -1,0 +1,47 @@
+{
+ "other/domain": {
+  "n": 2881,
+  "median": 77.7,
+  "pct_when": 47.9
+ },
+ "generator/creator": {
+  "n": 481,
+  "median": 76.4,
+  "pct_when": 44.5
+ },
+ "workflow/orchestrator": {
+  "n": 422,
+  "median": 72.5,
+  "pct_when": 40.8
+ },
+ "reviewer/auditor": {
+  "n": 326,
+  "median": 68.9,
+  "pct_when": 32.5
+ },
+ "data/analytics": {
+  "n": 246,
+  "median": 63.5,
+  "pct_when": 19.9
+ },
+ "test/quality": {
+  "n": 232,
+  "median": 66.2,
+  "pct_when": 28.9
+ },
+ "integration/connector": {
+  "n": 138,
+  "median": 70.8,
+  "pct_when": 32.6
+ },
+ "reference/guide": {
+  "n": 129,
+  "median": 78.0,
+  "pct_when": 44.2
+ },
+ "transformer/converter": {
+  "n": 47,
+  "median": 80.0,
+  "pct_when": 46.8
+ }
+}
