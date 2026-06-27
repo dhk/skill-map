@@ -21,9 +21,16 @@ real figure, a dataset, and a reproducible command — not just opinion.
   repo and spread into a famous one).
 - **Backed by:** `lineage.html` (Timeline + Sankey), `lineage_trace.py`,
   the bulk-publish table (`llm-judge-tuning.md`).
-- **Figure:** the Sankey of repo→repo copy flows (`docs/figures/sankey-lineage.png`):
+- **Figure:** the copy-network (`docs/figures/copy-network.png`) — one node per
+  repo so intermediaries show as hubs. anthropics/openai originate; davila7 &
+  BbgnsurfTech are the big copiers AND intermediaries; the 223-skill
+  BbgnsurfTech→davila7 batch is the layered-inheritance edge.
 
-  ![Skill lineage Sankey](figures/sankey-lineage.png)
+  ![Skill copy network](figures/copy-network.png)
+
+  (A two-column Sankey, `figures/sankey-lineage.png`, was the first attempt but
+  was structurally wrong — both axes were the same repo universe, forcing each
+  repo to be a pure source or sink and hiding the intermediaries.)
 
 ## 2. "Who's Actually Inventing? The Originators"
 **Thesis:** the biggest repos aren't the inventors — the originators are smaller.
