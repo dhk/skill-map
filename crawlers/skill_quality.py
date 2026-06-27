@@ -136,7 +136,10 @@ def _count(body, pattern, flags=re.M):
     return len(re.findall(pattern, body, flags))
 
 
-def _metrics(parsed, dir_name=None):
+REF_SIBLING_RE = re.compile(r'(^|/)(reference|references|scripts|assets|docs)/', re.I)
+
+
+def _metrics(parsed, dir_name=None, sibling_files=None):
     fm = parsed['frontmatter']
     body = parsed['body']
     desc = fm.get('description', '')
@@ -145,6 +148,12 @@ def _metrics(parsed, dir_name=None):
         body, r'\]\(([^)]+\.(?:md|py|sh|js|ts|txt|json|ya?ml|csv))\)')
     ref_files += _count(body, r'(?:see|read|refer to|reference)\s+[`\'"]?'
                               r'[\w./-]+\.(?:md|py|sh|txt)', re.I)
+    # Real folder contents (backfilled by fetch_siblings.py): does the skill
+    # delegate depth to reference/scripts/ sibling files? This is what the
+    # progressive-disclosure axis should measure — not just inline links.
+    sibs = sibling_files or []
+    has_ref_siblings = any(REF_SIBLING_RE.search(p) for p in sibs)
+    n_siblings = len(sibs)
     return {
         'has_name': bool(fm.get('name')),
         'has_description': bool(desc),
@@ -170,6 +179,8 @@ def _metrics(parsed, dir_name=None):
         'bullets': _count(body, r'^\s*[-*] '),
         'numbered_steps': _count(body, r'^\s*\d+\. '),
         'ref_files': ref_files,
+        'has_ref_siblings': has_ref_siblings,
+        'n_siblings': n_siblings,
         'has_output_format': any(re.search(p, body, re.I | re.M)
                                  for p in OUTPUT_FORMAT_PATTERNS),
         'is_high_stakes': any(re.search(p, body, re.I) for p in HIGH_STAKES_PATTERNS),
@@ -210,9 +221,11 @@ def _score_disclosure(m):
     if bw < BODY_STUB_WORDS:
         return 15 if bw > 0 else 0                 # stub
     s = 60                                          # has a real body
-    if m['ref_files'] >= 1:       s += 25          # links out for depth
-    if m['ref_files'] >= 3:       s += 15
-    if bw > BODY_LONG_WORDS and m['ref_files'] == 0:
+    # depth delegated either via inline links OR real reference/scripts siblings
+    delegates = m['ref_files'] >= 1 or m['has_ref_siblings']
+    if delegates:                 s += 25
+    if m['ref_files'] >= 3 or m['n_siblings'] >= 5:  s += 15
+    if bw > BODY_LONG_WORDS and not delegates:
         s -= 25                                     # dumps everything inline
     return max(0, min(100, s))
 
@@ -242,10 +255,12 @@ def _grade(overall):
     return 'F'
 
 
-def score_skill(md, dir_name=None):
-    """Score a raw SKILL.md string. dir_name enables name==dir checking."""
+def score_skill(md, dir_name=None, sibling_files=None):
+    """Score a raw SKILL.md string. dir_name enables name==dir checking;
+    sibling_files (the skill folder's other files) lets the disclosure axis
+    credit reference/scripts delegation instead of inferring it from links."""
     parsed = parse_skill(md)
-    m = _metrics(parsed, dir_name)
+    m = _metrics(parsed, dir_name, sibling_files)
     scores = {
         'frontmatter': _score_frontmatter(m),
         'triggering':  _score_triggering(m),
@@ -266,7 +281,8 @@ def score_skill(md, dir_name=None):
         flags.append('no-anti-trigger')
     if m['body_words'] < BODY_STUB_WORDS:
         flags.append('stub-body')
-    if m['body_words'] > BODY_LONG_WORDS and m['ref_files'] == 0:
+    if (m['body_words'] > BODY_LONG_WORDS and m['ref_files'] == 0
+            and not m['has_ref_siblings']):
         flags.append('no-progressive-disclosure')
     if m['junk_keys']:
         flags.append('nonstandard-frontmatter')

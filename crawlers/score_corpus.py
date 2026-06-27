@@ -37,6 +37,8 @@ def load_all_crawls():
 
 def main():
     results = load_all_crawls()
+    sib_path = BASE / 'data' / 'sibling_files.json'
+    siblings = json.load(open(sib_path)) if sib_path.exists() else {}
 
     per_skill = []
     by_repo = defaultdict(list)
@@ -49,7 +51,8 @@ def main():
         rn = it['repo_full_name']
         _parts = it['file_path'].replace('\\', '/').split('/')
         dir_name = _parts[-2] if len(_parts) >= 2 else None
-        sc = score_skill(md, dir_name)
+        sc = score_skill(md, dir_name,
+                         siblings.get(f"{rn}\t{it['file_path']}"))
         rec = {
             'repo': rn,
             'file_path': it['file_path'],
