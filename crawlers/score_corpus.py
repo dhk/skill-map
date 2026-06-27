@@ -21,13 +21,22 @@ from skill_quality import score_skill
 from repo_signature import classify_repo
 
 BASE = Path(__file__).parent.parent
-CRAWL = BASE / 'crawls' / 'crawl-1-2026-06-24' / 'data.json'
+CRAWLS_DIR = BASE / 'crawls'
 OUT = BASE / 'data' / 'skill_quality.json'
 
 
+def load_all_crawls():
+    """Merge results across every crawls/*/data.json. On duplicate
+    (repo, file_path), the most recent crawl (by dir name) wins."""
+    merged = {}
+    for data_path in sorted(CRAWLS_DIR.glob('*/data.json')):
+        for r in json.load(open(data_path)).get('results', []):
+            merged[(r['repo_full_name'], r['file_path'])] = r
+    return list(merged.values())
+
+
 def main():
-    data = json.load(open(CRAWL))
-    results = data['results']
+    results = load_all_crawls()
 
     per_skill = []
     by_repo = defaultdict(list)

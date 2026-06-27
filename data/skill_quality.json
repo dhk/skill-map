@@ -1,35 +1,35 @@
 {
  "corpus": {
-  "n_skills": 4902,
-  "n_repos": 39,
-  "median_quality": 79.8,
-  "mean_quality": 78.0,
+  "n_skills": 4953,
+  "n_repos": 41,
+  "median_quality": 79.5,
+  "mean_quality": 77.9,
   "grade_dist": {
-   "A": 1574,
-   "B": 2430,
-   "C": 766,
+   "A": 1576,
+   "B": 2454,
+   "C": 790,
    "D": 78,
-   "F": 54
+   "F": 55
   },
-  "pct_with_when": 68.5,
+  "pct_with_when": 68.1,
   "pct_with_anti_trigger": 2.5,
-  "pct_uses_refs": 26.8,
+  "pct_uses_refs": 26.6,
   "flag_freq": [
    [
     "no-anti-trigger",
-    4758
+    4807
    ],
    [
     "output-format-unstated",
-    3073
+    3114
    ],
    [
     "no-when-trigger",
-    1521
+    1559
    ],
    [
     "nonstandard-frontmatter",
-    1119
+    1129
    ],
    [
     "thin-description",
@@ -53,11 +53,11 @@
    ],
    [
     "missing-description",
-    21
+    22
    ],
    [
     "missing-name",
-    14
+    15
    ]
   ]
  },
@@ -104,8 +104,8 @@
    ]
   },
   "domain-pack": {
-   "n_repos": 11,
-   "n_skills": 370,
+   "n_repos": 12,
+   "n_skills": 410,
    "repos": [
     "foxj77/claude-code-skills",
     "muratcankoylan/Agent-Skills-for-Context-Engineering",
@@ -117,28 +117,29 @@
     "dmccreary/claude-skills",
     "mattpocock/skills",
     "JimLiu/baoyu-skills",
-    "can1357/oh-my-pi"
+    "can1357/oh-my-pi",
+    "rohitg00/awesome-claude-code-toolkit"
    ],
    "median_quality": 85.0,
-   "mean_quality": 81.8,
-   "pct_with_when": 80.8,
-   "pct_uses_refs": 58.1,
+   "mean_quality": 80.4,
+   "pct_with_when": 73.2,
+   "pct_uses_refs": 52.7,
    "top_flags": [
     [
      "no-anti-trigger",
-     360
+     399
     ],
     [
      "output-format-unstated",
-     186
-    ],
-    [
-     "nonstandard-frontmatter",
-     90
+     217
     ],
     [
      "no-when-trigger",
-     69
+     107
+    ],
+    [
+     "nonstandard-frontmatter",
+     93
     ],
     [
      "stub-body",
@@ -151,35 +152,36 @@
    ]
   },
   "boutique": {
-   "n_repos": 5,
-   "n_skills": 38,
+   "n_repos": 6,
+   "n_skills": 49,
    "repos": [
     "obra/superpowers",
     "kepano/obsidian-skills",
     "dhk/adventures-in-ai",
     "ykdojo/claude-code-tips",
-    "sebastianwessel/skills"
+    "sebastianwessel/skills",
+    "mksglu/context-mode"
    ],
    "median_quality": 80.0,
-   "mean_quality": 79.2,
-   "pct_with_when": 86.8,
-   "pct_uses_refs": 23.7,
+   "mean_quality": 79.0,
+   "pct_with_when": 89.8,
+   "pct_uses_refs": 22.4,
    "top_flags": [
     [
      "no-anti-trigger",
-     37
+     47
     ],
     [
      "output-format-unstated",
-     34
+     44
+    ],
+    [
+     "nonstandard-frontmatter",
+     10
     ],
     [
      "no-when-trigger",
      5
-    ],
-    [
-     "nonstandard-frontmatter",
-     3
     ],
     [
      "no-progressive-disclosure",
@@ -1623,6 +1625,78 @@
     [
      "nonstandard-frontmatter",
      39
+    ]
+   ]
+  },
+  "rohitg00/awesome-claude-code-toolkit": {
+   "n_skills": 40,
+   "stars": 2191,
+   "owner_type": "User",
+   "source": "toolkit",
+   "median_quality": 69.0,
+   "mean_quality": 68.1,
+   "quality_stdev": 5.7,
+   "grade_dist": {
+    "B": 16,
+    "C": 23,
+    "F": 1
+   },
+   "signature": "domain-pack",
+   "signature_rationale": "40 skills \u2192 domain-pack by scale",
+   "pct_with_when": 2.5,
+   "pct_uses_refs": 2.5,
+   "top_flags": [
+    [
+     "no-anti-trigger",
+     39
+    ],
+    [
+     "no-when-trigger",
+     38
+    ],
+    [
+     "output-format-unstated",
+     31
+    ],
+    [
+     "nonstandard-frontmatter",
+     3
+    ],
+    [
+     "missing-name",
+     1
+    ]
+   ]
+  },
+  "mksglu/context-mode": {
+   "n_skills": 11,
+   "stars": 18263,
+   "owner_type": "User",
+   "source": "tool",
+   "median_quality": 77.5,
+   "mean_quality": 78.3,
+   "quality_stdev": 8.8,
+   "grade_dist": {
+    "A": 2,
+    "B": 8,
+    "C": 1
+   },
+   "signature": "boutique",
+   "signature_rationale": "11 skills \u2192 boutique by scale",
+   "pct_with_when": 100.0,
+   "pct_uses_refs": 18.2,
+   "top_flags": [
+    [
+     "no-anti-trigger",
+     10
+    ],
+    [
+     "output-format-unstated",
+     10
+    ],
+    [
+     "nonstandard-frontmatter",
+     7
     ]
    ]
   }
@@ -111272,6 +111346,1166 @@
    ],
    "desc_words": 31,
    "body_words": 406,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/accessibility-wcag/SKILL.md",
+   "name": "accessibility-wcag",
+   "overall": 72.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 50,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 15,
+   "body_words": 594,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/agentkit-seo/SKILL.md",
+   "name": "agentkit-seo",
+   "overall": 70.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 80,
+    "triggering": 60,
+    "disclosure": 60,
+    "structure": 80
+   },
+   "flags": [
+    "no-anti-trigger",
+    "nonstandard-frontmatter",
+    "output-format-unstated"
+   ],
+   "desc_words": 42,
+   "body_words": 420,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/api-design-patterns/SKILL.md",
+   "name": "api-design-patterns",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 12,
+   "body_words": 616,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/authentication-patterns/SKILL.md",
+   "name": "authentication-patterns",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger"
+   ],
+   "desc_words": 13,
+   "body_words": 629,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/aws-cloud-patterns/SKILL.md",
+   "name": "aws-cloud-patterns",
+   "overall": 64.5,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 25,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger"
+   ],
+   "desc_words": 14,
+   "body_words": 506,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/ci-cd-pipelines/SKILL.md",
+   "name": "ci-cd-pipelines",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 13,
+   "body_words": 499,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/claude-memory-kit/SKILL.md",
+   "name": "claude-memory-kit",
+   "overall": 63.2,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 95,
+    "triggering": 25,
+    "disclosure": 60,
+    "structure": 80
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "nonstandard-frontmatter",
+    "output-format-unstated"
+   ],
+   "desc_words": 21,
+   "body_words": 98,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/continuous-learning/SKILL.md",
+   "name": "continuous-learning",
+   "overall": 74.5,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 50,
+    "disclosure": 60,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 14,
+   "body_words": 745,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/data-engineering/SKILL.md",
+   "name": "data-engineering",
+   "overall": 72.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 50,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 14,
+   "body_words": 590,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/database-optimization/SKILL.md",
+   "name": "database-optimization",
+   "overall": 71.5,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 12,
+   "body_words": 722,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/deep-dive/SKILL.md",
+   "name": "deep-dive",
+   "overall": 64.5,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 80,
+    "triggering": 25,
+    "disclosure": 60,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "nonstandard-frontmatter"
+   ],
+   "desc_words": 17,
+   "body_words": 907,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/devops-automation/SKILL.md",
+   "name": "devops-automation",
+   "overall": 71.5,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 12,
+   "body_words": 698,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/django-patterns/SKILL.md",
+   "name": "django-patterns",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 12,
+   "body_words": 413,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/docker-best-practices/SKILL.md",
+   "name": "docker-best-practices",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 12,
+   "body_words": 442,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/frontend-excellence/SKILL.md",
+   "name": "frontend-excellence",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 13,
+   "body_words": 662,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/git-advanced/SKILL.md",
+   "name": "git-advanced",
+   "overall": 61.5,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 15,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 12,
+   "body_words": 652,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/golang-idioms/SKILL.md",
+   "name": "golang-idioms",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 12,
+   "body_words": 1014,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/graphql-design/SKILL.md",
+   "name": "graphql-design",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 13,
+   "body_words": 653,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/kubernetes-operations/SKILL.md",
+   "name": "kubernetes-operations",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 11,
+   "body_words": 423,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/llm-integration/SKILL.md",
+   "name": "llm-integration",
+   "overall": 72.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 50,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 14,
+   "body_words": 723,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/manage-skills/SKILL.md",
+   "name": "manage-skills",
+   "overall": 72.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 50,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 27,
+   "body_words": 749,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/mcp-development/SKILL.md",
+   "name": "mcp-development",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 13,
+   "body_words": 549,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/microservices-design/SKILL.md",
+   "name": "microservices-design",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 13,
+   "body_words": 495,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/mobile-development/SKILL.md",
+   "name": "mobile-development",
+   "overall": 72.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 50,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 15,
+   "body_words": 609,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/monitoring-observability/SKILL.md",
+   "name": "monitoring-observability",
+   "overall": 61.5,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 15,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 11,
+   "body_words": 568,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/nextjs-mastery/SKILL.md",
+   "name": "nextjs-mastery",
+   "overall": 72.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 50,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 14,
+   "body_words": 556,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/performance-optimization/SKILL.md",
+   "name": "performance-optimization",
+   "overall": 72.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 50,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 14,
+   "body_words": 536,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/postgres-optimization/SKILL.md",
+   "name": "postgres-optimization",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 12,
+   "body_words": 613,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/prompt-engineering/SKILL.md",
+   "name": "prompt-engineering",
+   "overall": 71.5,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger"
+   ],
+   "desc_words": 13,
+   "body_words": 641,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/python-best-practices/SKILL.md",
+   "name": "python-best-practices",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger"
+   ],
+   "desc_words": 12,
+   "body_words": 803,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/react-patterns/SKILL.md",
+   "name": "react-patterns",
+   "overall": 61.5,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 15,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger"
+   ],
+   "desc_words": 12,
+   "body_words": 799,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/redis-patterns/SKILL.md",
+   "name": "redis-patterns",
+   "overall": 72.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 50,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger"
+   ],
+   "desc_words": 15,
+   "body_words": 583,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/rust-systems/SKILL.md",
+   "name": "rust-systems",
+   "overall": 64.5,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 25,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 14,
+   "body_words": 595,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/security-hardening/SKILL.md",
+   "name": "security-hardening",
+   "overall": 71.5,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger"
+   ],
+   "desc_words": 12,
+   "body_words": 767,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/springboot-patterns/SKILL.md",
+   "name": "springboot-patterns",
+   "overall": 69.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 12,
+   "body_words": 474,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/styleseed/SKILL.md",
+   "name": "styleseed",
+   "overall": 39.5,
+   "grade": "F",
+   "scores": {
+    "frontmatter": 0,
+    "triggering": 0,
+    "disclosure": 85,
+    "structure": 90
+   },
+   "flags": [
+    "missing-name",
+    "missing-description",
+    "output-format-unstated"
+   ],
+   "desc_words": 0,
+   "body_words": 183,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 1
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/tdd-mastery/SKILL.md",
+   "name": "tdd-mastery",
+   "overall": 71.5,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 60,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 8,
+   "body_words": 571,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/testing-strategies/SKILL.md",
+   "name": "testing-strategies",
+   "overall": 72.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 50,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 14,
+   "body_words": 651,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/typescript-advanced/SKILL.md",
+   "name": "typescript-advanced",
+   "overall": 64.5,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 25,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger"
+   ],
+   "desc_words": 14,
+   "body_words": 687,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "rohitg00/awesome-claude-code-toolkit",
+   "file_path": "skills/websocket-realtime/SKILL.md",
+   "name": "websocket-realtime",
+   "overall": 61.5,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 15,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 11,
+   "body_words": 581,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "mksglu/context-mode",
+   "file_path": ".claude/skills/context-mode-ops/SKILL.md",
+   "name": "context-mode-ops",
+   "overall": 93.0,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 85,
+    "disclosure": 100,
+    "structure": 100
+   },
+   "flags": [
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 43,
+   "body_words": 3579,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 15
+  },
+  {
+   "repo": "mksglu/context-mode",
+   "file_path": "configs/antigravity-cli/skills/context-mode/SKILL.md",
+   "name": "context-mode",
+   "overall": 82.5,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 85,
+    "disclosure": 60,
+    "structure": 90
+   },
+   "flags": [
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 30,
+   "body_words": 395,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "mksglu/context-mode",
+   "file_path": "configs/copilot-cli/skills/context-mode/SKILL.md",
+   "name": "context-mode",
+   "overall": 80.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 85,
+    "disclosure": 60,
+    "structure": 80
+   },
+   "flags": [
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 35,
+   "body_words": 203,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "mksglu/context-mode",
+   "file_path": "skills/context-mode/SKILL.md",
+   "name": "context-mode",
+   "overall": 94.5,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 90,
+    "disclosure": 100,
+    "structure": 100
+   },
+   "flags": [
+    "output-format-unstated"
+   ],
+   "desc_words": 115,
+   "body_words": 2065,
+   "desc_has_when": true,
+   "desc_has_anti": true,
+   "ref_files": 5
+  },
+  {
+   "repo": "mksglu/context-mode",
+   "file_path": "skills/ctx-doctor/SKILL.md",
+   "name": "ctx-doctor",
+   "overall": 70.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 85,
+    "triggering": 60,
+    "disclosure": 60,
+    "structure": 75
+   },
+   "flags": [
+    "no-anti-trigger",
+    "nonstandard-frontmatter"
+   ],
+   "desc_words": 15,
+   "body_words": 113,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "mksglu/context-mode",
+   "file_path": "skills/ctx-index/SKILL.md",
+   "name": "ctx-index",
+   "overall": 72.5,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 85,
+    "triggering": 60,
+    "disclosure": 60,
+    "structure": 85
+   },
+   "flags": [
+    "no-anti-trigger",
+    "nonstandard-frontmatter",
+    "output-format-unstated"
+   ],
+   "desc_words": 26,
+   "body_words": 159,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "mksglu/context-mode",
+   "file_path": "skills/ctx-insight/SKILL.md",
+   "name": "ctx-insight",
+   "overall": 65.0,
+   "grade": "C",
+   "scores": {
+    "frontmatter": 85,
+    "triggering": 60,
+    "disclosure": 60,
+    "structure": 55
+   },
+   "flags": [
+    "no-anti-trigger",
+    "nonstandard-frontmatter",
+    "output-format-unstated"
+   ],
+   "desc_words": 31,
+   "body_words": 87,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "mksglu/context-mode",
+   "file_path": "skills/ctx-purge/SKILL.md",
+   "name": "ctx-purge",
+   "overall": 71.2,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 85,
+    "triggering": 60,
+    "disclosure": 60,
+    "structure": 80
+   },
+   "flags": [
+    "no-anti-trigger",
+    "nonstandard-frontmatter",
+    "output-format-unstated"
+   ],
+   "desc_words": 23,
+   "body_words": 357,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "mksglu/context-mode",
+   "file_path": "skills/ctx-search/SKILL.md",
+   "name": "ctx-search",
+   "overall": 77.5,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 85,
+    "triggering": 85,
+    "disclosure": 60,
+    "structure": 75
+   },
+   "flags": [
+    "no-anti-trigger",
+    "nonstandard-frontmatter",
+    "output-format-unstated"
+   ],
+   "desc_words": 18,
+   "body_words": 110,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "mksglu/context-mode",
+   "file_path": "skills/ctx-stats/SKILL.md",
+   "name": "ctx-stats",
+   "overall": 75.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 85,
+    "triggering": 85,
+    "disclosure": 60,
+    "structure": 65
+   },
+   "flags": [
+    "no-anti-trigger",
+    "nonstandard-frontmatter",
+    "output-format-unstated"
+   ],
+   "desc_words": 37,
+   "body_words": 122,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "mksglu/context-mode",
+   "file_path": "skills/ctx-upgrade/SKILL.md",
+   "name": "ctx-upgrade",
+   "overall": 80.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 85,
+    "triggering": 85,
+    "disclosure": 60,
+    "structure": 85
+   },
+   "flags": [
+    "no-anti-trigger",
+    "nonstandard-frontmatter",
+    "output-format-unstated"
+   ],
+   "desc_words": 18,
+   "body_words": 142,
    "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
