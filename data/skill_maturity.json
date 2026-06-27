@@ -1,10 +1,84 @@
 {
  "summary": {
-  "n": 62,
-  "corr_commits_vs_quality": -0.14,
+  "n": 172,
+  "corr_commits_vs_quality": -0.002,
   "median_commits": 2.0,
-  "quality_of_low_commit": 88.4,
-  "quality_of_high_commit": 85.3
+  "quality_of_low_commit": 84.7,
+  "quality_of_high_commit": 83.4,
+  "bulk_publish_by_repo": {
+   "anthropics/skills": {
+    "n": 18,
+    "pct_single_commit": 61,
+    "top_first_commit_day": "2025-12-01",
+    "pct_on_top_day": 89,
+    "median_commits": 1.0,
+    "bulk_published": true
+   },
+   "obra/superpowers": {
+    "n": 14,
+    "pct_single_commit": 0,
+    "top_first_commit_day": "2025-10-16",
+    "pct_on_top_day": 100,
+    "median_commits": 9.0,
+    "bulk_published": true
+   },
+   "wshobson/agents": {
+    "n": 20,
+    "pct_single_commit": 0,
+    "top_first_commit_day": "2025-12-16",
+    "pct_on_top_day": 30,
+    "median_commits": 4.0,
+    "bulk_published": false
+   },
+   "deanpeters/Product-Manager-Skills": {
+    "n": 20,
+    "pct_single_commit": 5,
+    "top_first_commit_day": "2026-02-05",
+    "pct_on_top_day": 50,
+    "median_commits": 4.0,
+    "bulk_published": false
+   },
+   "affaan-m/ECC": {
+    "n": 20,
+    "pct_single_commit": 5,
+    "top_first_commit_day": "2026-02-25",
+    "pct_on_top_day": 25,
+    "median_commits": 3.0,
+    "bulk_published": false
+   },
+   "mattpocock/skills": {
+    "n": 20,
+    "pct_single_commit": 35,
+    "top_first_commit_day": "2026-04-28",
+    "pct_on_top_day": 55,
+    "median_commits": 3.0,
+    "bulk_published": false
+   },
+   "davila7/claude-code-templates": {
+    "n": 20,
+    "pct_single_commit": 100,
+    "top_first_commit_day": "2026-01-25",
+    "pct_on_top_day": 50,
+    "median_commits": 1.0,
+    "bulk_published": true
+   },
+   "openai/skills": {
+    "n": 20,
+    "pct_single_commit": 50,
+    "top_first_commit_day": "2025-12-19",
+    "pct_on_top_day": 30,
+    "median_commits": 1.5,
+    "bulk_published": false
+   },
+   "BbgnsurfTech/claude-skills-collection": {
+    "n": 20,
+    "pct_single_commit": 100,
+    "top_first_commit_day": "2025-12-18",
+    "pct_on_top_day": 100,
+    "median_commits": 1.0,
+    "bulk_published": true
+   }
+  }
  },
  "rows": [
   {
@@ -150,6 +224,918 @@
    "commits": 1,
    "first": "2025-12-01T18:05:36Z",
    "last": "2025-12-01T18:05:36Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/brainstorming/SKILL.md",
+   "quality": 89.5,
+   "commits": 25,
+   "first": "2025-10-16T14:19:00Z",
+   "last": "2026-06-16T17:09:45Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/dispatching-parallel-agents/SKILL.md",
+   "quality": 80.5,
+   "commits": 5,
+   "first": "2025-10-16T14:19:00Z",
+   "last": "2026-06-16T17:09:43Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/executing-plans/SKILL.md",
+   "quality": 84.5,
+   "commits": 10,
+   "first": "2025-10-16T14:19:00Z",
+   "last": "2026-06-16T17:09:43Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/finishing-a-development-branch/SKILL.md",
+   "quality": 89.5,
+   "commits": 7,
+   "first": "2025-10-16T14:19:00Z",
+   "last": "2026-06-16T17:09:44Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/receiving-code-review/SKILL.md",
+   "quality": 89.5,
+   "commits": 5,
+   "first": "2025-10-16T14:19:00Z",
+   "last": "2026-06-16T17:09:43Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/requesting-code-review/SKILL.md",
+   "quality": 83.0,
+   "commits": 10,
+   "first": "2025-10-16T14:19:00Z",
+   "last": "2026-06-16T17:09:43Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/subagent-driven-development/SKILL.md",
+   "quality": 84.9,
+   "commits": 44,
+   "first": "2025-10-16T14:19:00Z",
+   "last": "2026-06-18T22:44:22Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/systematic-debugging/SKILL.md",
+   "quality": 90.9,
+   "commits": 7,
+   "first": "2025-10-16T14:19:00Z",
+   "last": "2026-06-16T17:09:44Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/test-driven-development/SKILL.md",
+   "quality": 88.4,
+   "commits": 5,
+   "first": "2025-10-16T14:19:00Z",
+   "last": "2026-06-16T17:09:43Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/using-git-worktrees/SKILL.md",
+   "quality": 80.5,
+   "commits": 8,
+   "first": "2025-10-16T14:19:00Z",
+   "last": "2026-06-16T17:09:43Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/using-superpowers/SKILL.md",
+   "quality": 88.5,
+   "commits": 23,
+   "first": "2025-10-16T14:35:57Z",
+   "last": "2026-06-16T17:09:44Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/verification-before-completion/SKILL.md",
+   "quality": 89.5,
+   "commits": 2,
+   "first": "2025-10-16T14:19:00Z",
+   "last": "2025-10-17T16:40:36Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/writing-plans/SKILL.md",
+   "quality": 78.0,
+   "commits": 20,
+   "first": "2025-10-16T14:19:00Z",
+   "last": "2026-06-16T17:09:47Z"
+  },
+  {
+   "repo": "obra/superpowers",
+   "path": "skills/writing-skills/SKILL.md",
+   "quality": 97.5,
+   "commits": 20,
+   "first": "2025-10-16T14:19:00Z",
+   "last": "2026-06-16T17:09:45Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/accessibility-compliance/skills/screen-reader-testing/SKILL.md",
+   "quality": 89.5,
+   "commits": 3,
+   "first": "2025-12-16T21:00:58Z",
+   "last": "2026-03-07T15:53:17Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/accessibility-compliance/skills/wcag-audit-patterns/SKILL.md",
+   "quality": 87.0,
+   "commits": 4,
+   "first": "2025-12-16T21:00:58Z",
+   "last": "2026-05-22T12:18:21Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/agent-teams/skills/multi-reviewer-patterns/SKILL.md",
+   "quality": 89.5,
+   "commits": 3,
+   "first": "2026-02-05T22:10:02Z",
+   "last": "2026-02-05T22:42:30Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/agent-teams/skills/parallel-debugging/SKILL.md",
+   "quality": 89.5,
+   "commits": 3,
+   "first": "2026-02-05T22:10:02Z",
+   "last": "2026-02-05T22:42:30Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/agent-teams/skills/parallel-feature-development/SKILL.md",
+   "quality": 91.5,
+   "commits": 4,
+   "first": "2026-02-05T22:10:02Z",
+   "last": "2026-03-26T16:05:17Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/agent-teams/skills/task-coordination-strategies/SKILL.md",
+   "quality": 89.5,
+   "commits": 3,
+   "first": "2026-02-05T22:10:02Z",
+   "last": "2026-02-05T22:42:30Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/agent-teams/skills/team-communication-protocols/SKILL.md",
+   "quality": 94.5,
+   "commits": 7,
+   "first": "2026-02-05T22:10:02Z",
+   "last": "2026-05-17T00:46:39Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/agent-teams/skills/team-composition-patterns/SKILL.md",
+   "quality": 91.5,
+   "commits": 8,
+   "first": "2026-02-05T22:10:02Z",
+   "last": "2026-05-17T00:46:39Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/api-scaffolding/skills/fastapi-templates/SKILL.md",
+   "quality": 87.0,
+   "commits": 4,
+   "first": "2025-10-17T00:33:27Z",
+   "last": "2026-05-22T12:18:21Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/backend-development/skills/api-design-principles/SKILL.md",
+   "quality": 89.5,
+   "commits": 4,
+   "first": "2025-10-17T00:33:27Z",
+   "last": "2026-05-22T12:18:21Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/backend-development/skills/architecture-patterns/SKILL.md",
+   "quality": 92.0,
+   "commits": 6,
+   "first": "2025-10-17T00:33:27Z",
+   "last": "2026-05-22T12:18:21Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/backend-development/skills/cqrs-implementation/SKILL.md",
+   "quality": 87.0,
+   "commits": 4,
+   "first": "2025-12-16T21:00:58Z",
+   "last": "2026-05-22T12:18:21Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/backend-development/skills/event-store-design/SKILL.md",
+   "quality": 87.0,
+   "commits": 4,
+   "first": "2025-12-16T21:00:58Z",
+   "last": "2026-05-22T12:18:21Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/backend-development/skills/microservices-patterns/SKILL.md",
+   "quality": 82.0,
+   "commits": 4,
+   "first": "2025-10-17T00:33:27Z",
+   "last": "2026-05-22T12:18:21Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/backend-development/skills/projection-patterns/SKILL.md",
+   "quality": 87.0,
+   "commits": 4,
+   "first": "2025-12-16T21:00:58Z",
+   "last": "2026-05-22T12:18:21Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/backend-development/skills/saga-orchestration/SKILL.md",
+   "quality": 92.0,
+   "commits": 6,
+   "first": "2025-12-16T21:00:58Z",
+   "last": "2026-05-22T12:18:21Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/backend-development/skills/temporal-python-testing/SKILL.md",
+   "quality": 89.5,
+   "commits": 2,
+   "first": "2025-11-17T01:45:36Z",
+   "last": "2026-01-15T22:38:21Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/backend-development/skills/workflow-orchestration-patterns/SKILL.md",
+   "quality": 84.5,
+   "commits": 3,
+   "first": "2025-11-17T01:45:36Z",
+   "last": "2026-05-22T12:18:21Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/block-no-verify/skills/block-no-verify-hook/SKILL.md",
+   "quality": 89.5,
+   "commits": 3,
+   "first": "2026-04-05T14:44:58Z",
+   "last": "2026-04-05T14:44:58Z"
+  },
+  {
+   "repo": "wshobson/agents",
+   "path": "plugins/blockchain-web3/skills/defi-protocol-templates/SKILL.md",
+   "quality": 87.0,
+   "commits": 4,
+   "first": "2025-10-17T00:33:27Z",
+   "last": "2026-06-22T03:17:47Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/acquisition-channel-advisor/SKILL.md",
+   "quality": 92.0,
+   "commits": 4,
+   "first": "2026-02-08T16:24:28Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/ai-shaped-readiness-advisor/SKILL.md",
+   "quality": 95.0,
+   "commits": 8,
+   "first": "2026-02-05T08:43:41Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/altitude-horizon-framework/SKILL.md",
+   "quality": 83.0,
+   "commits": 6,
+   "first": "2026-02-27T22:20:13Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/business-health-diagnostic/SKILL.md",
+   "quality": 87.0,
+   "commits": 5,
+   "first": "2026-02-08T16:24:28Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/company-intel/SKILL.md",
+   "quality": 95.0,
+   "commits": 1,
+   "first": "2026-06-22T16:15:22Z",
+   "last": "2026-06-22T16:15:22Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/company-research/SKILL.md",
+   "quality": 92.0,
+   "commits": 3,
+   "first": "2026-02-05T08:12:40Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/context-engineering-advisor/SKILL.md",
+   "quality": 86.0,
+   "commits": 7,
+   "first": "2026-02-05T08:53:19Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/customer-journey-map/SKILL.md",
+   "quality": 95.0,
+   "commits": 5,
+   "first": "2026-02-05T08:12:40Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/customer-journey-mapping-workshop/SKILL.md",
+   "quality": 83.0,
+   "commits": 5,
+   "first": "2026-02-05T08:12:40Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/derisk-measurement-advisor/SKILL.md",
+   "quality": 90.0,
+   "commits": 2,
+   "first": "2026-06-22T12:07:49Z",
+   "last": "2026-06-22T16:15:22Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/director-readiness-advisor/SKILL.md",
+   "quality": 81.0,
+   "commits": 3,
+   "first": "2026-02-27T22:20:13Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/discovery-interview-prep/SKILL.md",
+   "quality": 92.0,
+   "commits": 5,
+   "first": "2026-02-05T08:12:40Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/discovery-process/SKILL.md",
+   "quality": 92.0,
+   "commits": 6,
+   "first": "2026-02-05T08:12:40Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/eol-message/SKILL.md",
+   "quality": 92.0,
+   "commits": 3,
+   "first": "2026-02-05T08:12:40Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/epic-breakdown-advisor/SKILL.md",
+   "quality": 83.0,
+   "commits": 6,
+   "first": "2026-02-05T08:12:40Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/epic-hypothesis/SKILL.md",
+   "quality": 95.0,
+   "commits": 3,
+   "first": "2026-02-05T08:12:40Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/executive-onboarding-playbook/SKILL.md",
+   "quality": 81.0,
+   "commits": 3,
+   "first": "2026-02-27T22:20:13Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/feature-investment-advisor/SKILL.md",
+   "quality": 78.0,
+   "commits": 4,
+   "first": "2026-02-08T16:24:28Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/finance-based-pricing-advisor/SKILL.md",
+   "quality": 78.0,
+   "commits": 4,
+   "first": "2026-02-08T16:24:28Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "deanpeters/Product-Manager-Skills",
+   "path": "skills/finance-metrics-quickref/SKILL.md",
+   "quality": 68.0,
+   "commits": 3,
+   "first": "2026-02-08T16:24:28Z",
+   "last": "2026-03-09T19:07:27Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/agent-introspection-debugging/SKILL.md",
+   "quality": 77.5,
+   "commits": 2,
+   "first": "2026-04-06T03:10:54Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/agent-sort/SKILL.md",
+   "quality": 89.5,
+   "commits": 2,
+   "first": "2026-04-06T00:36:37Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/api-design/SKILL.md",
+   "quality": 77.5,
+   "commits": 2,
+   "first": "2026-02-25T18:45:29Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/article-writing/SKILL.md",
+   "quality": 84.5,
+   "commits": 4,
+   "first": "2026-02-27T13:50:23Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/backend-patterns/SKILL.md",
+   "quality": 75.0,
+   "commits": 3,
+   "first": "2026-02-25T18:45:29Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/benchmark-methodology/SKILL.md",
+   "quality": 61.0,
+   "commits": 1,
+   "first": "2026-06-11T19:57:55Z",
+   "last": "2026-06-11T19:57:55Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/brand-discovery/SKILL.md",
+   "quality": 61.0,
+   "commits": 4,
+   "first": "2026-06-11T19:57:55Z",
+   "last": "2026-06-11T19:58:42Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/brand-voice/SKILL.md",
+   "quality": 89.5,
+   "commits": 2,
+   "first": "2026-04-02T02:41:03Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/bun-runtime/SKILL.md",
+   "quality": 75.0,
+   "commits": 3,
+   "first": "2026-03-16T21:03:26Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/coding-standards/SKILL.md",
+   "quality": 75.0,
+   "commits": 5,
+   "first": "2026-02-25T18:45:29Z",
+   "last": "2026-06-07T05:26:01Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/competitive-platform-analysis/SKILL.md",
+   "quality": 56.0,
+   "commits": 4,
+   "first": "2026-06-11T19:57:55Z",
+   "last": "2026-06-11T19:58:42Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/competitive-report-structure/SKILL.md",
+   "quality": 53.5,
+   "commits": 4,
+   "first": "2026-06-11T19:57:55Z",
+   "last": "2026-06-11T19:58:42Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/content-engine/SKILL.md",
+   "quality": 84.5,
+   "commits": 5,
+   "first": "2026-02-27T13:50:23Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/crosspost/SKILL.md",
+   "quality": 75.5,
+   "commits": 8,
+   "first": "2026-03-12T15:53:52Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/deep-research/SKILL.md",
+   "quality": 89.5,
+   "commits": 4,
+   "first": "2026-03-12T15:53:52Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/dmux-workflows/SKILL.md",
+   "quality": 89.5,
+   "commits": 4,
+   "first": "2026-03-12T15:53:52Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/documentation-lookup/SKILL.md",
+   "quality": 75.5,
+   "commits": 3,
+   "first": "2026-03-16T21:03:26Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/e2e-testing/SKILL.md",
+   "quality": 75.0,
+   "commits": 2,
+   "first": "2026-02-25T18:45:29Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/eval-harness/SKILL.md",
+   "quality": 64.9,
+   "commits": 2,
+   "first": "2026-02-25T18:45:29Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "path": ".agents/skills/everything-claude-code/SKILL.md",
+   "quality": 64.9,
+   "commits": 3,
+   "first": "2026-03-20T12:20:23Z",
+   "last": "2026-04-29T02:10:17Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/deprecated/design-an-interface/SKILL.md",
+   "quality": 89.5,
+   "commits": 1,
+   "first": "2026-04-28T08:23:06Z",
+   "last": "2026-04-28T08:23:06Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/deprecated/qa/SKILL.md",
+   "quality": 80.5,
+   "commits": 1,
+   "first": "2026-04-28T08:42:34Z",
+   "last": "2026-04-28T08:42:34Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/deprecated/request-refactor-plan/SKILL.md",
+   "quality": 84.5,
+   "commits": 1,
+   "first": "2026-04-28T08:42:34Z",
+   "last": "2026-04-28T08:42:34Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/deprecated/ubiquitous-language/SKILL.md",
+   "quality": 89.5,
+   "commits": 1,
+   "first": "2026-04-28T08:42:34Z",
+   "last": "2026-04-28T08:42:34Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/ask-matt/SKILL.md",
+   "quality": 75.5,
+   "commits": 3,
+   "first": "2026-06-17T13:45:47Z",
+   "last": "2026-06-17T13:57:25Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/codebase-design/SKILL.md",
+   "quality": 94.5,
+   "commits": 2,
+   "first": "2026-06-12T08:25:19Z",
+   "last": "2026-06-17T14:15:11Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/diagnosing-bugs/SKILL.md",
+   "quality": 89.5,
+   "commits": 3,
+   "first": "2026-06-12T08:25:19Z",
+   "last": "2026-06-17T14:15:11Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/domain-modeling/SKILL.md",
+   "quality": 94.5,
+   "commits": 2,
+   "first": "2026-06-12T08:25:19Z",
+   "last": "2026-06-17T14:15:11Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/grill-with-docs/SKILL.md",
+   "quality": 46.0,
+   "commits": 7,
+   "first": "2026-04-28T09:17:37Z",
+   "last": "2026-06-12T08:25:19Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/implement/SKILL.md",
+   "quality": 39.9,
+   "commits": 1,
+   "first": "2026-06-12T08:25:19Z",
+   "last": "2026-06-12T08:25:19Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/improve-codebase-architecture/SKILL.md",
+   "quality": 66.0,
+   "commits": 6,
+   "first": "2026-04-28T08:42:34Z",
+   "last": "2026-06-12T08:25:19Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/prototype/SKILL.md",
+   "quality": 77.5,
+   "commits": 3,
+   "first": "2026-05-06T08:26:48Z",
+   "last": "2026-06-12T08:25:19Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/resolving-merge-conflicts/SKILL.md",
+   "quality": 59.4,
+   "commits": 1,
+   "first": "2026-06-12T08:25:19Z",
+   "last": "2026-06-12T08:25:19Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/setup-matt-pocock-skills/SKILL.md",
+   "quality": 83.0,
+   "commits": 6,
+   "first": "2026-04-28T15:33:37Z",
+   "last": "2026-06-18T08:41:30Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/tdd/SKILL.md",
+   "quality": 95.0,
+   "commits": 5,
+   "first": "2026-04-28T08:42:34Z",
+   "last": "2026-06-17T14:15:11Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/to-issues/SKILL.md",
+   "quality": 61.0,
+   "commits": 8,
+   "first": "2026-04-28T08:42:34Z",
+   "last": "2026-06-12T08:25:19Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/to-prd/SKILL.md",
+   "quality": 63.5,
+   "commits": 9,
+   "first": "2026-04-28T08:42:34Z",
+   "last": "2026-06-12T08:25:19Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/engineering/triage/SKILL.md",
+   "quality": 85.5,
+   "commits": 4,
+   "first": "2026-04-28T15:33:37Z",
+   "last": "2026-06-18T08:41:30Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/in-progress/decision-mapping/SKILL.md",
+   "quality": 68.5,
+   "commits": 4,
+   "first": "2026-06-17T14:15:11Z",
+   "last": "2026-06-25T11:48:23Z"
+  },
+  {
+   "repo": "mattpocock/skills",
+   "path": "skills/in-progress/loop-me/SKILL.md",
+   "quality": 70.0,
+   "commits": 1,
+   "first": "2026-06-24T10:26:57Z",
+   "last": "2026-06-24T10:26:57Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-maestro/agent-management/SKILL.md",
+   "quality": 82.0,
+   "commits": 1,
+   "first": "2026-02-23T00:41:45Z",
+   "last": "2026-02-23T00:41:45Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-maestro/agent-messaging/SKILL.md",
+   "quality": 78.0,
+   "commits": 1,
+   "first": "2026-02-23T00:41:45Z",
+   "last": "2026-02-23T00:41:45Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-maestro/docs-search/SKILL.md",
+   "quality": 82.0,
+   "commits": 1,
+   "first": "2026-02-23T00:41:45Z",
+   "last": "2026-02-23T00:41:45Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-maestro/graph-query/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2026-02-23T00:41:45Z",
+   "last": "2026-02-23T00:41:45Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-maestro/memory-search/SKILL.md",
+   "quality": 82.0,
+   "commits": 1,
+   "first": "2026-02-23T00:41:45Z",
+   "last": "2026-02-23T00:41:45Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-maestro/planning/SKILL.md",
+   "quality": 89.5,
+   "commits": 1,
+   "first": "2026-02-23T00:41:45Z",
+   "last": "2026-02-23T00:41:45Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/agent-evaluation/SKILL.md",
+   "quality": 80.8,
+   "commits": 1,
+   "first": "2026-01-25T15:01:14Z",
+   "last": "2026-01-25T15:01:14Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/agent-manager-skill/SKILL.md",
+   "quality": 68.9,
+   "commits": 1,
+   "first": "2026-01-25T15:01:14Z",
+   "last": "2026-01-25T15:01:14Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/agent-memory-mcp/SKILL.md",
+   "quality": 77.5,
+   "commits": 1,
+   "first": "2026-01-25T15:01:14Z",
+   "last": "2026-01-25T15:01:14Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/agent-memory-systems/SKILL.md",
+   "quality": 71.8,
+   "commits": 1,
+   "first": "2026-01-25T15:01:14Z",
+   "last": "2026-01-25T15:01:14Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/agent-tool-builder/SKILL.md",
+   "quality": 68.8,
+   "commits": 1,
+   "first": "2026-01-25T15:01:14Z",
+   "last": "2026-01-25T15:01:14Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/agents-autogpt/SKILL.md",
+   "quality": 93.8,
+   "commits": 1,
+   "first": "2026-01-08T14:24:29Z",
+   "last": "2026-01-08T14:24:29Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/agents-crewai/SKILL.md",
+   "quality": 96.8,
+   "commits": 1,
+   "first": "2026-01-08T14:24:29Z",
+   "last": "2026-01-08T14:24:29Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/agents-langchain/SKILL.md",
+   "quality": 96.8,
+   "commits": 1,
+   "first": "2026-01-08T14:24:29Z",
+   "last": "2026-01-08T14:24:29Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/agents-llamaindex/SKILL.md",
+   "quality": 96.8,
+   "commits": 1,
+   "first": "2026-01-08T14:24:29Z",
+   "last": "2026-01-08T14:24:29Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/ai-agents-architect/SKILL.md",
+   "quality": 85.8,
+   "commits": 1,
+   "first": "2026-01-25T15:01:14Z",
+   "last": "2026-01-25T15:01:14Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/autonomous-agent-patterns/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2026-01-25T15:01:14Z",
+   "last": "2026-01-25T15:01:14Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/autonomous-agents/SKILL.md",
+   "quality": 59.8,
+   "commits": 1,
+   "first": "2026-01-25T15:01:14Z",
+   "last": "2026-01-25T15:01:14Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/behavioral-modes/SKILL.md",
+   "quality": 77.5,
+   "commits": 1,
+   "first": "2026-01-25T15:01:14Z",
+   "last": "2026-01-25T15:01:14Z"
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "path": "cli-tool/components/skills/ai-research/claude-code-guide/SKILL.md",
+   "quality": 77.5,
+   "commits": 1,
+   "first": "2026-01-25T15:01:14Z",
+   "last": "2026-01-25T15:01:14Z"
   },
   {
    "repo": "openai/skills",
@@ -312,196 +1298,164 @@
    "last": "2026-02-02T20:20:40Z"
   },
   {
-   "repo": "openai/skills",
-   "path": "skills/.curated/notion-knowledge-capture/SKILL.md",
-   "quality": 78.0,
-   "commits": 3,
-   "first": "2025-12-19T07:14:01Z",
-   "last": "2025-12-19T17:18:15Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.curated/notion-meeting-intelligence/SKILL.md",
-   "quality": 87.0,
-   "commits": 3,
-   "first": "2025-12-19T07:14:01Z",
-   "last": "2025-12-19T17:18:15Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.curated/notion-research-documentation/SKILL.md",
-   "quality": 83.0,
-   "commits": 3,
-   "first": "2025-12-19T07:14:01Z",
-   "last": "2025-12-19T17:18:15Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.curated/notion-spec-to-implementation/SKILL.md",
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/c-level-advisor/ceo-advisor/SKILL.md",
    "quality": 92.0,
-   "commits": 3,
-   "first": "2025-12-19T07:14:01Z",
-   "last": "2025-12-19T17:18:15Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.curated/openai-docs/SKILL.md",
-   "quality": 84.5,
-   "commits": 6,
-   "first": "2026-01-31T18:14:20Z",
-   "last": "2026-06-17T19:15:37Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.curated/pdf/SKILL.md",
-   "quality": 89.5,
-   "commits": 2,
-   "first": "2026-01-27T11:18:44Z",
-   "last": "2026-01-30T18:34:32Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.curated/playwright-interactive/SKILL.md",
-   "quality": 68.9,
-   "commits": 3,
-   "first": "2026-03-05T16:30:19Z",
-   "last": "2026-03-11T23:54:05Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.curated/playwright/SKILL.md",
-   "quality": 89.5,
-   "commits": 2,
-   "first": "2026-01-31T18:14:20Z",
-   "last": "2026-02-06T18:01:32Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.curated/render-deploy/SKILL.md",
-   "quality": 97.5,
-   "commits": 2,
-   "first": "2026-01-31T20:23:45Z",
-   "last": "2026-02-02T20:20:40Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.curated/screenshot/SKILL.md",
-   "quality": 78.0,
-   "commits": 2,
-   "first": "2026-01-27T11:18:44Z",
-   "last": "2026-01-30T18:34:32Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.curated/security-best-practices/SKILL.md",
-   "quality": 84.5,
    "commits": 1,
-   "first": "2026-02-02T15:58:27Z",
-   "last": "2026-02-02T15:58:27Z"
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
   },
   {
-   "repo": "openai/skills",
-   "path": "skills/.curated/security-ownership-map/SKILL.md",
-   "quality": 94.5,
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/c-level-advisor/cto-advisor/SKILL.md",
+   "quality": 92.0,
    "commits": 1,
-   "first": "2026-02-02T15:58:27Z",
-   "last": "2026-02-02T15:58:27Z"
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
   },
   {
-   "repo": "openai/skills",
-   "path": "skills/.curated/security-threat-model/SKILL.md",
-   "quality": 82.0,
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/code-reviewer/SKILL.md",
+   "quality": 87.0,
    "commits": 1,
-   "first": "2026-02-02T15:58:27Z",
-   "last": "2026-02-02T15:58:27Z"
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
   },
   {
-   "repo": "openai/skills",
-   "path": "skills/.curated/sentry/SKILL.md",
-   "quality": 89.5,
-   "commits": 2,
-   "first": "2026-01-31T18:14:20Z",
-   "last": "2026-04-08T21:47:09Z"
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/senior-architect/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
   },
   {
-   "repo": "openai/skills",
-   "path": "skills/.curated/speech/SKILL.md",
-   "quality": 94.5,
-   "commits": 2,
-   "first": "2026-01-27T11:18:44Z",
-   "last": "2026-01-30T18:34:32Z"
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/senior-backend/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
   },
   {
-   "repo": "openai/skills",
-   "path": "skills/.curated/transcribe/SKILL.md",
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/senior-computer-vision/SKILL.md",
    "quality": 89.5,
    "commits": 1,
-   "first": "2026-01-31T18:14:20Z",
-   "last": "2026-01-31T18:14:20Z"
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
   },
   {
-   "repo": "openai/skills",
-   "path": "skills/.curated/vercel-deploy/SKILL.md",
-   "quality": 89.5,
-   "commits": 5,
-   "first": "2026-01-31T20:23:45Z",
-   "last": "2026-02-21T04:07:43Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.curated/winui-app/SKILL.md",
-   "quality": 94.5,
-   "commits": 1,
-   "first": "2026-03-04T17:20:21Z",
-   "last": "2026-03-04T17:20:21Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.curated/yeet/SKILL.md",
-   "quality": 78.0,
-   "commits": 5,
-   "first": "2026-01-27T11:18:44Z",
-   "last": "2026-05-18T23:16:36Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.system/imagegen/SKILL.md",
-   "quality": 91.5,
-   "commits": 1,
-   "first": "2026-04-15T03:43:27Z",
-   "last": "2026-04-15T03:43:27Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.system/openai-docs/SKILL.md",
-   "quality": 84.5,
-   "commits": 6,
-   "first": "2026-03-05T17:54:31Z",
-   "last": "2026-06-17T19:15:37Z"
-  },
-  {
-   "repo": "openai/skills",
-   "path": "skills/.system/plugin-creator/SKILL.md",
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/senior-data-engineer/SKILL.md",
    "quality": 89.5,
    "commits": 1,
-   "first": "2026-04-18T00:55:46Z",
-   "last": "2026-04-18T00:55:46Z"
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
   },
   {
-   "repo": "openai/skills",
-   "path": "skills/.system/skill-creator/SKILL.md",
-   "quality": 100.0,
-   "commits": 6,
-   "first": "2025-12-18T08:32:59Z",
-   "last": "2026-02-09T21:38:07Z"
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/senior-data-scientist/SKILL.md",
+   "quality": 89.5,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
   },
   {
-   "repo": "openai/skills",
-   "path": "skills/.system/skill-installer/SKILL.md",
-   "quality": 78.0,
-   "commits": 4,
-   "first": "2025-12-19T16:54:49Z",
-   "last": "2026-06-24T02:36:12Z"
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/senior-devops/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/senior-frontend/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/senior-fullstack/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/senior-ml-engineer/SKILL.md",
+   "quality": 89.5,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/senior-prompt-engineer/SKILL.md",
+   "quality": 89.5,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/senior-qa/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/senior-secops/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/engineering-team/senior-security/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/marketing-skill/content-creator/SKILL.md",
+   "quality": 92.0,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/marketing-skill/marketing-demand-acquisition/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/marketing-skill/marketing-strategy-pmm/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "path": "community/alirezarezvani-claude-skills/product-team/agile-product-owner/SKILL.md",
+   "quality": 79.5,
+   "commits": 1,
+   "first": "2025-12-18T12:18:04Z",
+   "last": "2025-12-18T12:18:04Z"
   }
  ]
 }

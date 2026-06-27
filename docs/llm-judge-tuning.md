@@ -107,23 +107,47 @@ The one maturity proxy repo-level data can't test is **per-skill commit count**
 `crawlers/maturity_crawl.py` fetches it per file via the GitHub commits API
 (`?path=<file>`) and correlates against the heuristic score.
 
-Run on the canonical repos (62 skills), the answer is clear — and it's a *null*
-result:
+The answer fails on **two independent grounds**.
+
+**Ground 1 — commit count is uncorrelated with quality.** Across 172 skills from
+9 repos spanning every signature:
 
 | Metric | Value |
 |---|---|
-| corr(commit count, quality) | **−0.14** (negligible, slightly negative) |
-| median commits per skill | 2 |
-| mean quality, ≤median commits | 88.4 |
-| mean quality, >median commits | 85.3 |
+| corr(commit count, quality) | **−0.002** (zero) |
 
-**More commits do not mean better definitions.** The canonical skills are mostly
-written well *once* (median 2 commits) and rarely revised; the high-commit ones
-are if anything marginally worse (revision churn ≠ polish). Quality comes from
-the authoring standard, not from iteration count — consistent with the
-repo-level finding that stars and recency don't predict quality either.
+There is simply no relationship. More commits do not mean better definitions.
 
-Caveat: the canonical set has little quality variance (everything is 80–100), so
-the dynamic range is narrow. To test across the full A–F range, run
-`maturity_crawl.py --all` (one API call per skill, ~4,900 calls — use a token).
-Data: `data/skill_maturity.json`.
+**Ground 2 — for the biggest repos, commit history isn't a maturity signal at
+all, because skills are bulk-published.** People iterate a skill locally (or copy
+it wholesale from elsewhere) and land it in the repo as a single snapshot commit.
+The repo's git history then reflects *publishing*, not *development* — exactly as
+suspected. The bulk-publish detector (`maturity_crawl.py`) makes this visible:
+
+| Repo | Signature | % single-commit | % share one first-commit day | median commits | bulk-published |
+|---|---|---|---|---|---|
+| davila7/claude-code-templates | mega-collection | 100% | 50% | 1 | **yes** |
+| BbgnsurfTech/...collection | mega-collection | 100% | 100% | 1 | **yes** |
+| anthropics/skills | canonical | 61% | 89% | 1 | **yes** |
+| openai/skills | canonical | 50% | 30% | 1.5 | no |
+| mattpocock/skills | domain-pack | 35% | 55% | 3 | no |
+| deanpeters/PM-Skills | domain-pack | 5% | 50% | 4 | no |
+| affaan-m/ECC | mega-collection | 5% | 25% | 3 | no |
+| wshobson/agents | marketplace | 0% | 30% | 4 | no |
+| obra/superpowers | boutique | 0% | 100% (one launch day) | 9 | iterated in-repo |
+
+The two purest mega-collections are **100% single-commit** — every skill landed in
+one shot, zero in-repo revision. `anthropics/skills` is also a bulk publish (89%
+share one day): a snapshot of internally-developed skills, so its git history
+tells us nothing about how much each was iterated before release. At the other
+end, `obra/superpowers` is genuinely worked *in* the repo (median 9 commits).
+
+**Conclusion:** commit count is the wrong instrument. Where iteration happens
+in-repo, it doesn't predict quality (corr ≈ 0); where it doesn't (bulk publishes,
+including Anthropic and the mega-collections), the history can't measure maturity
+in the first place. Quality is set by the **authoring standard at publish time**,
+not by how the file was version-controlled. To probe true maturity you'd need a
+signal outside git — e.g. an explicit `version:` field, or tracking a skill back
+to its *origin* repo rather than the collection that copied it.
+
+Data: `data/skill_maturity.json` (now includes `bulk_publish_by_repo`).
