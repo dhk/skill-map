@@ -151,3 +151,36 @@ signal outside git — e.g. an explicit `version:` field, or tracking a skill ba
 to its *origin* repo rather than the collection that copied it.
 
 Data: `data/skill_maturity.json` (now includes `bulk_publish_by_repo`).
+
+## The judgment axes (v3) — what the heuristic can't see
+
+The judge was extended with three axes that map to the harder checklist items
+(`scope`, `instruction`, `safety`). Across the 34-skill stratified sample
+(`data/llm_sample_v2.json`), mean scores 0–10:
+
+| Axis | Mean | Read |
+|---|---|---|
+| triggering | 5.6 | the known gap (when/anti-trigger) |
+| **instruction** | **5.7** | **new — second-weakest; the heuristic is blind to it** |
+| disclosure | 5.8 | inline-heavy bodies |
+| frontmatter | 6.2 | |
+| safety | 6.8 | moderate; a few sharp failures |
+| structure | 6.9 | the corpus's strength |
+| scope | 7.2 | most skills are reasonably narrow |
+| tone | 7.3 | |
+
+**Instruction quality is the new finding.** It's nearly as weak as triggering and
+*completely invisible* to the structural scorer: skills that score 85–88
+heuristically get `instruction=3` (e.g. `johnlindquist/design`,
+`muratcankoylan/template`) — clear headings, ambiguous actual guidance. This is
+exactly the heuristic-vs-judgment split: a regex can confirm a heading exists, not
+that the instruction under it is unambiguous.
+
+**Safety catches what high-stakes flags can't grade.**
+`BbgnsurfTech/penetration-tester` scores 78 on the heuristic but **safety=1** — a
+pen-testing skill with no validation, scoping, or guardrails. The heuristic flag
+`high-stakes-no-safety` surfaces the candidate; the LLM confirms the severity.
+
+Takeaway: the heuristic gate is necessary but the `instruction` and `safety` axes
+are where the next round of real quality improvement lives — and neither is
+fakeable with pattern-matching.
