@@ -21,7 +21,9 @@ real figure, a dataset, and a reproducible command — not just opinion.
   repo and spread into a famous one).
 - **Backed by:** `lineage.html` (Timeline + Sankey), `lineage_trace.py`,
   the bulk-publish table (`llm-judge-tuning.md`).
-- **Figure:** the Sankey of repo→repo copy flows.
+- **Figure:** the Sankey of repo→repo copy flows (`docs/figures/sankey-lineage.png`):
+
+  ![Skill lineage Sankey](figures/sankey-lineage.png)
 
 ## 2. "Who's Actually Inventing? The Originators"
 **Thesis:** the biggest repos aren't the inventors — the originators are smaller.
