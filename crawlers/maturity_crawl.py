@@ -118,15 +118,38 @@ def main():
     if rows:
         commits = [r['commits'] for r in rows]
         qual = [r['quality'] for r in rows]
+        med = st.median(commits)
+        lo = [r['quality'] for r in rows if r['commits'] <= med]
+        hi = [r['quality'] for r in rows if r['commits'] > med]
         summary = {
             'n': len(rows),
             'corr_commits_vs_quality': corr(commits, qual),
-            'median_commits': st.median(commits),
-            'quality_of_low_commit': round(st.mean(
-                [r['quality'] for r in rows if r['commits'] <= st.median(commits)]), 1),
-            'quality_of_high_commit': round(st.mean(
-                [r['quality'] for r in rows if r['commits'] > st.median(commits)]), 1),
+            'median_commits': med,
+            'quality_of_low_commit': round(st.mean(lo), 1) if lo else None,
+            'quality_of_high_commit': round(st.mean(hi), 1) if hi else None,
         }
+        # Bulk-publish detection: skills aren't iterated in the repo if they
+        # have a single commit, or if most share one first-commit day (a batch
+        # "add skills" import). Either way, repo commit history measures
+        # publishing, not development.
+        per_repo = {}
+        from collections import Counter, defaultdict
+        byrepo = defaultdict(list)
+        for r in rows:
+            byrepo[r['repo']].append(r)
+        for rp, rr in byrepo.items():
+            day = Counter(r['first'][:10] for r in rr)
+            top_day, top_n = day.most_common(1)[0]
+            single = sum(1 for r in rr if r['commits'] == 1)
+            per_repo[rp] = {
+                'n': len(rr),
+                'pct_single_commit': round(100 * single / len(rr)),
+                'top_first_commit_day': top_day,
+                'pct_on_top_day': round(100 * top_n / len(rr)),
+                'median_commits': st.median([r['commits'] for r in rr]),
+                'bulk_published': (single / len(rr) > 0.5) or (top_n / len(rr) > 0.6),
+            }
+        summary['bulk_publish_by_repo'] = per_repo
         OUT.write_text(json.dumps({'summary': summary, 'rows': rows}, indent=1))
         print('\nSUMMARY:', json.dumps(summary, indent=1))
         print(f'wrote {OUT}')
