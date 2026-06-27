@@ -262,9 +262,45 @@ def git_commit_push(crawl_id: str) -> None:
 # ---------------------------------------------------------------------------
 
 def load_crawl_list(path: Path) -> tuple[list[dict], dict]:
+    """Load a crawl list from JSON or Markdown.
+
+    Markdown format: optional YAML frontmatter (--- ... ---) for list metadata,
+    plus a Markdown table whose header includes a `repo` column. Extra columns
+    (type/tier/notes) become per-repo fields.
+    """
+    if path.suffix.lower() in (".md", ".markdown"):
+        return _load_crawl_list_md(path.read_text())
     raw = json.loads(path.read_text())
     meta = {k: v for k, v in raw.items() if k != "repos"}
     return raw.get("repos", []), meta
+
+
+def _load_crawl_list_md(text: str) -> tuple[list[dict], dict]:
+    meta: dict = {}
+    body = text
+    m = re.match(r"^\s*---\s*\n(.*?)\n---\s*\n(.*)$", text, re.S)
+    if m:
+        body = m.group(2)
+        for line in m.group(1).splitlines():
+            mm = re.match(r"^([A-Za-z0-9_-]+):\s*(.*)$", line)
+            if mm:
+                meta[mm.group(1).strip()] = mm.group(2).strip()
+    repos: list[dict] = []
+    header: list[str] | None = None
+    for line in body.splitlines():
+        if not line.strip().startswith("|"):
+            header = None
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if set("".join(cells)) <= set("-: "):   # separator row
+            continue
+        if header is None:
+            header = [c.lower() for c in cells]
+            continue
+        row = dict(zip(header, cells))
+        if row.get("repo"):
+            repos.append(row)
+    return repos, meta
 
 
 def input_quality_metrics(
