@@ -1,4 +1,15 @@
 """
+maturity_crawl.py — [RETIRED from the main study] Per-skill git maturity.
+
+RETIRED: commit history measures *publishing*, not development — most skills are
+bulk-published as snapshots (see docs/llm-judge-tuning.md), and commit count is
+uncorrelated with quality (r=-0.002). It is NOT part of the study pipeline.
+
+Kept because it is still useful for PRIVATE repos, where you control the git
+history and commit count can be a real iteration signal. Run it on your own repo:
+    python crawlers/maturity_crawl.py --repos you/your-private-repo --token $TOKEN
+
+Original docs:
 maturity_crawl.py — Fetch per-skill git maturity and correlate with quality.
 
 Answers: "do more-iterated skills have better definitions?" The main crawl

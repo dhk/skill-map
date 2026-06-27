@@ -97,13 +97,23 @@ is the **frontmatter discipline and the trigger** — the parts that make a skil
 
 ## Lesson 6 — what the LLM cross-read caught that heuristics can't
 
-A stratified sample of 34 skills was deep-read by Claude and compared to the
-Anthropic house style (`crawlers/sample_llm.py`). **Calibration caveat:** the
-judge ran *pessimistic* — it labelled even top-scoring canonical skills "weak,"
-so its absolute verdicts aren't trustworthy. But its **relative** signal is
-clean: every "broken" verdict landed on a genuinely low-scoring skill (heuristic
-< 50), while higher scores got "weak," never "broken." The heuristic floor and
-the LLM floor agree.
+A stratified sample was deep-read by Claude and compared to the Anthropic house
+style. The first judge (`sample_llm.py`) was miscalibrated and called even
+Anthropic "weak"; the **tuned v2 judge** (`judge_llm.py`, see
+[llm-judge-tuning.md](llm-judge-tuning.md)) agrees with the heuristic cleanly and
+monotonically:
+
+| Heuristic band | v2 verdicts |
+|---|---|
+| < 50 | broken ×3, weak ×1 |
+| 50–75 | solid ×9, exemplary ×1, weak ×2 |
+| 75–90 | solid ×9, exemplary ×1, weak ×2 |
+| 90+ | exemplary ×2, solid ×2 |
+
+The two graders now track each other — the LLM adds *substance* judgment on top of
+the heuristic's *structure* check. Its weakest axes across the sample are
+**triggering (6.2/10)** and **disclosure (6.2)**, exactly the dimensions the
+corpus numbers flag.
 
 Where it earned its keep was the **qualitative divergences** structure can't see:
 

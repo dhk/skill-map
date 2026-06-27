@@ -19,6 +19,9 @@ Anthropic gold standard, three ways:
 | [just-add-these-skills.md](just-add-these-skills.md) | The general-purpose set + practice-level changes for skills you already have. |
 | [skill-types.md](skill-types.md) | Quality sliced by skill type — which kinds are written well vs badly. |
 | [llm-judge-tuning.md](llm-judge-tuning.md) | Why the LLM judge scored Anthropic "weak," the fix, and the maturity (commit-count) finding. |
+| [update-from-anthropic.md](update-from-anthropic.md) | Specific Anthropic skills that miss Anthropic's own rubric, and what to use instead. |
+| [article-series.md](article-series.md) | A planned 5-part article series built on this study. |
+| **[lineage.html](../lineage.html)** | Interactive: where copied skills came from (Timeline + Sankey). |
 
 ## The tooling (run it on your own repos, public or private)
 
