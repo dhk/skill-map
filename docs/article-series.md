@@ -40,8 +40,8 @@ real figure, a dataset, and a reproducible command — not just opinion.
 ## 3. "Who's Doing the Best Work? A Quality Census"
 **Thesis:** quality is concentrated, and popularity doesn't predict it.
 
-- **Hook:** corpus median 73.5/100; quality collapses in mega-collections (77% of
-  all skills, median 68) while curated repos sit at 80–85. Stars (r=0.16),
+- **Hook:** corpus median 79.8/100; quality dips in mega-collections (77% of
+  all skills, median 78) vs curated repos at 85. Stars (r=0.16),
   recency (0.10), and commit count (−0.002) **all fail to predict quality**.
 - **The reveal:** the repo *signature* predicts quality; nothing else does.
 - **Backed by:** the signature study (`what-i-learned-crawling-39-repos.md`),
@@ -51,10 +51,10 @@ real figure, a dataset, and a reproducible command — not just opinion.
 ## 4. "What Makes a Skill 'Good'? The Gold Standard, Measured"
 **Thesis:** "good" is measurable, and the cheapest fixes are the biggest.
 
-- **Hook:** only 43% of skills say *when* to use them; only **2.2%** say when
+- **Hook:** 68% of skills say *when* to use them but only **2.5%** say when
   *not* to — the anti-trigger note, the rarest practice in the ecosystem.
-- **The reveal:** the rubric derived from `anthropics/skills`, and the by-type
-  finding (judgment skills like data/analytics are written worst).
+- **The reveal:** the rubric derived from `anthropics/skills`; quality is flat
+  across skill types — the repo's discipline, not the task, sets quality.
 - **Backed by:** `best-practices.md`, `skill-types.md`, `skill_quality.py`.
 
 ## 5. "Audit Your Skills in 60 Seconds (and Why You Should)"

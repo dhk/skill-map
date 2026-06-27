@@ -27,7 +27,7 @@ How signatures are assigned (by scale, then refined):
 
 ## mega-collection — *the highest-impact fixes in the ecosystem*
 
-> 5 repos · 3,775 skills · **median 69.4** · only **33%** have WHEN-triggers
+> 5 repos · 3,775 skills · **median 78.0** · **64%** have WHEN-triggers
 
 You hold 77% of the ecosystem's skills and set its median. Coverage is not your
 problem — **consistency is**. A third of your skills can't tell Claude when to
@@ -37,7 +37,7 @@ fire.
 1. **Add a CI quality gate.** Run `crawlers/skill_quality.py` on every PR; reject
    anything below grade C. This one change would move the ecosystem median by
    double digits.
-2. **Backfill WHEN-triggers.** Your biggest defect by far (2,528 skills). Sweep
+2. **Backfill WHEN-triggers.** ~36% of your skills still lack one. Sweep
    descriptions to the "Use this when…" pattern.
 3. **Deduplicate.** Collections this size accrete near-identical skills; merge them.
 4. **Normalize frontmatter** to `name` / `description` / `license`.
@@ -50,7 +50,7 @@ fire.
 
 ## marketplace — *consistency across contributors*
 
-> 6 repos · 594 skills · median 87.0 · 81% have WHEN-triggers
+> 6 repos · 594 skills · median 85.0 · 87% have WHEN-triggers
 
 Multi-domain catalogs with many contributors. You're already good; the risk is
 drift between authors.
@@ -69,7 +69,7 @@ drift between authors.
 
 ## domain-pack — *depth over breadth*
 
-> 11 repos · 370 skills · median 89.0 · 74% have WHEN-triggers · **58% use refs (best in class)**
+> 11 repos · 370 skills · median 85.0 · 81% have WHEN-triggers · **58% use refs (best in class)**
 
 Focused on one subject. You already lead on progressive disclosure. Polish the
 descriptions and you're at the canonical bar.
@@ -87,7 +87,7 @@ descriptions and you're at the canonical bar.
 
 ## boutique — *small enough to make every skill an A*
 
-> 5 repos · 38 skills · median 84.5 · 74% have WHEN-triggers
+> 5 repos · 38 skills · median 80.0 · 87% have WHEN-triggers
 
 A handful of personal skills. At this size there's no excuse not to be all-A.
 
@@ -104,7 +104,7 @@ A handful of personal skills. At this size there's no excuse not to be all-A.
 
 ## single-skill — *make the one skill exemplary*
 
-> 7 repos · 7 skills · median 87.0
+> 7 repos · 7 skills · median 85.0
 
 Often a skill embedded in a larger product/docs repo. It's your showcase.
 
@@ -116,14 +116,14 @@ Often a skill embedded in a larger product/docs repo. It's your showcase.
 
 ## canonical-reference — *you are the bar*
 
-> 5 repos · 118 skills · median 89.5 · 82% have WHEN-triggers
+> 5 repos · 118 skills · median 85.0 · 87% have WHEN-triggers
 
 Official, curated, consistent. Keep it that way.
 
 **Do this:**
 1. Keep the set tight — every skill earns its place.
 2. Maintain a `SKILL.md` template and lint new skills against it.
-3. Even here, 18% lack a WHEN-trigger — close the gap; everyone copies you.
+3. Even here, 13% lack a WHEN-trigger and nearly all lack an anti-trigger — close the gap; everyone copies you.
 
 ---
 

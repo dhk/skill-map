@@ -82,11 +82,26 @@ def parse_skill(md):
         m = re.match(r'^\s*---\s*\n(.*?)\n---\s*\n?(.*)$', md, re.S)
         if m:
             body = m.group(2)
-            for line in m.group(1).splitlines():
-                mm = re.match(r'^([A-Za-z0-9_-]+):\s*(.*)$', line)
-                if mm:
-                    val = mm.group(2).strip().strip('"\'')
-                    fm[mm.group(1).strip()] = val
+            lines = m.group(1).splitlines()
+            i = 0
+            while i < len(lines):
+                mm = re.match(r'^([A-Za-z0-9_-]+):\s*(.*)$', lines[i])
+                if not mm:
+                    i += 1
+                    continue
+                key, val = mm.group(1).strip(), mm.group(2).strip()
+                # YAML block scalar (|, |-, >, >- ...): gather indented lines
+                if re.match(r'^[|>][-+0-9]*$', val):
+                    block = []
+                    i += 1
+                    while i < len(lines) and (lines[i].strip() == '' or
+                                              re.match(r'^\s+', lines[i])):
+                        block.append(lines[i].strip())
+                        i += 1
+                    fm[key] = ' '.join(b for b in block if b).strip()
+                    continue
+                fm[key] = val.strip('"\'')
+                i += 1
     return {'frontmatter': fm, 'body': body, 'raw': md,
             'has_yaml': bool(fm) or md.lstrip().startswith('---')}
 

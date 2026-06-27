@@ -6,19 +6,25 @@ Anthropic gold standard (see [best-practices.md](best-practices.md)). One crawl,
 
 ## The headline numbers
 
-- **Corpus median quality: 73.5 / 100** — a solid B-minus ecosystem.
-- **Grade distribution:** A 1,276 · B 1,428 · C 1,347 · D 797 · F 54.
-- **Only 2.2% of skills state when *not* to use them** (the anti-trigger note) —
-  the rarest practice in the ecosystem and now the #1 defect (4,771 skills). Even
-  the canonical repos mostly miss it. See [the rubric](best-practices.md) and
-  [judge-tuning](llm-judge-tuning.md) for why it matters.
-- **Only 43% tell Claude *when* to use them at all** — 2,770 skills have no
-  WHEN-trigger.
+- **Corpus median quality: 79.8 / 100** — a solid B ecosystem, better than first
+  reported (see the correction note below).
+- **Grade distribution:** A 1,574 · B 2,430 · C 766 · D 78 · F 54.
+- **Only 2.5% of skills state when *not* to use them** (the anti-trigger note) —
+  the rarest practice in the ecosystem and the #1 defect (4,758 skills). Even the
+  canonical repos almost all miss it. This is the one genuinely universal gap.
+- **68% tell Claude *when* to use them** — 1,521 skills still have no
+  WHEN-trigger, but most do.
 - **Only 27% use progressive disclosure** (link to reference files instead of
   inlining everything).
 
-(Quality numbers here reflect the v2 rubric, which scores the anti-trigger note;
-it lowered every signature ~3–4 points uniformly without changing the rankings.)
+> **Correction (parser fix).** An earlier pass reported median 73.5 and "only
+> 43% have a WHEN-trigger." That was a bug: the scorer didn't parse YAML
+> block-scalar descriptions (`description: |-`), which **27.5% of the corpus
+> uses** — so a quarter of all skills had their descriptions read as empty. After
+> fixing it, the median rose to 79.8 and WHEN-triggers to 68%. The lesson cuts
+> both ways: measure your measurement. The anti-trigger finding survived; the
+> "ecosystem writes bad metadata" narrative softened to "the ecosystem is fine
+> except for one near-universal omission."
 
 ## Lesson 1 — The ecosystem's quality problem is concentrated, not spread
 
@@ -26,27 +32,29 @@ Quality does **not** degrade evenly. It collapses in one place: **mega-collectio
 
 | Signature | Repos | Skills | Median quality | % with WHEN-trigger |
 |---|---|---|---|---|
-| canonical-reference | 5 | 118 | **85.0** | 82% |
-| domain-pack | 11 | 370 | **85.0** | 74% |
-| marketplace | 6 | 594 | **82.5** | 81% |
-| single-skill | 7 | 7 | 85.0 | 71% |
-| boutique | 5 | 38 | 80.0 | 74% |
-| **mega-collection** | 5 | **3,775** | **68.2** | **33%** |
+| canonical-reference | 5 | 118 | **85.0** | 87% |
+| domain-pack | 11 | 370 | **85.0** | 81% |
+| marketplace | 6 | 594 | **85.0** | 87% |
+| single-skill | 7 | 7 | 85.0 | 100% |
+| boutique | 5 | 38 | 80.0 | 87% |
+| **mega-collection** | 5 | **3,775** | **78.0** | **64%** |
 
-Mega-collections are **77% of all skills in the corpus** but have the lowest
-median and barely a third carry a WHEN-trigger. Everything that *isn't* a
-mega-collection clusters at 84–90 median. **The ecosystem median (76) is dragged
-down almost entirely by five giant repos.** Curated work is genuinely good.
+Mega-collections are **77% of all skills in the corpus** and have the lowest
+median (78) and the lowest WHEN-trigger rate (64%). Everything that *isn't* a
+mega-collection clusters at 80–85 median. The gap is real but **modest** — these
+are big aggregations with uneven contributions, not junk. Curated work is a notch
+better across the board.
 
-## Lesson 2 — The WHEN-trigger is the great divider
+## Lesson 2 — The WHEN-trigger still divides curated from bulk
 
-The biggest, cheapest, highest-leverage gap in the entire ecosystem is
-descriptions that say *what* a skill does but never *when* to invoke it. This is
+The cheapest, highest-leverage gap is descriptions that say *what* a skill does
+but never *when* to invoke it. Two-thirds of the corpus gets this right; the
+shortfall is concentrated in mega-collections. This is
 the text Claude reads to decide whether to use the skill at all — omitting the
 trigger directly hurts retrieval.
 
-- Canonical / domain / marketplace repos: **74–82%** have it.
-- Mega-collections: **33%** have it.
+- Canonical / domain / marketplace repos: **81–87%** have it.
+- Mega-collections: **64%** have it.
 
 Adding "Use this when…" to a description is a one-line change that moves a skill
 up a full grade. It is the first thing to fix anywhere.
@@ -60,11 +68,11 @@ gold standard is disciplined: `name`, `description`, and at most `license` /
 absent house style — and house style is exactly what separates the
 canonical-reference repos from same-sized domain-packs.
 
-## Lesson 4 — Thin descriptions are rampant
+## Lesson 4 — Thin descriptions are rare (once you parse them right)
 
-**1,732 skills (35%)** have a description under 8 words — too short to state both
-what and when. Thin descriptions and missing WHEN-triggers overlap heavily and
-share a fix: write a real two-clause description.
+Only **388 skills (8%)** have a description under 8 words. An earlier pass put
+this at 35% — almost all of that was the block-scalar parser bug reading real
+multi-line descriptions as empty. Genuinely thin descriptions are the exception.
 
 ## Lesson 5 — Structure is the corpus's *strength*
 
@@ -77,9 +85,9 @@ is the **frontmatter discipline and the trigger** — the parts that make a skil
 
 | Defect | Skills affected | % of corpus |
 |---|---|---|
-| no anti-trigger ("when NOT to use") | 4,771 | 97% |
-| no WHEN-trigger | 2,770 | 56% |
-| thin description (<8 words) | 1,732 | 35% |
+| no anti-trigger ("when NOT to use") | 4,758 | 97% |
+| no WHEN-trigger | 1,521 | 31% |
+| thin description (<8 words) | 388 | 8% |
 | nonstandard frontmatter | 1,119 | 23% |
 | non-slug name | 368 | 8% |
 | no progressive disclosure | 248 | 5% |
@@ -120,12 +128,11 @@ substance.
 
 ## The one-paragraph takeaway
 
-The Claude skills ecosystem writes good *content* and bad *metadata*. Bodies are
-structured and useful; descriptions too often fail to say when to fire, and
-frontmatter drifts from the canonical shape. The fix is overwhelmingly cheap —
-two-clause descriptions and a tight frontmatter schema — and it is concentrated
-in a handful of mega-collections that, if they adopted a CI quality gate, would
-lift the entire ecosystem median by double digits.
+The Claude skills ecosystem is in better shape than headlines suggest: median
+~80, two-thirds of skills carry a WHEN-trigger, bodies are structured and useful.
+The one near-universal omission is the **anti-trigger note** — 97% of skills
+never say when *not* to fire. That, plus some frontmatter drift in the
+mega-collections, is the whole to-do list. The fix is cheap and mechanical.
 
 ---
 

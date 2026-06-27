@@ -6,9 +6,10 @@ from the canonical reference skills** — `anthropics/skills` (18 skills) and
 measuring what those repos actually do, then encoding it so any `SKILL.md` can
 be scored automatically (`crawlers/skill_quality.py`).
 
-The canonical repos validate the rubric: Anthropic scores a **median 87/100**,
-OpenAI **89.5/100**. The one Anthropic skill that scores low (43) is the
-intentional `template` stub — exactly what should score low.
+The canonical repos validate the rubric: Anthropic scores a **median 85.5/100**,
+OpenAI **85.0/100** (on the v2 rubric, which also scores the rare anti-trigger
+note). The one Anthropic skill that scores low (41) is the intentional `template`
+stub — exactly what should score low.
 
 ---
 
@@ -18,7 +19,7 @@ intentional `template` stub — exactly what should score low.
 |---|---|---|
 | Always has `name` + `description` | 18/18 | 44/44 |
 | Description length (median words) | 43 | 42 |
-| Description states **when** to use it | 13/18 (72%) | 34/44 (77%) |
+| Description states **when** to use it | 16/18 (89%) | 41/44 (93%) |
 | Body length (median words) | ~1,194 | ~940 |
 | Uses headings (`##`/`###`) | nearly all | nearly all |
 | Links to reference files for depth | yes (e.g. `mcp-builder` → 10) | yes |
@@ -51,8 +52,9 @@ description states:
 - in a **healthy length** — long enough to disambiguate (~14–60 words), not a
   bloated paragraph
 
-A description without a WHEN-trigger is the most common defect in the entire
-corpus (see the study). It is also the cheapest to fix and the highest-leverage.
+A missing WHEN-trigger is one of the most common defects (31% of the corpus) and
+the cheapest to fix. The single most common defect, though, is the missing
+anti-trigger (below).
 
 **The anti-trigger note.** The tuned LLM judge ([llm-judge-tuning.md](llm-judge-tuning.md))
 surfaced one practice even the canonical skills usually skip: stating when *not*
@@ -60,8 +62,8 @@ to invoke the skill. `anthropics/skills/xlsx` does this well ("not for Word docs
 Google Sheets, or standalone scripts") and it measurably prevents false-positive
 retrieval on adjacent tasks. A complete description states **what**, **when**, and
 **when not**. The scorer now rewards it (worth 15 of the triggering axis's 100
-points) — and it reveals just how rare it is: **only 2.2% of the entire corpus
-has one**, making it the single most common defect (4,771 skills).
+points) — and it reveals just how rare it is: **only 2.5% of the entire corpus
+has one**, making it the single most common defect (4,758 skills).
 
 ### 3. Progressive disclosure — 20%
 - a real body (not a stub)

@@ -49,7 +49,7 @@ Beyond adding whole skills, these are the practice-level changes that generalize
 to *every* skill you already have (in priority order, from the corpus defect
 data):
 
-1. **Add a WHEN-trigger to every description.** 56% of the corpus lacks one. The
+1. **Add a WHEN-trigger to every description.** ~31% of the corpus still lacks one. The
    single highest-leverage edit. Pattern: *"<What it does>. Use this when <the
    user does / asks for X>."*
 2. **Expand thin descriptions** to two clauses (what + when). 35% are under 8

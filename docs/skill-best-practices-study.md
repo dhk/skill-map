@@ -40,9 +40,10 @@ python crawlers/audit_repo.py --github you/private-repo --token $GITHUB_TOKEN --
 
 ## The three-sentence summary
 
-The ecosystem writes good skill **bodies** and bad skill **metadata**: 56% of
-skills never tell Claude *when* to fire, and quality collapses almost entirely
-inside a handful of mega-collections that hold 77% of all skills. The fix is
+The ecosystem is in better shape than a first pass suggested (median ~80): two
+thirds of skills tell Claude *when* to fire, but **only 2.5% say when NOT to** —
+the anti-trigger note is the one near-universal gap. Quality dips in the
+mega-collections that hold 77% of all skills, but modestly (median 78 vs 85). The fix is
 cheap and mechanical — two-clause descriptions, tight frontmatter, a CI quality
 gate — and the single highest-leverage skill to adopt is `skill-creator`, because
 it bakes the gold standard into everything you write next. If you only do one
