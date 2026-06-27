@@ -161,10 +161,16 @@ def main():
         for items in buckets.values():
             targets += random.sample(items, min(args.n, len(items)))
 
-    print(f'judging {len(targets)} skills (v2)')
-    results = []
+    path = OUT if not args.validate else BASE / 'data' / 'llm_validate_v2.json'
+    # resilient: load any prior results and write after each judgment
+    results = json.load(open(path))['results'] if path.exists() else []
+    seen = {(r['repo'], r['file_path']) for r in results}
+
+    print(f'judging {len(targets)} skills (v2); {len(seen)} already cached')
     for s in targets:
         key = (s['repo'], s['file_path'])
+        if key in seen:
+            continue
         md = crawl[key]['skill_md_content']
         sig = repo_sig[s['repo']]
         if args.dry_run:
@@ -175,15 +181,15 @@ def main():
         results.append({'repo': s['repo'], 'file_path': s['file_path'],
                         'signature': sig, 'heuristic_score': s['overall'],
                         'llm': res})
-        nm = s['file_path'].replace('\\', '/').split('/')[-2]
+        Path(path).write_text(json.dumps({'results': results}, indent=1))
+        _p = s['file_path'].replace('\\', '/').split('/')
+        nm = _p[-2] if len(_p) >= 2 else _p[-1]
         print(f'  {s["repo"][:24]:24s} {nm[:20]:20s} '
               f'h={s["overall"]:.0f} → {res.get("overall","?")} '
               f'(axis_mean={res.get("axis_mean","?")})')
 
     if not args.dry_run:
-        path = OUT if not args.validate else BASE / 'data' / 'llm_validate_v2.json'
-        Path(path).write_text(json.dumps({'results': results}, indent=1))
-        print(f'wrote {path}')
+        print(f'wrote {path} ({len(results)} judged)')
 
 
 if __name__ == '__main__':
