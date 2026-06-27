@@ -69,7 +69,7 @@ drift between authors.
 
 ## domain-pack — *depth over breadth*
 
-> 11 repos · 370 skills · median 85.0 · 81% have WHEN-triggers · **58% use refs (best in class)**
+> 12 repos · 410 skills · median 85.0 · 73% have WHEN-triggers · **58% use refs (best in class)**
 
 Focused on one subject. You already lead on progressive disclosure. Polish the
 descriptions and you're at the canonical bar.

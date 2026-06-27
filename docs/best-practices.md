@@ -99,7 +99,7 @@ the tooling is deliberately two-layer (see
 [skill-author-checklist.md](skill-author-checklist.md) for the full mapping):
 
 - **Heuristic gate** (`crawlers/skill_quality.py`) — scores the four structural
-  dimensions above for all 4,902 skills, fast and free. It also raises
+  dimensions above for all 4,953 skills, fast and free. It also raises
   *informational* flags it can detect but shouldn't grade crudely:
   `output-format-unstated` (63% of the corpus never states its output format) and
   `high-stakes-no-safety` (skills describing deploy/delete/payment/secret
