@@ -57,8 +57,17 @@ Reference exemplar (scores ~9–10): a skill whose description states WHAT it do
 and WHEN to use it in 2–4 sentences, with an anti-trigger note; a body with clear
 headings and a worked example; heavy detail delegated to reference/ files.
 
+Axis definitions (the last three need real judgment, not pattern-matching):
+  scope        — one clear job, narrow & reliable, doesn't sprawl into a catch-all
+  instruction  — top instructions short & unambiguous; says what to DO (not just
+                 what to avoid); output format explicit; constraints stated early
+  safety       — for risky/high-stakes work (deploy, delete, payments, prod): are
+                 there validation steps, tight constraints, deterministic scripts,
+                 or appropriate model-invocation controls? (N/A → score 8 if the
+                 skill is low-stakes and needs none)
+
 Reply with ONLY this JSON, no prose:
-{{"axes":{{"frontmatter":0-10,"triggering":0-10,"disclosure":0-10,"structure":0-10,"tone":0-10,"scope":0-10}},
+{{"axes":{{"frontmatter":0-10,"triggering":0-10,"disclosure":0-10,"structure":0-10,"tone":0-10,"scope":0-10,"instruction":0-10,"safety":0-10}},
   "overall":"exemplary|solid|weak|broken",
   "genuine_issues":["only real, non-artifact problems"],
   "best_trait":"short phrase"}}

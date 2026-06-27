@@ -56,6 +56,32 @@ ANTI_TRIGGER_PATTERNS = [
     r'\b(except|unless|excluding)\b',
     r'\bnot\b.{0,40}\b(standalone|google sheets|word docs?|simple|read-only)\b',
 ]
+# Signals that the skill states its OUTPUT format explicitly (a checklist item:
+# "the desired output format is explicit").
+OUTPUT_FORMAT_PATTERNS = [
+    r'^#{1,4}\s*output', r'\boutput\s*(format|schema|structure)\b',
+    r'\b(returns?|produces?|generates?|emits?)\b.{0,40}\b(json|yaml|markdown|table|csv|file|report|format)\b',
+    r'\bformat\b.{0,20}:\s*\n',
+]
+# High-stakes signals: genuinely risky/irreversible operations whose failure is
+# costly. Kept tight on purpose — broad terms like "deploy"/"token"/"migrate"
+# over-fire, so we require destructive verbs, financial movement, secret
+# exposure, or production-deploy specifically.
+HIGH_STAKES_PATTERNS = [
+    r'\brm\s+-rf\b', r'\b(force[- ]?push|git\s+push\s+--force)\b',
+    r'\b(delete|drop|destroy|truncate|wipe|purge)\b.{0,30}'
+    r'\b(database|table|production|prod|bucket|volume|repo|branch|record|user)\b',
+    r'\b(deploy|release|rollout|ship)\b.{0,30}\b(production|prod\b|live)\b',
+    r'\b(payment|charge|refund|invoice|wire\s+transfer|payout|billing)\b',
+    r'\b(secret|credential|api[- ]?key|private\s+key|password)\b.{0,30}'
+    r'\b(rotat|expos|leak|commit|store|delete|revoke)\w*',
+    r'\b(irreversible|cannot be undone|permanently delete|data loss)\b',
+]
+SAFETY_PATTERNS = [
+    r'\b(validat|verif|confirm|dry[- ]?run|rollback|backup|review before|'
+    r'check before|idempotent|test first|sanity check|guard)\w*',
+    r'\ballowed-tools\b', r'\bdisable-model-invocation\b',
+]
 # Verbs that signal the description says WHAT the skill does.
 WHAT_PATTERNS = [
     r'\b(creat|generat|build|analyz|extract|transform|convert|writ|review|'
@@ -144,6 +170,10 @@ def _metrics(parsed, dir_name=None):
         'bullets': _count(body, r'^\s*[-*] '),
         'numbered_steps': _count(body, r'^\s*\d+\. '),
         'ref_files': ref_files,
+        'has_output_format': any(re.search(p, body, re.I | re.M)
+                                 for p in OUTPUT_FORMAT_PATTERNS),
+        'is_high_stakes': any(re.search(p, body, re.I) for p in HIGH_STAKES_PATTERNS),
+        'has_safety_posture': any(re.search(p, body, re.I) for p in SAFETY_PATTERNS),
     }
 
 
@@ -240,6 +270,12 @@ def score_skill(md, dir_name=None):
         flags.append('no-progressive-disclosure')
     if m['junk_keys']:
         flags.append('nonstandard-frontmatter')
+    # Informational flags (do NOT affect the overall score — they surface
+    # checklist items that need a human/LLM read, not a regex verdict).
+    if m['body_words'] >= BODY_STUB_WORDS and not m['has_output_format']:
+        flags.append('output-format-unstated')
+    if m['is_high_stakes'] and not m['has_safety_posture']:
+        flags.append('high-stakes-no-safety')
     return {'overall': overall, 'grade': _grade(overall),
             'scores': scores, 'flags': flags, 'metrics': m}
 

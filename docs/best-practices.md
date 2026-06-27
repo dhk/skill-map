@@ -92,15 +92,28 @@ has one**, making it the single most common defect (4,758 skills).
 
 ---
 
-## Heuristics vs. judgment
+## Two layers: heuristic gate + LLM judgment
 
-The scorer measures **structure** — it can verify a description *has* a
-when-clause, but not whether that clause is *good*. The LLM deep-read
-(`crawlers/sample_llm.py`) covers the gap: it samples skills across the quality
-range and asks Claude to compare each to the Anthropic house style. The two
-disagree in instructive places — some skills that score well structurally read
-as "weak" on substance (a skill can have perfect headings and still not earn its
-place). Use the heuristic score as a fast gate and the LLM read as the tiebreak.
+"Best practice" splits into what a machine can verify and what needs judgment, so
+the tooling is deliberately two-layer (see
+[skill-author-checklist.md](skill-author-checklist.md) for the full mapping):
+
+- **Heuristic gate** (`crawlers/skill_quality.py`) — scores the four structural
+  dimensions above for all 4,902 skills, fast and free. It also raises
+  *informational* flags it can detect but shouldn't grade crudely:
+  `output-format-unstated` (63% of the corpus never states its output format) and
+  `high-stakes-no-safety` (skills describing deploy/delete/payment/secret
+  operations with no visible validation or guard — 92 skills). These don't move
+  the score; they flag a checklist item for a human to confirm.
+- **LLM judgment** (`crawlers/judge_llm.py`) — the authoritative quality layer for
+  things a regex can't honestly assess: **scope** (one job, not a catch-all),
+  **instruction** quality (unambiguous, output-format explicit), and **safety**
+  adequacy. Its per-axis 0–10 scores now track the heuristic monotonically (see
+  [llm-judge-tuning.md](llm-judge-tuning.md)).
+
+Use the heuristic as the gate (every skill, every PR); use the LLM read for the
+judgment-heavy axes and the tiebreak. A skill can have perfect headings and still
+not earn its place — only the second layer catches that.
 
 ## Run it yourself
 

@@ -75,8 +75,8 @@ Focused on one subject. You already lead on progressive disclosure. Polish the
 descriptions and you're at the canonical bar.
 
 **Do this:**
-1. Make descriptions trigger **precisely within the domain** (you're at 74%; the
-   canonical repos are at 82%).
+1. Make descriptions trigger **precisely within the domain** (you're at 81%; the
+   canonical repos are at 87%).
 2. Cross-link related skills.
 3. Match `name` to directory; keep slugs consistent.
 

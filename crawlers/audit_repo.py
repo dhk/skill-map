@@ -119,6 +119,36 @@ def general_purpose_index(corpus, min_repos=4, min_quality=75):
 
 
 # ── Audit ─────────────────────────────────────────────────────────────
+def _norm_body(md):
+    m = re.match(r'^\s*---\s*\n.*?\n---\s*\n?(.*)$', md or '', re.S)
+    return re.sub(r'\s+', ' ', (m.group(1) if m else (md or '')).lower()).strip()
+
+
+def find_overlap(files):
+    """Intra-repo near-duplicate skills — the checklist's 'doesn't overlap with
+    another skill'. Returns clusters of >1 skill with near-identical bodies."""
+    bodies = []
+    for path, md in files:
+        b = _norm_body(md)
+        if len(b) >= 80:
+            bodies.append((path, set(b.split())))
+    clusters, used = [], set()
+    for i in range(len(bodies)):
+        if i in used:
+            continue
+        grp = [bodies[i][0]]
+        for j in range(i + 1, len(bodies)):
+            if j in used:
+                continue
+            a, b = bodies[i][1], bodies[j][1]
+            if a and b and len(a & b) / len(a | b) >= 0.8:
+                grp.append(bodies[j][0])
+                used.add(j)
+        if len(grp) > 1:
+            clusters.append(grp)
+    return clusters
+
+
 def audit(files, owner_type='User', stars=None, source=None):
     scored = []
     for path, md in files:
@@ -145,6 +175,7 @@ def audit(files, owner_type='User', stars=None, source=None):
     gd = defaultdict(int)
     for s in scored:
         gd[s['grade']] += 1
+    overlap = find_overlap(files)
     return {'n_skills': len(scored), 'median_quality': round(med, 1),
             'mean_quality': round(st.mean(ov), 1), 'quality_stdev': round(std, 1),
             'signature': sig['signature'], 'signature_rationale': sig['rationale'],
@@ -152,6 +183,7 @@ def audit(files, owner_type='User', stars=None, source=None):
             'pct_with_when': round(100 * sum(s['desc_has_when'] for s in scored) / len(scored), 1),
             'pct_uses_refs': round(100 * sum(s['ref_files'] > 0 for s in scored) / len(scored), 1),
             'flag_freq': sorted(flagct.items(), key=lambda x: -x[1]),
+            'overlap_clusters': overlap,
             'skills': scored}
 
 
@@ -198,6 +230,30 @@ def build_report(a, corpus, target_name, top_n=10):
         L.append(f'| `{s["name"]}` | {s["overall"]} | {s["grade"]} | '
                  f'{", ".join(s["flags"]) or "—"} |')
     L.append('')
+    # Scope / overlap (the checklist's "doesn't overlap with another skill")
+    ov = a.get('overlap_clusters') or []
+    if ov:
+        L.append('## Scope — overlapping skills (consolidate these)\n')
+        L.append('_Near-identical skills within this repo. Each cluster is one job '
+                 'split across multiple skills; merge or differentiate them._\n')
+        for grp in ov[:8]:
+            L.append(f'- { " ≈ ".join("`"+g.split("/")[-2]+"`" if "/" in g else "`"+g+"`" for g in grp) }')
+        L.append('')
+
+    # Checklist items the heuristic flags but a human should confirm
+    of = sum(1 for s in a['skills'] if 'output-format-unstated' in s['flags'])
+    hs = sum(1 for s in a['skills'] if 'high-stakes-no-safety' in s['flags'])
+    if of or hs:
+        L.append('## Checklist gaps (informational — confirm by reading)\n')
+        if of:
+            L.append(f'- **{of} skill(s)** never state their output format — '
+                     'add an explicit "Output:" section where format matters.')
+        if hs:
+            L.append(f'- **{hs} skill(s)** describe high-stakes operations '
+                     '(deploy/delete/payments/secrets) with **no visible validation, '
+                     'dry-run, or guard step** — add safety scaffolding.')
+        L.append('')
+
     # Missing general-purpose skills
     idx = general_purpose_index(corpus)
     have = {normalize_concept(s['name']) for s in a['skills']}
