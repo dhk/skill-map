@@ -1,0 +1,97 @@
+{
+ "results": [
+  {
+   "repo": "anthropics/skills",
+   "file_path": "skills/xlsx/SKILL.md",
+   "v1": "weak",
+   "llm": {
+    "axes": {
+     "frontmatter": 9,
+     "triggering": 9,
+     "disclosure": 7,
+     "structure": 8,
+     "tone": 8,
+     "scope": 8
+    },
+    "overall": "solid",
+    "genuine_issues": [
+     "No reference/ directory \u2014 detailed financial-model conventions (color coding, number formatting, documentation requirements for hardcodes) are fully inlined rather than delegated to a sibling doc, making the file long and harder to skim",
+     "Heading hierarchy is inconsistent: '## Excel File Workflows' is immediately followed by a '## CRITICAL' sub-topic at the same h2 level, then '### Common Workflow' appears as a child \u2014 the intended nesting isn't reflected in the actual heading levels",
+     "scripts/recalc.py output format (JSON schema) is documented in two separate places (the workflow section and the verification checklist) with slight differences, creating mild redundancy"
+    ],
+    "best_trait": "Triggering description is precise and complete \u2014 positive triggers, casual-reference examples, and explicit anti-triggers all in one crisp paragraph",
+    "axis_mean": 8.17
+   }
+  },
+  {
+   "repo": "openai/skills",
+   "file_path": "skills/.curated/figma-use/SKILL.md",
+   "v1": "weak",
+   "llm": {
+    "axes": {
+     "frontmatter": 5,
+     "triggering": 7,
+     "disclosure": 9,
+     "structure": 8,
+     "tone": 5,
+     "scope": 8
+    },
+    "overall": "solid",
+    "genuine_issues": [
+     "No anti-trigger note \u2014 description never states when NOT to invoke (e.g. simple read-only queries, non-Figma tasks)",
+     "Description field uses ALL-CAPS imperatives (MANDATORY, NEVER, MUST) and bold markdown \u2014 diverges from house style, which is direct without being shouty",
+     "Return-value rules are duplicated between Section 1 (rule 1) and Section 3, adding noise without adding information",
+     "Frontmatter description is overlong and doubles as an instruction rather than a clean 2\u20134 sentence 'what/when' summary"
+    ],
+    "best_trait": "Section 9 reference table \u2014 precise 'when to load' criteria for each sibling file is exemplary progressive disclosure",
+    "axis_mean": 7.0
+   }
+  },
+  {
+   "repo": "openai/skills",
+   "file_path": "skills/.curated/migrate-to-codex/SKILL.md",
+   "v1": "weak",
+   "llm": {
+    "axes": {
+     "frontmatter": 6,
+     "triggering": 5,
+     "disclosure": 7,
+     "structure": 7,
+     "tone": 8,
+     "scope": 8
+    },
+    "overall": "solid",
+    "genuine_issues": [
+     "Frontmatter description is a single sentence with no WHEN-to-use context and no anti-trigger note \u2014 the house style calls for 2\u20134 sentences covering what, when, and when not to invoke",
+     "No triggering guidance anywhere: a user reading the description cannot tell what prompts ('migrate my Claude config', 'set up Codex') should fire this skill or what shouldn't (e.g. don't invoke if already on Codex-native tooling)",
+     "Migration Order section (10 numbered steps, many sub-items) is long enough to deserve its own reference/ file or a collapsed 'quick steps' lead followed by a link \u2014 as written it dominates the file and slows orientation",
+     "No worked input\u2192output example showing a real source artifact (e.g. a sample .claude/settings.json hook) transformed into a concrete Codex output; the table documents output format but doesn't illustrate a migration"
+    ],
+    "best_trait": "Final report table format is exceptionally precise: status values, column semantics, and worked rows leave no ambiguity about expected output",
+    "axis_mean": 6.83
+   }
+  },
+  {
+   "repo": "posit-dev/skills",
+   "file_path": "alt-text/SKILL.md",
+   "v1": "weak",
+   "llm": {
+    "axes": {
+     "frontmatter": 8,
+     "triggering": 7,
+     "disclosure": 9,
+     "structure": 9,
+     "tone": 9,
+     "scope": 9
+    },
+    "overall": "exemplary",
+    "genuine_issues": [
+     "No anti-trigger clause \u2014 description never says when NOT to activate (e.g., general HTML/CSS alt text outside R/Quarto contexts, non-ggplot image libraries)",
+     "ARGUMENTS section uses loose prose instead of a structured arg definition block, which is inconsistent with canonical skill style"
+    ],
+    "best_trait": "Worked example anchors all three formula parts (code context + caption + good alt text) in a single concrete case",
+    "axis_mean": 8.5
+   }
+  }
+ ]
+}

@@ -1,0 +1,507 @@
+{
+ "summary": {
+  "n": 62,
+  "corr_commits_vs_quality": -0.14,
+  "median_commits": 2.0,
+  "quality_of_low_commit": 88.4,
+  "quality_of_high_commit": 85.3
+ },
+ "rows": [
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/algorithmic-art/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2025-12-01T18:05:36Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/brand-guidelines/SKILL.md",
+   "quality": 84.5,
+   "commits": 1,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2025-12-01T18:05:36Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/canvas-design/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2025-12-01T18:05:36Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/claude-api/SKILL.md",
+   "quality": 71.5,
+   "commits": 14,
+   "first": "2026-03-04T20:05:44Z",
+   "last": "2026-06-27T16:07:56Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/doc-coauthoring/SKILL.md",
+   "quality": 79.5,
+   "commits": 1,
+   "first": "2025-12-04T17:01:46Z",
+   "last": "2025-12-04T17:01:46Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/docx/SKILL.md",
+   "quality": 84.0,
+   "commits": 3,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2026-02-25T04:28:38Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/frontend-design/SKILL.md",
+   "quality": 79.5,
+   "commits": 3,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2026-06-09T19:33:41Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/internal-comms/SKILL.md",
+   "quality": 87.0,
+   "commits": 1,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2025-12-01T18:05:36Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/mcp-builder/SKILL.md",
+   "quality": 100.0,
+   "commits": 1,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2025-12-01T18:05:36Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/pdf/SKILL.md",
+   "quality": 97.5,
+   "commits": 2,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2026-02-04T02:09:36Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/pptx/SKILL.md",
+   "quality": 97.0,
+   "commits": 2,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2026-02-04T02:09:36Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/skill-creator/SKILL.md",
+   "quality": 97.5,
+   "commits": 4,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2026-03-06T20:06:23Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/slack-gif-creator/SKILL.md",
+   "quality": 92.0,
+   "commits": 1,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2025-12-01T18:05:36Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/theme-factory/SKILL.md",
+   "quality": 75.0,
+   "commits": 1,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2025-12-01T18:05:36Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/web-artifacts-builder/SKILL.md",
+   "quality": 92.0,
+   "commits": 1,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2025-12-01T18:05:36Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/webapp-testing/SKILL.md",
+   "quality": 80.0,
+   "commits": 1,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2025-12-01T18:05:36Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "skills/xlsx/SKILL.md",
+   "quality": 89.0,
+   "commits": 2,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2026-02-04T02:09:36Z"
+  },
+  {
+   "repo": "anthropics/skills",
+   "path": "template/SKILL.md",
+   "quality": 43.4,
+   "commits": 1,
+   "first": "2025-12-01T18:05:36Z",
+   "last": "2025-12-01T18:05:36Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/aspnet-core/SKILL.md",
+   "quality": 92.5,
+   "commits": 1,
+   "first": "2026-03-04T17:20:21Z",
+   "last": "2026-03-04T17:20:21Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/chatgpt-apps/SKILL.md",
+   "quality": 92.5,
+   "commits": 1,
+   "first": "2026-03-02T18:22:37Z",
+   "last": "2026-03-02T18:22:37Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/cli-creator/SKILL.md",
+   "quality": 94.5,
+   "commits": 1,
+   "first": "2026-04-10T18:02:02Z",
+   "last": "2026-04-10T18:02:02Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/cloudflare-deploy/SKILL.md",
+   "quality": 87.0,
+   "commits": 2,
+   "first": "2026-01-31T20:23:45Z",
+   "last": "2026-02-02T20:20:40Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/define-goal/SKILL.md",
+   "quality": 84.5,
+   "commits": 1,
+   "first": "2026-05-21T18:13:37Z",
+   "last": "2026-05-21T18:13:37Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/figma-code-connect-components/SKILL.md",
+   "quality": 97.5,
+   "commits": 5,
+   "first": "2025-12-19T07:24:00Z",
+   "last": "2026-03-24T14:48:51Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/figma-create-design-system-rules/SKILL.md",
+   "quality": 84.5,
+   "commits": 5,
+   "first": "2025-12-19T07:24:00Z",
+   "last": "2026-03-24T14:48:51Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/figma-create-new-file/SKILL.md",
+   "quality": 89.5,
+   "commits": 1,
+   "first": "2026-03-24T14:48:51Z",
+   "last": "2026-03-24T14:48:51Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/figma-generate-design/SKILL.md",
+   "quality": 94.5,
+   "commits": 1,
+   "first": "2026-03-24T14:48:51Z",
+   "last": "2026-03-24T14:48:51Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/figma-generate-library/SKILL.md",
+   "quality": 97.5,
+   "commits": 1,
+   "first": "2026-03-24T14:48:51Z",
+   "last": "2026-03-24T14:48:51Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/figma-implement-design/SKILL.md",
+   "quality": 97.5,
+   "commits": 6,
+   "first": "2025-12-19T07:24:00Z",
+   "last": "2026-03-24T14:48:51Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/figma-use/SKILL.md",
+   "quality": 97.5,
+   "commits": 1,
+   "first": "2026-03-24T14:48:51Z",
+   "last": "2026-03-24T14:48:51Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/figma/SKILL.md",
+   "quality": 89.5,
+   "commits": 1,
+   "first": "2026-02-01T17:05:37Z",
+   "last": "2026-02-01T17:05:37Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/gh-address-comments/SKILL.md",
+   "quality": 72.5,
+   "commits": 3,
+   "first": "2025-12-19T17:34:40Z",
+   "last": "2025-12-19T22:10:04Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/gh-fix-ci/SKILL.md",
+   "quality": 84.5,
+   "commits": 4,
+   "first": "2025-12-19T17:34:40Z",
+   "last": "2026-01-30T18:34:32Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/hatch-pet/SKILL.md",
+   "quality": 91.5,
+   "commits": 4,
+   "first": "2026-05-01T17:55:19Z",
+   "last": "2026-05-12T22:24:22Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/jupyter-notebook/SKILL.md",
+   "quality": 89.5,
+   "commits": 1,
+   "first": "2026-01-31T18:14:20Z",
+   "last": "2026-01-31T18:14:20Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/linear/SKILL.md",
+   "quality": 92.0,
+   "commits": 3,
+   "first": "2025-12-19T17:18:48Z",
+   "last": "2026-01-31T22:21:03Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/migrate-to-codex/SKILL.md",
+   "quality": 73.5,
+   "commits": 2,
+   "first": "2026-04-27T20:29:29Z",
+   "last": "2026-05-01T14:34:51Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/netlify-deploy/SKILL.md",
+   "quality": 97.5,
+   "commits": 2,
+   "first": "2026-01-31T20:23:45Z",
+   "last": "2026-02-02T20:20:40Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/notion-knowledge-capture/SKILL.md",
+   "quality": 78.0,
+   "commits": 3,
+   "first": "2025-12-19T07:14:01Z",
+   "last": "2025-12-19T17:18:15Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/notion-meeting-intelligence/SKILL.md",
+   "quality": 87.0,
+   "commits": 3,
+   "first": "2025-12-19T07:14:01Z",
+   "last": "2025-12-19T17:18:15Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/notion-research-documentation/SKILL.md",
+   "quality": 83.0,
+   "commits": 3,
+   "first": "2025-12-19T07:14:01Z",
+   "last": "2025-12-19T17:18:15Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/notion-spec-to-implementation/SKILL.md",
+   "quality": 92.0,
+   "commits": 3,
+   "first": "2025-12-19T07:14:01Z",
+   "last": "2025-12-19T17:18:15Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/openai-docs/SKILL.md",
+   "quality": 84.5,
+   "commits": 6,
+   "first": "2026-01-31T18:14:20Z",
+   "last": "2026-06-17T19:15:37Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/pdf/SKILL.md",
+   "quality": 89.5,
+   "commits": 2,
+   "first": "2026-01-27T11:18:44Z",
+   "last": "2026-01-30T18:34:32Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/playwright-interactive/SKILL.md",
+   "quality": 68.9,
+   "commits": 3,
+   "first": "2026-03-05T16:30:19Z",
+   "last": "2026-03-11T23:54:05Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/playwright/SKILL.md",
+   "quality": 89.5,
+   "commits": 2,
+   "first": "2026-01-31T18:14:20Z",
+   "last": "2026-02-06T18:01:32Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/render-deploy/SKILL.md",
+   "quality": 97.5,
+   "commits": 2,
+   "first": "2026-01-31T20:23:45Z",
+   "last": "2026-02-02T20:20:40Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/screenshot/SKILL.md",
+   "quality": 78.0,
+   "commits": 2,
+   "first": "2026-01-27T11:18:44Z",
+   "last": "2026-01-30T18:34:32Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/security-best-practices/SKILL.md",
+   "quality": 84.5,
+   "commits": 1,
+   "first": "2026-02-02T15:58:27Z",
+   "last": "2026-02-02T15:58:27Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/security-ownership-map/SKILL.md",
+   "quality": 94.5,
+   "commits": 1,
+   "first": "2026-02-02T15:58:27Z",
+   "last": "2026-02-02T15:58:27Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/security-threat-model/SKILL.md",
+   "quality": 82.0,
+   "commits": 1,
+   "first": "2026-02-02T15:58:27Z",
+   "last": "2026-02-02T15:58:27Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/sentry/SKILL.md",
+   "quality": 89.5,
+   "commits": 2,
+   "first": "2026-01-31T18:14:20Z",
+   "last": "2026-04-08T21:47:09Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/speech/SKILL.md",
+   "quality": 94.5,
+   "commits": 2,
+   "first": "2026-01-27T11:18:44Z",
+   "last": "2026-01-30T18:34:32Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/transcribe/SKILL.md",
+   "quality": 89.5,
+   "commits": 1,
+   "first": "2026-01-31T18:14:20Z",
+   "last": "2026-01-31T18:14:20Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/vercel-deploy/SKILL.md",
+   "quality": 89.5,
+   "commits": 5,
+   "first": "2026-01-31T20:23:45Z",
+   "last": "2026-02-21T04:07:43Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/winui-app/SKILL.md",
+   "quality": 94.5,
+   "commits": 1,
+   "first": "2026-03-04T17:20:21Z",
+   "last": "2026-03-04T17:20:21Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.curated/yeet/SKILL.md",
+   "quality": 78.0,
+   "commits": 5,
+   "first": "2026-01-27T11:18:44Z",
+   "last": "2026-05-18T23:16:36Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.system/imagegen/SKILL.md",
+   "quality": 91.5,
+   "commits": 1,
+   "first": "2026-04-15T03:43:27Z",
+   "last": "2026-04-15T03:43:27Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.system/openai-docs/SKILL.md",
+   "quality": 84.5,
+   "commits": 6,
+   "first": "2026-03-05T17:54:31Z",
+   "last": "2026-06-17T19:15:37Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.system/plugin-creator/SKILL.md",
+   "quality": 89.5,
+   "commits": 1,
+   "first": "2026-04-18T00:55:46Z",
+   "last": "2026-04-18T00:55:46Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.system/skill-creator/SKILL.md",
+   "quality": 100.0,
+   "commits": 6,
+   "first": "2025-12-18T08:32:59Z",
+   "last": "2026-02-09T21:38:07Z"
+  },
+  {
+   "repo": "openai/skills",
+   "path": "skills/.system/skill-installer/SKILL.md",
+   "quality": 78.0,
+   "commits": 4,
+   "first": "2025-12-19T16:54:49Z",
+   "last": "2026-06-24T02:36:12Z"
+  }
+ ]
+}

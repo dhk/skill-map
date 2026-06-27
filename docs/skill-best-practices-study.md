@@ -18,6 +18,7 @@ Anthropic gold standard, three ways:
 | [repo-signature-playbook.md](repo-signature-playbook.md) | "If your repo looks like X, do Y" + top-N skills to add, per signature. |
 | [just-add-these-skills.md](just-add-these-skills.md) | The general-purpose set + practice-level changes for skills you already have. |
 | [skill-types.md](skill-types.md) | Quality sliced by skill type — which kinds are written well vs badly. |
+| [llm-judge-tuning.md](llm-judge-tuning.md) | Why the LLM judge scored Anthropic "weak," the fix, and the maturity (commit-count) finding. |
 
 ## The tooling (run it on your own repos, public or private)
 
@@ -26,7 +27,9 @@ Anthropic gold standard, three ways:
 | `crawlers/skill_quality.py` | Score one `SKILL.md` against the rubric. |
 | `crawlers/repo_signature.py` | Classify a repo's signature from observable features. |
 | `crawlers/score_corpus.py` | Score the whole crawl → `data/skill_quality.json`. |
-| `crawlers/sample_llm.py` | LLM deep-read on a stratified sample (cross-check). |
+| `crawlers/sample_llm.py` | LLM deep-read, v1 (superseded — see tuning doc). |
+| `crawlers/judge_llm.py` | LLM judge **v2** — no truncation, sees reference files, per-axis scoring. |
+| `crawlers/maturity_crawl.py` | Per-skill commit count vs quality (the maturity question). |
 | **`crawlers/audit_repo.py`** | **Audit any repo (local or GitHub, public/private) → report + recommendations.** |
 
 ```bash

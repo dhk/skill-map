@@ -54,6 +54,13 @@ description states:
 A description without a WHEN-trigger is the most common defect in the entire
 corpus (see the study). It is also the cheapest to fix and the highest-leverage.
 
+**The anti-trigger note.** The tuned LLM judge ([llm-judge-tuning.md](llm-judge-tuning.md))
+surfaced one practice even the canonical skills usually skip: stating when *not*
+to invoke the skill. `anthropics/skills/xlsx` does this well ("not for Word docs,
+Google Sheets, or standalone scripts") and it measurably prevents false-positive
+retrieval on adjacent tasks. A complete description states **what**, **when**, and
+**when not**. The heuristic scorer doesn't yet require it; the judge does.
+
 ### 3. Progressive disclosure — 20%
 - a real body (not a stub)
 - **token economy**: a body over ~2,200 words with *zero* links to reference
