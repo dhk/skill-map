@@ -1,0 +1,654 @@
+{
+ "results": [
+  {
+   "repo": "obra/superpowers",
+   "file_path": "skills/using-superpowers/SKILL.md",
+   "signature": "boutique",
+   "tier": "high",
+   "heuristic_score": 88.5,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "description trigger is 'any conversation' \u2014 not a meaningful, bounded scope",
+     "coercive enforcement language (ABSOLUTELY MUST, YOU DO NOT HAVE A CHOICE, 'not negotiable') clashes with measured Anthropic tone",
+     "inline dot-graph diagram adds visual bulk rather than delegating to a reference file",
+     "non-standard XML-style tags (<SUBAGENT-STOP>, <EXTREMELY-IMPORTANT>) with no Anthropic precedent",
+     "Red Flags table frames the model as an adversary to be guarded against, not a collaborator",
+     "skill acts as a policy enforcer rather than a capability describer \u2014 conflates meta-governance with task guidance"
+    ],
+    "best_trait": "progressive disclosure via per-platform reference file links instead of inlining tool mappings",
+    "one_fix": "Replace the coercive all-caps block and vague 'any conversation' trigger with a specific, bounded description of when this skill applies (e.g. 'Use when a task-specific skill exists for the user's request') \u2014 the enforcement pressure undermines trust and the broad trigger causes the skill to fire on everything, defeating discoverability"
+   }
+  },
+  {
+   "repo": "obra/superpowers",
+   "file_path": "skills/receiving-code-review/SKILL.md",
+   "signature": "boutique",
+   "tier": "high",
+   "heuristic_score": 89.5,
+   "llm": {
+    "verdict": "broken",
+    "diverges_from_anthropic": [
+     "file is truncated mid-sentence ('When replyi') \u2014 incomplete/unshippable",
+     "no progressive disclosure \u2014 entire rulebook dumped inline instead of linked reference files",
+     "scope creep: tone policing ('never say Thanks', gratitude bans) is personality configuration, not skill content",
+     "description is wordy and buries the WHAT behind the WHEN",
+     "non-standard jargon ('your human partner') hardcoded throughout without explanation",
+     "pseudo-code flowcharts add noise without adding precision"
+    ],
+    "best_trait": "concrete real-world examples with bad/good contrast are clear and immediately actionable",
+    "one_fix": "complete the truncated file, then extract all behavioral rules into a linked reference doc (e.g. review-reception-rules.md) and reduce SKILL.md to a 5-line summary + link \u2014 the inline dump is the root cause of length, scope, and disclosure failures"
+   }
+  },
+  {
+   "repo": "ykdojo/claude-code-tips",
+   "file_path": "skills/gha/SKILL.md",
+   "signature": "boutique",
+   "tier": "low",
+   "heuristic_score": 58.9,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "description missing 'when to use' trigger conditions",
+     "entire investigation protocol dumped inline instead of linked reference file",
+     "no concrete examples of invocation or expected output",
+     "numbered list body reads as a prompt template, not a skill doc"
+    ],
+    "best_trait": "investigation steps are thorough with well-placed emphasis (CRITICAL/IMPORTANT callouts) that guide the model to common failure-analysis pitfalls",
+    "one_fix": "rewrite description to 'Analyze a GitHub Actions workflow failure from a URL. Use when the user pastes a GHA run link or asks why CI is failing.' \u2014 it currently states what but never when, which is half the required contract"
+   }
+  },
+  {
+   "repo": "ykdojo/claude-code-tips",
+   "file_path": "skills/clone/SKILL.md",
+   "signature": "boutique",
+   "tier": "low",
+   "heuristic_score": 53.5,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "description omits WHEN to use it (trigger conditions missing)",
+     "no progressive disclosure \u2014 all steps inline with no reference to external docs",
+     "steps are implementation detail, not user-facing guidance",
+     "no concrete example of what the user types or sees",
+     "scope bleeds into shell scripting minutiae rather than skill intent"
+    ],
+    "best_trait": "concrete, unambiguous shell commands that leave no room for guessing",
+    "one_fix": "Rewrite the description to include a WHEN trigger: 'Use when the user wants to branch their conversation, try a different approach without losing current context, or experiment with an alternative direction.'"
+   }
+  },
+  {
+   "repo": "obra/superpowers",
+   "file_path": "skills/writing-plans/SKILL.md",
+   "signature": "boutique",
+   "tier": "mid",
+   "heuristic_score": 78.0,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "description omits WHAT the skill does (only states WHEN, not that it creates implementation plan documents)",
+     "no progressive disclosure \u2014 all templates, rules, and examples are dumped inline instead of referencing external files",
+     "Self-Review section is truncated mid-sentence, leaving the skill broken at the end",
+     "'Remember' section redundantly restates content already covered in earlier sections",
+     "skill body is too long to scan quickly; Anthropic house style favors concise SKILL.md with links to reference docs"
+    ],
+    "best_trait": "concrete, executable task template with real code snippets, exact CLI commands, and expected output \u2014 leaves no ambiguity for the implementer",
+    "one_fix": "Extract the 'Plan Document Header' and 'Task Structure' templates into a linked reference file (e.g. docs/superpowers/plan-template.md) and replace those blocks in SKILL.md with a single link \u2014 this alone halves the file length and establishes progressive disclosure"
+   }
+  },
+  {
+   "repo": "ykdojo/claude-code-tips",
+   "file_path": "skills/review-claudemd/SKILL.md",
+   "signature": "boutique",
+   "tier": "mid",
+   "heuristic_score": 73.9,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "description states what but omits WHEN trigger conditions",
+     "multi-step bash scripts dumped inline instead of referenced from separate files",
+     "subagent prompt template embedded inline rather than linked",
+     "no invocation example showing what the user types to trigger it"
+    ],
+    "best_trait": "four-step pipeline with file-size batching heuristics makes the workflow concrete and self-contained",
+    "one_fix": "Extend the description with explicit WHEN triggers, e.g. 'Use when the user asks to review, update, or audit their CLAUDE.md files based on past session patterns' \u2014 without this the harness cannot auto-select the skill"
+   }
+  },
+  {
+   "repo": "openai/skills",
+   "file_path": "skills/.curated/figma-use/SKILL.md",
+   "signature": "canonical-reference",
+   "tier": "high",
+   "heuristic_score": 97.5,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "Description uses alarmist imperative language ('MANDATORY prerequisite', 'NEVER', 'hard-to-debug failures') instead of a clean functional trigger statement",
+     "Section 1 dumps 17 inline rules violating progressive disclosure \u2014 reference files exist but are not used for this content",
+     "Duplicate rule numbering (3 and 3a) breaks the numbered list contract",
+     "No concrete invocation examples showing how/when the skill is triggered",
+     "File is truncated mid-sentence in Section 2, leaving critical Page Rules incomplete"
+    ],
+    "best_trait": "Cross-links to external reference files for detailed API docs rather than inlining them",
+    "one_fix": "Move the 17 Critical Rules into references/critical-rules.md and replace Section 1 with a 2-3 sentence summary plus a link \u2014 this restores progressive disclosure and cuts the SKILL.md to a focused trigger guide"
+   }
+  },
+  {
+   "repo": "anthropics/skills",
+   "file_path": "skills/xlsx/SKILL.md",
+   "signature": "canonical-reference",
+   "tier": "high",
+   "heuristic_score": 89.0,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "no progressive disclosure \u2014 all rules dumped inline instead of linked to reference files",
+     "frontmatter description exceeds 200 words (should be 2-4 concise sentences)",
+     "document is truncated mid-sentence in the final section",
+     "financial-model-specific conventions mixed with general spreadsheet guidance without scoping",
+     "duplicate '## Excel File Workflows' heading hierarchy"
+    ],
+    "best_trait": "explicit anti-trigger list in the description prevents false positives on adjacent tasks (Word docs, Google Sheets, standalone scripts)",
+    "one_fix": "move all the detailed rules (color coding, number formatting, formula construction, documentation requirements) into linked reference files (e.g. docs/financial-model-style.md) and replace the inline content with a single sentence and a link \u2014 this alone fixes the progressive-disclosure violation that makes the SKILL.md unreadably long"
+   }
+  },
+  {
+   "repo": "QuestForTech-Investments/claude-code-skills",
+   "file_path": "template-skill/SKILL.md",
+   "signature": "canonical-reference",
+   "tier": "low",
+   "heuristic_score": 45.4,
+   "llm": {
+    "verdict": "broken",
+    "diverges_from_anthropic": [
+     "description is an unfilled placeholder, not a real what/when statement",
+     "body contains zero instructions \u2014 only a heading stub",
+     "no trigger conditions or examples",
+     "no progressive disclosure or reference links",
+     "skill name is 'template-skill', not a real skill name"
+    ],
+    "best_trait": "frontmatter fields (name, description) are structurally present",
+    "one_fix": "replace every placeholder with real content: a concrete description of what the skill does and when to invoke it, followed by actual step-by-step instructions in the body"
+   }
+  },
+  {
+   "repo": "anthropics/skills",
+   "file_path": "template/SKILL.md",
+   "signature": "canonical-reference",
+   "tier": "low",
+   "heuristic_score": 43.4,
+   "llm": {
+    "verdict": "broken",
+    "diverges_from_anthropic": [
+     "description is an unfilled placeholder with no WHAT or WHEN",
+     "body contains no instructions at all",
+     "no progressive disclosure or reference links",
+     "no concrete examples",
+     "skill name is generic template label, not functional"
+    ],
+    "best_trait": "placeholder text at least echoes the correct description contract ('what the skill does and when to use it')",
+    "one_fix": "Replace every placeholder with real content: set name to the skill's actual function, write a description stating what it does and the trigger condition for invoking it, and add concrete instructions in the body"
+   }
+  },
+  {
+   "repo": "openai/skills",
+   "file_path": "skills/.curated/migrate-to-codex/SKILL.md",
+   "signature": "canonical-reference",
+   "tier": "mid",
+   "heuristic_score": 73.5,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "description missing 'Use when\u2026' trigger language",
+     "no progressive disclosure \u2014 entire 10-step procedure and full report spec dumped inline instead of linking to reference docs",
+     "Autonomy section reads as a standalone instruction contract, not a skill card header",
+     "report-format example is far too verbose inline (full table schema + five sample rows)",
+     "skill card doubles as a specification document, violating tight-scope principle"
+    ],
+    "best_trait": "concrete, self-consistent report format with explicit Status enum values and worked examples",
+    "one_fix": "extract the Migration Order steps (2\u201310) and the full report-format spec into references/migration-guide.md and replace the inline body with a one-paragraph summary plus a link \u2014 this alone achieves progressive disclosure and cuts the card to an appropriate length"
+   }
+  },
+  {
+   "repo": "posit-dev/skills",
+   "file_path": "alt-text/SKILL.md",
+   "signature": "canonical-reference",
+   "tier": "mid",
+   "heuristic_score": 68.5,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "dumps 8+ template patterns inline rather than in a linked reference file",
+     "quality checklist, content rules, and length table all inline \u2014 violates progressive disclosure",
+     "Example section is cut off with no actual example shown",
+     "body is far too long for a skill entry point; should orchestrate, not document"
+    ],
+    "best_trait": "description clearly states both WHAT and WHEN with concrete trigger keywords (fig-alt, fig.alt, pkgdown, .qmd)",
+    "one_fix": "Extract the template patterns, quality checklist, content rules, and length table into references/templates.md and replace all of it in SKILL.md with a single line: '\u2192 See `references/templates.md` for chart-type templates, content rules, and the quality checklist.'"
+   }
+  },
+  {
+   "repo": "muratcankoylan/Agent-Skills-for-Context-Engineering",
+   "file_path": "SKILL.md",
+   "signature": "domain-pack",
+   "tier": "high",
+   "heuristic_score": 90.0,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "dumps all content inline instead of linking to reference files (no progressive disclosure)",
+     "no concrete examples anywhere\u2014only abstract pattern descriptions",
+     "scope is not tight ('comprehensive collection' spans 8+ distinct domains)",
+     "'When to Activate' section duplicates what belongs in the description",
+     "bold text used as pseudo-headings instead of proper markdown heading hierarchy",
+     "skill is truncated mid-sentence ('that a task is we'), making it incomplete/broken at the end"
+    ],
+    "best_trait": "description clearly states both WHAT the skill does and WHEN to invoke it",
+    "one_fix": "replace every inline explanation block with a one-sentence summary and a link to a dedicated reference file (e.g., 'See [memory-patterns.md](./memory-patterns.md)') \u2014 this single change enforces progressive disclosure and cuts the skill to a navigable index rather than a wall of prose"
+   }
+  },
+  {
+   "repo": "coreyhaines31/marketingskills",
+   "file_path": "skills/aso/SKILL.md",
+   "signature": "domain-pack",
+   "tier": "high",
+   "heuristic_score": 97.0,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "file truncated mid-sentence \u2014 ends on '**Est', breaking Phase 1.5 entirely",
+     "store field lists (30+ fields each) dumped inline instead of linked reference files",
+     "description enumerates ~10 trigger phrases as a keyword list rather than stating a crisp when-to-use condition",
+     "no example output shown \u2014 reader cannot see what a finished audit looks like",
+     "skill mixes reference data (field schemas, tier table) with procedural instructions, violating progressive disclosure"
+    ],
+    "best_trait": "tiered brand-maturity model (Dominant / Established / Challenger) shows genuine domain expertise and prevents false-positive scoring",
+    "one_fix": "extract the Apple and Google field lists into a linked reference file (e.g. `.claude/aso-reference.md`) and replace both field-dump sections with a single sentence pointing there \u2014 this restores progressive disclosure and cuts the skill to a readable length in one edit"
+   }
+  },
+  {
+   "repo": "can1357/oh-my-pi",
+   "file_path": "packages/coding-agent/test/fixtures/skills/invalid-name-chars/SKILL.md",
+   "signature": "domain-pack",
+   "tier": "low",
+   "heuristic_score": 28.4,
+   "llm": {
+    "verdict": "broken",
+    "diverges_from_anthropic": [
+     "name contains uppercase letters and underscores (must be lowercase-hyphenated)",
+     "description states neither WHAT the skill does nor WHEN to use it",
+     "no progressive disclosure or reference links",
+     "no concrete examples",
+     "no clear headings beyond title",
+     "scope is undefined"
+    ],
+    "best_trait": "has a description field present",
+    "one_fix": "rename to a lowercase-hyphenated slug (e.g. 'invalid-name') and rewrite description to explicitly state what the skill does and when to invoke it"
+   }
+  },
+  {
+   "repo": "AgriciDaniel/claude-seo",
+   "file_path": "skills/seo-local/SKILL.md",
+   "signature": "domain-pack",
+   "tier": "low",
+   "heuristic_score": 52.2,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "no progressive disclosure \u2014 statistics table, detection logic, scoring rubrics all dumped inline instead of linked reference files",
+     "SKILL.md acts as a full reference document rather than an orchestration entry point",
+     "description over-enumerates 10+ keyword triggers instead of describing the core use case concisely",
+     "data that changes over time (Whitespark 2026 stats, Sterling Sky rules) embedded directly, making maintenance brittle",
+     "content is truncated mid-section (Section 3 cut off), indicating the file already exceeds its intended scope"
+    ],
+    "best_trait": "WHEN-to-use triggers are explicit and unambiguous \u2014 keyword list leaves no doubt about invocation conditions",
+    "one_fix": "Extract the statistics table, business-type detection blocks, industry vertical table, and all scoring guides into linked reference files (e.g. references/local-gbp-signals.md), replacing inline content with a single-sentence summary and a link per section"
+   }
+  },
+  {
+   "repo": "flonat/claude-research",
+   "file_path": "skills/init-project-light/skill.md",
+   "signature": "domain-pack",
+   "tier": "mid",
+   "heuristic_score": 76.9,
+   "llm": {
+    "verdict": "solid",
+    "diverges_from_anthropic": [
+     "description states only WHEN to use, not WHAT the skill does",
+     "lean-claude-md rule is referenced by name but not linked \u2014 breaks progressive disclosure",
+     "permissions JSON block dumped inline rather than linked to a reference file",
+     "no trigger phrases or aliases in description to surface natural invocation patterns"
+    ],
+    "best_trait": "clear escalation boundary with explicit /init-project-research handoff and concrete decision criteria",
+    "one_fix": "Rewrite the description to state both WHAT and WHEN: e.g. 'Creates a CLAUDE.md and suggests lightweight folder structure for small, code-free projects. Use when the user says \"set up something light\", \"quick init\", or when the project lacks a code pipeline or journal target.'"
+   }
+  },
+  {
+   "repo": "AgriciDaniel/claude-seo",
+   "file_path": "extensions/seranking/skills/seo-seranking/SKILL.md",
+   "signature": "domain-pack",
+   "tier": "mid",
+   "heuristic_score": 62.2,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "description has no WHEN-to-use trigger language \u2014 only states what it does",
+     "marketing copy in description ('Highest-impact new extension\u2026no other vendor') has no place in a skill trigger",
+     "AI Share-of-Voice scoring fields dumped inline instead of linked to a reference file",
+     "cost guardrails reference scripts/dataforseo_costs.py \u2014 a cross-skill artifact that breaks isolation",
+     "no example output shown for any command"
+    ],
+    "best_trait": "routing table maps every command to its purpose in one scannable view",
+    "one_fix": "rewrite the description frontmatter to 'Use when the user wants to track AI Share-of-Voice or brand visibility across ChatGPT, Gemini, Perplexity, AI Overviews, or AI Mode; strip all marketing copy from it'"
+   }
+  },
+  {
+   "repo": "julianobarbosa/claude-code-skills",
+   "file_path": "skills/devops-network-calculator-for-azure/SKILL.md",
+   "signature": "marketplace",
+   "tier": "high",
+   "heuristic_score": 95.0,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "Project Context section hardcodes one user's specific IPs and utilization percentages \u2014 breaks generalizability for a marketplace skill",
+     "Gotchas section dumps six long inline paragraphs instead of linking to a reference guide",
+     "Azure Quick Reference inlines constraint data that already belongs in the linked azure-constraints.md",
+     "Description over-triggers via exhaustive keyword enumeration rather than concise WHEN criteria",
+     "Execution section is a one-liner stub ('Follow workflow.md') that adds noise without actionable guidance"
+    ],
+    "best_trait": "Commands-to-reference table maps each subcommand to the right doc \u2014 progressive disclosure applied correctly",
+    "one_fix": "Delete the hardcoded Project Context subnet table; replace with a note that `analyze --from-tfvars` outputs live utilization \u2014 the current table embeds one author's VNet state into every caller's context"
+   }
+  },
+  {
+   "repo": "daymade/claude-code-skills",
+   "file_path": "capture-screen/SKILL.md",
+   "signature": "marketplace",
+   "tier": "high",
+   "heuristic_score": 94.5,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "no progressive disclosure \u2014 all code dumped inline instead of linking to reference files",
+     "multi-shot workflow example is truncated mid-snippet (ends at `dcf_`)",
+     "content skews heavily toward Microsoft Excel despite claiming general macOS screenshot scope",
+     "reads as a reference manual, not a concise invocation guide \u2014 Anthropic skills stay brief and defer details",
+     "no negative trigger guidance (when NOT to invoke) to help the model self-select"
+    ],
+    "best_trait": "battle-tested operational details (timeout wrapping for hung osascript, CGWindowID invalidation warning, Retina 2x caveat) that a naive implementation would miss",
+    "one_fix": "extract the inline Swift, AppleScript, and screencapture blocks into scripts/reference files and replace them with short links \u2014 the SKILL.md body should be a concise decision guide, not a copy-paste cookbook"
+   }
+  },
+  {
+   "repo": "daymade/claude-code-skills",
+   "file_path": "daymade-claude-code/claude-export-txt-better/SKILL.md",
+   "signature": "marketplace",
+   "tier": "low",
+   "heuristic_score": 56.5,
+   "llm": {
+    "verdict": "solid",
+    "diverges_from_anthropic": [
+     "description mixes trigger heuristics with what/when in a long block instead of a clean two-sentence what+when",
+     "no link to reference scripts \u2014 skill-path resolution workaround exposes an internal fragility rather than hiding it",
+     "'Key Design Decisions' and 'What Gets Fixed' sections dump implementation detail that belongs in the script, not the skill doc",
+     "checklist pattern is non-standard; Anthropic house style uses prose workflow steps or defers to a referenced doc",
+     "marker-count safety contract listed inline rather than in the validation script's own docstring"
+    ],
+    "best_trait": "concrete quick-start commands with realistic expected output numbers give users immediate confidence",
+    "one_fix": "collapse 'Key Design Decisions' and the implementation detail in 'What Gets Fixed' into a single short paragraph or remove them \u2014 skill docs should tell users what to run and what to expect, not how the state machine works"
+   }
+  },
+  {
+   "repo": "julianobarbosa/claude-code-skills",
+   "file_path": "skills/azure-cost-management-app/SKILL.md",
+   "signature": "marketplace",
+   "tier": "low",
+   "heuristic_score": 56.0,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "No progressive disclosure \u2014 full 100-line runbook dumped inline instead of linked to a reference file",
+     "When This Skill Applies section duplicates frontmatter description verbatim",
+     "Key Facts block inlines domain knowledge that belongs in a separate reference doc",
+     "File is truncated \u2014 Parameters table is cut off mid-header row, making the skill incomplete/broken"
+    ],
+    "best_trait": "Frontmatter description names both WHAT and WHEN with multiple concrete trigger phrases",
+    "one_fix": "Extract Steps 1\u20135 and all inline tables into a WORKFLOW.md reference file, then replace the Workflow section with a single link \u2014 SKILL.md should describe and trigger the skill, not be the runbook itself"
+   }
+  },
+  {
+   "repo": "julianobarbosa/claude-code-skills",
+   "file_path": "skills/azure-landing-zone-checklist/SKILL.md",
+   "signature": "marketplace",
+   "tier": "mid",
+   "heuristic_score": 66.0,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "dumps implementation detail inline instead of linking reference files (Python openpyxl code, subnet layout table, subscription mapping table all belong in references/)",
+     "description trigger list is exhaustive keyword soup rather than a concise WHEN heuristic",
+     "\"Why this matters\" section adds prose bloat not present in gold-standard skills",
+     "Phase 5 reads as developer documentation, not skill orchestration guidance"
+    ],
+    "best_trait": "description clearly states both WHAT the skill produces and WHEN to trigger it, including the Excel-tab detection heuristic",
+    "one_fix": "extract the Python code block, subnet layout table, and subscription pattern table into reference files (e.g. references/alz-checklist-impl.md) and replace them with a single link \u2014 this collapses ~60 lines of inline implementation detail into progressive disclosure and aligns with the Anthropic house style's core principle"
+   }
+  },
+  {
+   "repo": "FlorianBruniaux/claude-code-ultimate-guide",
+   "file_path": "examples/skills/plan-pipeline/ceo-review/SKILL.md",
+   "signature": "marketplace",
+   "tier": "mid",
+   "heuristic_score": 71.8,
+   "llm": {
+    "verdict": "solid",
+    "diverges_from_anthropic": [
+     "Full prompt template dumped inline instead of extracted to a referenced file (violates progressive disclosure)",
+     "description field lacks an explicit WHEN trigger clause \u2014 readers must infer from body prose",
+     "disable-model-invocation frontmatter key is non-standard and undocumented in house style",
+     "Three-mode table adds upfront cognitive load that belongs behind a details link or separate reference"
+    ],
+    "best_trait": "Concrete input/output example with a named domain scenario makes the value proposition immediately clear",
+    "one_fix": "Extract the prompt template block into a separate file (e.g. prompts/ceo-review.md) and replace it with a single link \u2014 this alone removes ~50 lines of inline noise and respects progressive disclosure"
+   }
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "file_path": "plugins/claude-code-plugins-plus/plugins/security/access-control-auditor/skills/access-control-auditor/SKILL.md",
+   "signature": "mega-collection",
+   "tier": "high",
+   "heuristic_score": 85.0,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "description buries WHEN-to-use behind trigger phrases instead of stating it concisely upfront",
+     "references a fictional 'access-control-auditor plugin' that doesn't exist \u2014 skill invents an integration layer",
+     "prerequisites use unfilled template placeholder '{baseDir}/'",
+     "content is copy-paste boilerplate (Output, Error Handling, Resources sections) unrelated to the specific skill",
+     "no progressive disclosure \u2014 everything dumped inline with no links to reference files",
+     "'How It Works' describes a plugin workflow that conflicts with the actual allowed-tools list",
+     "allowed-tools permit arbitrary Bash under vague globs (security:*, scan:*, audit:*) with no scope rationale",
+     "examples describe plugin invocation steps, not real Claude behavior the user can observe"
+    ],
+    "best_trait": "trigger phrase list in description makes activation intent explicit",
+    "one_fix": "remove the fictional plugin abstraction entirely and rewrite the skill to describe what Claude actually does with the listed tools (Read/Grep/Bash) \u2014 the current 'How It Works' section is misleading and breaks user trust"
+   }
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "file_path": "community/individual-skills/web-asset-generator/skills/web-asset-generator/SKILL.md",
+   "signature": "mega-collection",
+   "tier": "high",
+   "heuristic_score": 84.5,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "dumps all six question-pattern specs inline instead of linking to a reference file",
+     "'Why Use AskUserQuestion?' rationale section explains the tool to Claude rather than directing behavior",
+     "decorative emoji and bullet-art (\u2705 \u25cb \u25cf) used throughout for style, not meaning",
+     "IMPORTANT banner and repeated emphasis markers inflate noise-to-signal ratio",
+     "document length far exceeds what Claude needs at inference time; no progressive disclosure"
+    ],
+    "best_trait": "description clearly states both what the skill does and the exact trigger conditions",
+    "one_fix": "extract the six Question Patterns into a linked reference file (e.g. docs/question-patterns.md) and replace the inline dump with a single sentence plus the link \u2014 this alone cuts ~70% of the document and enforces progressive disclosure"
+   }
+  },
+  {
+   "repo": "affaan-m/ECC",
+   "file_path": "docs/ja-JP/skills/design-system/SKILL.md",
+   "signature": "mega-collection",
+   "tier": "low",
+   "heuristic_score": 49.8,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "description omits WHEN to invoke (trigger conditions vs. always-on concepts)",
+     "no concrete examples of usage or invocation",
+     "vague generic checklist instead of progressive disclosure linking to reference files",
+     "tool list is informational prose, not actionable guidance",
+     "'\u8a73\u7d30\u306b\u3064\u3044\u3066\u306f\u3001\u30c9\u30ad\u30e5\u30e1\u30f3\u30c8\u3092\u53c2\u7167\u3057\u3066\u304f\u3060\u3055\u3044' links to nothing \u2014 broken progressive disclosure",
+     "scope is a broad topic overview, not a scoped actionable skill",
+     "no examples section showing actual skill invocation or expected output"
+    ],
+    "best_trait": "description lists the skill's core capabilities concisely in one line",
+    "one_fix": "Add a concrete trigger-condition block (e.g. 'Use when the user says \"set up a design system\", \"add a component library\", or \"sync Figma tokens\"') and link each checklist item to a real reference file rather than leaving both as dead prose"
+   }
+  },
+  {
+   "repo": "BbgnsurfTech/claude-skills-collection",
+   "file_path": "plugins/claude-code-plugins-plus/backups/skills-migration-20251108-070147/plugins/testing/unit-test-generator/skills/unit-test-generator/SKILL.md",
+   "signature": "mega-collection",
+   "tier": "low",
+   "heuristic_score": 54.0,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "description buries the trigger phrase 'gut' instead of leading with it",
+     "'How It Works' section dumps implementation detail not useful to the invoker",
+     "'Integration' and 'Best Practices' sections are filler padding with no actionable specifics",
+     "'When to Use This Skill' duplicates information already in the description",
+     "no progressive disclosure \u2014 no links to reference files or examples of real output",
+     "examples describe what the skill 'will do' rather than showing actual input/output",
+     "description opens with 'This skill enables Claude to' throat-clearing instead of a direct action statement"
+    ],
+    "best_trait": "description correctly states both WHAT the skill does and WHEN to trigger it, including the shortcut alias",
+    "one_fix": "delete the 'How It Works', 'Integration', and 'When to Use This Skill' sections entirely \u2014 they duplicate the description and add no value; replace with a single concrete example showing real input and the resulting test file snippet"
+   }
+  },
+  {
+   "repo": "davila7/claude-code-templates",
+   "file_path": "cli-tool/components/skills/gmod-addon-maker/SKILL.md",
+   "signature": "mega-collection",
+   "tier": "mid",
+   "heuristic_score": 62.8,
+   "llm": {
+    "verdict": "solid",
+    "diverges_from_anthropic": [
+     "When-to-use list duplicated verbatim between YAML description and 'When to Apply' heading",
+     "No concrete examples (no sample Lua snippet, no example directory tree to anchor the reader)",
+     "URL-fetching procedure (Action Sequence, STRICT PROHIBITION block) is inline documentation that belongs in a reference file",
+     "Awkward third-person imperative voice ('Tell user to test') breaks consistent instructional register",
+     "Description covers creation, debugging, content, packaging, and distribution \u2014 slightly over-scoped for a single skill"
+    ],
+    "best_trait": "progressive disclosure via external reference files (addon-structure.md, state-exp.md, common-error.md) keeps the body lean",
+    "one_fix": "Extract the entire 'Specific API Lookup Rule' block (FORBIDDEN notice + Action Sequence) into a references/api-lookup.md file and replace it with a single line \u2014 'See [api-lookup](references/api-lookup.md) for how to find GMod wiki URLs.' \u2014 then add one minimal Lua snippet (e.g. a SWEP base stub) so readers have a concrete anchor."
+   }
+  },
+  {
+   "repo": "borghei/claude-skills",
+   "file_path": "engineering/qa-browser-automation/SKILL.md",
+   "signature": "mega-collection",
+   "tier": "mid",
+   "heuristic_score": 61.0,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "no progressive disclosure \u2014 all three full workflows, 11-phase runbook, and tool docs inlined instead of linked",
+     "non-standard YAML frontmatter (license, nested metadata block) bloats the header with fields unused by the runtime",
+     "Quick Start is a raw command dump with no framing of when each command applies",
+     "content is truncated mid-table (Testing Tiers section cut off), leaving the file incomplete",
+     "breadth of 11 phases inlined makes the file a runbook, not a skill descriptor"
+    ],
+    "best_trait": "Clarify First section with an explicit stop rule prevents wasted sweeps on underspecified requests",
+    "one_fix": "Extract the three workflow sections and tool-reference table into separate linked files (e.g., docs/workflows.md, docs/tools.md) and replace them in SKILL.md with one-line pointers \u2014 this alone converts the file from a dumped runbook to a proper progressive-disclosure skill descriptor"
+   }
+  },
+  {
+   "repo": "github/spec-kit",
+   "file_path": ".github/skills/add-community-extension/SKILL.md",
+   "signature": "single-skill",
+   "tier": "high",
+   "heuristic_score": 87.0,
+   "llm": {
+    "verdict": "solid",
+    "diverges_from_anthropic": [
+     "dumps full validation checklist inline instead of deferring to extensions/EXTENSION-PUBLISHING-GUIDE.md",
+     "inlines complete JSON schema template rather than pointing to an existing catalog entry as the format reference",
+     "reproduces git/PR command boilerplate that belongs in a shared workflow reference",
+     "Common Pitfalls section is truncated mid-sentence ('Don't forget')"
+    ],
+    "best_trait": "frontmatter description nails WHAT/WHEN/DO NOT USE FOR with a useful argument-hint",
+    "one_fix": "replace the inline validation table (step 2) with a single sentence: 'Validate against all rules in extensions/EXTENSION-PUBLISHING-GUIDE.md \u2014 fetch and check each item before proceeding' \u2014 this removes the biggest progressive-disclosure violation and keeps the guide as the single source of truth"
+   }
+  },
+  {
+   "repo": "199-biotechnologies/claude-deep-research-skill",
+   "file_path": "SKILL.md",
+   "signature": "single-skill",
+   "tier": "high",
+   "heuristic_score": 97.5,
+   "llm": {
+    "verdict": "solid",
+    "diverges_from_anthropic": [
+     "Output Contract section dumps full required-sections list and quality standards inline instead of deferring to report-assembly.md and quality-gates.md",
+     "Workflow phase table and Decision tree belong in methodology.md, not the top-level SKILL.md",
+     "'When to Use / NOT Use' section largely restates the frontmatter description \u2014 redundant",
+     "Hardcoded output path (~/Documents/...) is an implementation detail that should live in a reference file",
+     "No concrete before/after examples of good vs. bad queries despite listing trigger phrases"
+    ],
+    "best_trait": "Frontmatter description is complete \u2014 names both the trigger phrases and explicit anti-triggers, covering WHAT and WHEN in one block",
+    "one_fix": "Collapse the 'Output Contract' section (required sections, output files, quality standards) to two lines pointing at report-assembly.md and quality-gates.md respectively \u2014 this removes ~40% of inline spec and fully honors the progressive-disclosure architecture the file already references"
+   }
+  },
+  {
+   "repo": "dhk/tricorder",
+   "file_path": "SKILL.md",
+   "signature": "single-skill",
+   "tier": "low",
+   "heuristic_score": 53.5,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "frontmatter description is 8 dense lines \u2014 should be 1-2 sentences covering what + when",
+     "inline bash scripts, config templates, and cache-tree diagrams violate progressive disclosure \u2014 reference files should be linked, not dumped",
+     "trigger-phrase list buried inside description field instead of a dedicated triggers: key or separate section",
+     "operational how-to (keychain retrieval, step-by-step harvest) belongs in referenced runbooks, not the skill definition",
+     "file is truncated mid-command, indicating the skill is too long to be a single document"
+    ],
+    "best_trait": "maturation-path taxonomy (judgment\u2192guidance\u2192convention\u2192rule\u2192deterministic) is concrete, named, and actionable",
+    "one_fix": "move all bash snippets, config templates, and cache-structure details into linked reference files (e.g. docs/harvest.md, docs/setup.md) and replace inline content with a single sentence + link \u2014 this fixes the progressive-disclosure violation that makes the file unreadably long"
+   }
+  },
+  {
+   "repo": "dhk/ivy-archive",
+   "file_path": "code/skills/ivy-archive/SKILL.md",
+   "signature": "single-skill",
+   "tier": "mid",
+   "heuristic_score": 61.0,
+   "llm": {
+    "verdict": "weak",
+    "diverges_from_anthropic": [
+     "no progressive disclosure \u2014 full bash implementations dumped inline instead of linked to script files",
+     "hardcoded user paths (Users/dhk/, ~/Documents/dev/) make skill non-portable",
+     "scope too wide \u2014 six distinct modes in one skill rather than tight single responsibility",
+     "description frontmatter lists exhaustive trigger phrases inline instead of keeping it concise",
+     "file truncated mid-sentence (COLLECT MODE cut off), indicating the doc has grown beyond manageable size",
+     "config block reproduces file content inline rather than referencing the file by path only"
+    ],
+    "best_trait": "mode-detection table is clear, scannable, and well-structured",
+    "one_fix": "extract all bash implementation blocks into ~/.claude/skills/ivy-archive/impl/*.sh scripts and replace them in SKILL.md with a single line referencing each script \u2014 this restores progressive disclosure and shrinks the doc to a navigable guide"
+   }
+  }
+ ]
+}

@@ -80,6 +80,37 @@ is the **frontmatter discipline and the trigger** — the parts that make a skil
 | missing description | 21 | <1% |
 | missing name | 14 | <1% |
 
+## Lesson 6 — what the LLM cross-read caught that heuristics can't
+
+A stratified sample of 34 skills was deep-read by Claude and compared to the
+Anthropic house style (`crawlers/sample_llm.py`). **Calibration caveat:** the
+judge ran *pessimistic* — it labelled even top-scoring canonical skills "weak,"
+so its absolute verdicts aren't trustworthy. But its **relative** signal is
+clean: every "broken" verdict landed on a genuinely low-scoring skill (heuristic
+< 50), while higher scores got "weak," never "broken." The heuristic floor and
+the LLM floor agree.
+
+Where it earned its keep was the **qualitative divergences** structure can't see:
+
+- **No progressive disclosure / no reference links** (most common) — rulebooks
+  dumped inline instead of linked out.
+- **No concrete examples** — passes the heading check, still unhelpful.
+- **Unbounded triggers** — "use in any conversation" is technically a trigger
+  but a meaningless one.
+- **Coercive tone** — "absolutely must," "you do not have a choice," "not
+  negotiable," adversarial "red flags" tables that frame the model as a threat to
+  be guarded against. This clashes hard with Anthropic's measured, collaborative
+  voice.
+- **Non-standard XML-ish tags** (`<extremely-important>`, `<subagent-stop>`) with
+  no canonical precedent.
+- **Scope creep** — "personality configuration" (gratitude bans, tone policing)
+  smuggled in as skill content; meta-governance conflated with task guidance.
+- **Unshippable artifacts** — at least one file truncated mid-sentence.
+
+The lesson: a high structural score is necessary, not sufficient. Use the
+heuristic as a fast gate; use a qualitative read to catch tone, scope, and
+substance.
+
 ## The one-paragraph takeaway
 
 The Claude skills ecosystem writes good *content* and bad *metadata*. Bodies are
