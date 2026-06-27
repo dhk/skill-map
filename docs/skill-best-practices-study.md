@@ -46,7 +46,7 @@ python crawlers/audit_repo.py --github you/private-repo --token $GITHUB_TOKEN --
 
 ## The three-sentence summary
 
-The ecosystem is in better shape than a first pass suggested (median 79.5): two
+The ecosystem is in better shape than a first pass suggested (median 82.5): two
 thirds of skills tell Claude *when* to fire, but **only 2.5% say when NOT to** —
 the anti-trigger note is the one near-universal gap. Quality dips in the
 mega-collections that hold 77% of all skills, but modestly (median 78 vs 85). The fix is

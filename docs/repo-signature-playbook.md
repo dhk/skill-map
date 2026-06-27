@@ -27,7 +27,7 @@ How signatures are assigned (by scale, then refined):
 
 ## mega-collection — *the highest-impact fixes in the ecosystem*
 
-> 5 repos · 3,775 skills · **median 78.0** · **64%** have WHEN-triggers
+> 5 repos · 3,775 skills · **median 80.0** · **64%** have WHEN-triggers
 
 You hold 77% of the ecosystem's skills and set its median. Coverage is not your
 problem — **consistency is**. A third of your skills can't tell Claude when to
@@ -50,7 +50,7 @@ fire.
 
 ## marketplace — *consistency across contributors*
 
-> 6 repos · 594 skills · median 85.0 · 87% have WHEN-triggers
+> 6 repos · 594 skills · median 90.0 · 87% have WHEN-triggers
 
 Multi-domain catalogs with many contributors. You're already good; the risk is
 drift between authors.
@@ -87,7 +87,7 @@ descriptions and you're at the canonical bar.
 
 ## boutique — *small enough to make every skill an A*
 
-> 5 repos · 38 skills · median 80.0 · 87% have WHEN-triggers
+> 6 repos · 49 skills · median 82.5 · 87% have WHEN-triggers
 
 A handful of personal skills. At this size there's no excuse not to be all-A.
 
@@ -116,7 +116,7 @@ Often a skill embedded in a larger product/docs repo. It's your showcase.
 
 ## canonical-reference — *you are the bar*
 
-> 5 repos · 118 skills · median 85.0 · 87% have WHEN-triggers
+> 5 repos · 118 skills · median 90.0 · 87% have WHEN-triggers
 
 Official, curated, consistent. Keep it that way.
 

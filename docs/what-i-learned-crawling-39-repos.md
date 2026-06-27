@@ -6,9 +6,9 @@ Anthropic gold standard (see [best-practices.md](best-practices.md)). One crawl,
 
 ## The headline numbers
 
-- **Corpus median quality: 79.5 / 100** — a solid B ecosystem, better than first
-  reported (see the correction note below).
-- **Grade distribution:** A 1,576 · B 2,454 · C 790 · D 78 · F 55.
+- **Corpus median quality: 82.5 / 100** — a solid B+ ecosystem, better than first
+  reported (see the two correction notes below).
+- **Grade distribution:** A 2,033 · B 2,100 · C 690 · D 76 · F 54.
 - **Only 2.5% of skills state when *not* to use them** (the anti-trigger note) —
   the rarest practice in the ecosystem and the #1 defect (4,758 skills). Even the
   canonical repos almost all miss it. This is the one genuinely universal gap.
@@ -34,22 +34,29 @@ Anthropic gold standard (see [best-practices.md](best-practices.md)). One crawl,
 > dragging domain-pack's trigger rate from 81%→73%; mksglu (18k★) has 11/11.
 > Lineage figures below remain crawl-1-scoped (the new repos add no copy edges).
 
+> **Correction 2 (sibling files).** The crawl captured only `SKILL.md`, so the
+> progressive-disclosure axis was blind to `reference/`/`scripts/` folders —
+> which **50% of the corpus has**. Backfilling folder contents
+> (`fetch_siblings.py`) and crediting them moved the median 79.5→82.5 and the
+> canonical repos to 90. Disclosure is now scored on real folder contents, not
+> inferred from inline links. (Same lesson, again: measure your measurement.)
+
 ## Lesson 1 — The ecosystem's quality problem is concentrated, not spread
 
 Quality does **not** degrade evenly. It collapses in one place: **mega-collections**.
 
 | Signature | Repos | Skills | Median quality | % with WHEN-trigger |
 |---|---|---|---|---|
-| canonical-reference | 5 | 118 | **85.0** | 87% |
+| canonical-reference | 5 | 118 | **90.0** | 87% |
 | domain-pack | 12 | 410 | **85.0** | 73% |
-| marketplace | 6 | 594 | **85.0** | 87% |
+| marketplace | 6 | 594 | **90.0** | 87% |
 | single-skill | 7 | 7 | 85.0 | 100% |
-| boutique | 6 | 49 | 80.0 | 90% |
-| **mega-collection** | 5 | **3,775** | **78.0** | **64%** |
+| boutique | 6 | 49 | 82.5 | 90% |
+| **mega-collection** | 5 | **3,775** | **80.0** | **64%** |
 
 Mega-collections are **77% of all skills in the corpus** and have the lowest
 median (78) and the lowest WHEN-trigger rate (64%). Everything that *isn't* a
-mega-collection clusters at 80–85 median. The gap is real but **modest** — these
+mega-collection clusters at 82–90 median. The gap is real but **modest** — these
 are big aggregations with uneven contributions, not junk. Curated work is a notch
 better across the board.
 
