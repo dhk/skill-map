@@ -170,8 +170,9 @@ def main():
           f'{sum(len(c) for c in clusters)} skills')
 
     cache = json.load(open(DATES)) if DATES.exists() else {}
-    out_clusters = []
-    flows = defaultdict(int)
+
+    # Pass 1: gather members + dates for every cluster.
+    raw = []
     n_fetch = sum(len(c) for c in clusters)
     done = 0
     for c in clusters:
@@ -187,49 +188,92 @@ def main():
                             'first_date': date,
                             'stars': stars.get(it['repo']),
                             'quality': qual.get((it['repo'], it['path']))})
-        dated = [m for m in members if m['first_date']]
-        ancestor = min(dated, key=lambda m: m['first_date']) if dated else None
         _sp = c[0]['path'].replace('\\', '/').split('/')
-        skill_name = _sp[-2] if len(_sp) >= 2 else _sp[-1]
-        out_clusters.append({'skill': skill_name, 'n_repos': len({m['repo'] for m in members}),
-                             'members': members, 'ancestor': ancestor})
-        if ancestor:
+        raw.append((_sp[-2] if len(_sp) >= 2 else _sp[-1], members))
+    if not args.no_fetch:
+        DATES.write_text(json.dumps(cache, indent=0))
+
+    # Detect bulk-published repos: a repo whose skills mostly share ONE
+    # first-commit day is a snapshot, so its commit DATES cannot be trusted as
+    # authorship dates (the same effect that invalidated the maturity analysis).
+    # Lineage *direction* through such a repo is unreliable.
+    repo_days = defaultdict(list)
+    for _, members in raw:
+        for m in members:
+            if m['first_date']:
+                repo_days[m['repo']].append(m['first_date'][:10])
+    bulk = set()
+    for r, days in repo_days.items():
+        if len(days) >= 3:
+            from collections import Counter
+            if Counter(days).most_common(1)[0][1] / len(days) > 0.5:
+                bulk.add(r)
+
+    # Canonical authority prior: vendor repos are the origin of their own
+    # skills regardless of when their public snapshot was committed.
+    CANON = {'anthropics/skills', 'openai/skills'}
+
+    def pick_ancestor(members):
+        dated = [m for m in members if m['first_date']]
+        if not dated:
+            return None, 'no-dates'
+        canon = [m for m in dated if m['repo'] in CANON]
+        if canon:
+            return min(canon, key=lambda m: m['first_date']), 'canonical-authority'
+        earliest = min(dated, key=lambda m: m['first_date'])
+        # direction is reliable only if the earliest repo isn't a snapshot
+        reliable = earliest['repo'] not in bulk
+        return earliest, ('date-reliable' if reliable else 'date-unreliable')
+
+    out_clusters = []
+    flows = defaultdict(int)
+    for skill_name, members in raw:
+        ancestor, basis = pick_ancestor(members)
+        out_clusters.append({'skill': skill_name,
+                             'n_repos': len({m['repo'] for m in members}),
+                             'members': members, 'ancestor': ancestor,
+                             'ancestor_basis': basis})
+        # only count flows when we trust the direction
+        if ancestor and basis in ('canonical-authority', 'date-reliable'):
             for m in members:
                 if m['repo'] != ancestor['repo']:
                     flows[(ancestor['repo'], m['repo'])] += 1
 
-    if not args.no_fetch:
-        DATES.write_text(json.dumps(cache, indent=0))
-
-    # non-obvious ancestors: small origin, big descendant
+    # Non-obvious ancestors — ONLY from reliable directions (small origin, big
+    # descendant). The naive version was dominated by bulk-publish artifacts.
     nonobvious = []
     for c in out_clusters:
         a = c['ancestor']
-        if not a or a['stars'] is None:
+        if not a or a['stars'] is None or c['ancestor_basis'] != 'date-reliable':
             continue
-        desc_stars = [m['stars'] for m in c['members']
-                      if m['repo'] != a['repo'] and m['stars'] is not None]
-        if desc_stars and a['stars'] < 2000 and max(desc_stars) > 10 * max(1, a['stars']):
-            nonobvious.append({'skill': c['skill'], 'ancestor_repo': a['repo'],
-                               'ancestor_stars': a['stars'],
-                               'ancestor_date': a['first_date'],
-                               'biggest_descendant': max(
-                                   (m for m in c['members'] if m['repo'] != a['repo']),
-                                   key=lambda m: m['stars'] or 0)['repo'],
-                               'descendant_stars': max(desc_stars)})
+        desc = [m for m in c['members'] if m['repo'] != a['repo']
+                and m['stars'] is not None]
+        if desc and a['stars'] < 2000:
+            big = max(desc, key=lambda m: m['stars'])
+            if big['stars'] > 10 * max(1, a['stars']):
+                nonobvious.append({'skill': c['skill'], 'ancestor_repo': a['repo'],
+                                   'ancestor_stars': a['stars'],
+                                   'ancestor_date': a['first_date'],
+                                   'biggest_descendant': big['repo'],
+                                   'descendant_stars': big['stars']})
     nonobvious.sort(key=lambda x: -x['descendant_stars'])
 
+    basis_ct = Counter(c['ancestor_basis'] for c in out_clusters)
     result = {'clusters': out_clusters,
+              'bulk_published_repos': sorted(bulk),
+              'ancestor_basis_counts': dict(basis_ct),
               'flows': [{'from': k[0], 'to': k[1], 'count': v}
                         for k, v in sorted(flows.items(), key=lambda x: -x[1])],
               'nonobvious': nonobvious}
     OUT.write_text(json.dumps(result, indent=1))
     print(f'wrote {OUT}: {len(out_clusters)} clusters, '
-          f'{len(result["flows"])} repo->repo flows, '
-          f'{len(nonobvious)} non-obvious ancestors')
+          f'{len(result["flows"])} reliable repo->repo flows, '
+          f'{len(nonobvious)} non-obvious ancestors (reliable only)')
+    print(f'  bulk-published (date-unreliable) repos: {sorted(bulk)}')
+    print(f'  ancestor basis: {dict(basis_ct)}')
     for n in nonobvious[:8]:
         print(f"  NON-OBVIOUS: '{n['skill']}' originated in {n['ancestor_repo']} "
-              f"({n['ancestor_stars']}*) -> copied into {n['biggest_descendant']} "
+              f"({n['ancestor_stars']}*) -> {n['biggest_descendant']} "
               f"({n['descendant_stars']}*)")
 
 
