@@ -29,15 +29,37 @@ BASE = Path(__file__).parent.parent
 OUT = BASE / 'data' / 'sibling_files.json'
 
 
+def _blobs_bfs(owner, name, sha):
+    """Per-directory walk for truncated trees (no flat 100k cap). Bounded."""
+    out, stack, walked = [], [('', sha)], 0
+    while stack and walked < 20000:
+        prefix, s = stack.pop()
+        try:
+            t = gh(f'https://api.github.com/repos/{owner}/{name}/git/trees/{s}')
+        except Exception:
+            continue
+        walked += 1
+        for n in t.get('tree', []):
+            full = f"{prefix}{n['path']}"
+            if n['type'] == 'tree':
+                stack.append((full + '/', n['sha']))
+            elif n['type'] == 'blob':
+                out.append(full)
+    return out
+
+
 def tree_paths(repo):
     # LEGACY FALLBACK only: crawl.py now captures sibling_files during its
-    # authenticated tree walk and main() prefers those, so this unauthenticated
-    # re-fetch runs only for repos crawled before that change. (Still ignores the
-    # truncation flag — acceptable for a backfill path that will age out.)
+    # authenticated tree walk and main() prefers those, so this re-fetch runs only
+    # for repos crawled before that change.
     owner, name = repo.split('/', 1)
     info = gh(f'https://api.github.com/repos/{owner}/{name}')
     branch = info.get('default_branch', 'main')
     t = gh(f'https://api.github.com/repos/{owner}/{name}/git/trees/{branch}?recursive=1')
+    if t.get('truncated'):
+        # Recover the full list per-directory instead of losing files past the cut.
+        print(f'    {repo}: tree truncated — walking per-directory')
+        return _blobs_bfs(owner, name, t['sha'])
     return [n['path'] for n in t.get('tree', []) if n['type'] == 'blob']
 
 
