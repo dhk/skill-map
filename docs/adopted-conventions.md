@@ -28,7 +28,9 @@ Frontmatter keys each group sprouts:
 - **Best practitioners:** `name`, `description`, `license`, `metadata`, `version`
 - **Everyone else:** `name`, `description`, `version`, `allowed-tools`, `origin`, `license`
 
-The lower tier carries **`origin`/`source`** keys (copy-provenance breadcrumbs) and leans on **`allowed-tools`** — the slash-command / aggregator style, not the curated-skill house style.
+The lower tier carries **`origin`/`source`** keys — copy-provenance breadcrumbs that mark aggregated content.
+
+> **On `allowed-tools` (the inverted row).** Don't read this as a quality negative. `allowed-tools` restricts which tools a skill may invoke — a real safety/scoping feature. It is rare among the elite because the canonical repos write *capability* skills (create documents, design, art) that need broad access. It is common in the rest because **workflow / agent / command** skills (research pipelines, code-ops, slash-commands) restrict tools *on purpose* — and for those it is good practice. A high-quality repo, `flonat/claude-research` (median 85), uses it on 96% of its skills. The rule is: **declare `allowed-tools` when your skill takes actions; omit it when it produces content.**
 
 ## Caveat
 

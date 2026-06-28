@@ -113,9 +113,19 @@ def main():
              + ', '.join(f'`{k}`' for k, _ in E['top_fm_keys'][:5]))
     L.append(f"- **Everyone else:** "
              + ', '.join(f'`{k}`' for k, _ in R['top_fm_keys'][:6]))
-    L.append('\nThe lower tier carries **`origin`/`source`** keys (copy-provenance '
-             'breadcrumbs) and leans on **`allowed-tools`** — the slash-command / '
-             'aggregator style, not the curated-skill house style.\n')
+    L.append('\nThe lower tier carries **`origin`/`source`** keys — copy-provenance '
+             'breadcrumbs that mark aggregated content.\n')
+    L.append('> **On `allowed-tools` (the inverted row).** Don\'t read this as a '
+             'quality negative. `allowed-tools` restricts which tools a skill may '
+             'invoke — a real safety/scoping feature. It is rare among the elite '
+             'because the canonical repos write *capability* skills (create '
+             'documents, design, art) that need broad access. It is common in the '
+             'rest because **workflow / agent / command** skills (research '
+             'pipelines, code-ops, slash-commands) restrict tools *on purpose* — and '
+             'for those it is good practice. A high-quality repo, `flonat/claude-'
+             'research` (median 85), uses it on 96% of its skills. The rule is: '
+             '**declare `allowed-tools` when your skill takes actions; omit it when '
+             'it produces content.**\n')
     L.append('## Caveat\n')
     L.append('Mild circularity: "best practitioners" is cut by the rubric\'s own '
              'median. But several signals here — `metadata` adoption, worked examples, '
