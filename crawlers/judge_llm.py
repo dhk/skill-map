@@ -27,11 +27,11 @@ import json
 import re
 import subprocess
 import sys
-import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from score_corpus import latest_content_by_key   # canonical merged-corpus loader
+from ghapi import gh_json                         # authenticated GitHub GET
 
 BASE = Path(__file__).parent.parent
 # Reads the MERGED corpus (latest content per skill across all crawls) so the
@@ -86,34 +86,46 @@ Files in this skill's folder: {siblings}
 _sibling_cache = {}
 
 
+_sib_sidecar = None
+
+
+def _load_sidecar():
+    global _sib_sidecar
+    if _sib_sidecar is None:
+        p = BASE / 'data' / 'sibling_files.json'
+        _sib_sidecar = json.loads(p.read_text()) if p.exists() else {}
+    return _sib_sidecar
+
+
 def fetch_siblings(repo, file_path):
-    """List files in the skill's folder + one level into reference/scripts dirs."""
-    # REVIEW(rework / fragile): this re-fetches sibling files over the UNAUTH
-    # GitHub API (60 req/hr → judging more than ~60 skills will start failing with
-    # the bare-except returning "(could not list: ...)"). The pipeline ALREADY
-    # produced data/sibling_files.json via fetch_siblings.py for the whole corpus.
-    # Read that sidecar instead of a third live crawl — and per the crawl.py note,
-    # the tree walk could have stored siblings in the first place, removing all of
-    # these fetches.
+    """List files in the skill's folder. Prefer the precomputed sidecar
+    (data/sibling_files.json, which the crawl now populates) — no network — and
+    only fall back to the GitHub contents API (authenticated via ghapi) when a
+    skill isn't covered there."""
     key = (repo, file_path)
     if key in _sibling_cache:
         return _sibling_cache[key]
-    owner_repo = repo
     d = '/'.join(file_path.replace('\\', '/').split('/')[:-1])
-    url = f'https://api.github.com/repos/{owner_repo}/contents/{d}'
+
+    # Fast path: sidecar (repo-relative paths under the skill folder).
+    sib = _load_sidecar().get(f'{repo}\t{file_path}')
+    if sib is not None:
+        names = [p[len(d) + 1:] if d and p.startswith(d + '/') else p for p in sib]
+        res = ', '.join(names) if names else '(only SKILL.md)'
+        _sibling_cache[key] = res
+        return res
+
+    # Fallback: authenticated contents API (threads $GITHUB_TOKEN).
+    url = f'https://api.github.com/repos/{repo}/contents/{d}'
     names = []
     try:
-        req = urllib.request.Request(url, headers={'User-Agent': 'skill-map'})
-        items = json.loads(urllib.request.urlopen(req, timeout=30).read())
+        items = gh_json(url, timeout=30)
         for it in items:
             names.append(it['name'] + ('/' if it['type'] == 'dir' else ''))
             if it['type'] == 'dir' and it['name'] in ('reference', 'references',
                                                       'scripts', 'assets'):
                 try:
-                    sub = json.loads(urllib.request.urlopen(
-                        urllib.request.Request(it['url'],
-                                               headers={'User-Agent': 'skill-map'}),
-                        timeout=30).read())
+                    sub = gh_json(it['url'], timeout=30)
                     names += [f"{it['name']}/{s['name']}" for s in sub[:12]]
                 except Exception:
                     pass

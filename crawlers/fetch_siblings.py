@@ -13,21 +13,20 @@ Usage:  python crawlers/fetch_siblings.py
 """
 import json
 import sys
-import urllib.request
 from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from score_corpus import load_all_crawls
-
-BASE = Path(__file__).parent.parent
-OUT = BASE / 'data' / 'sibling_files.json'
+from ghapi import gh_json   # authenticated GitHub GET (5,000 req/hr vs 60)
 
 
 def gh(url):
-    req = urllib.request.Request(url, headers={
-        'Accept': 'application/vnd.github+json', 'User-Agent': 'skill-map'})
-    return json.loads(urllib.request.urlopen(req, timeout=60).read())
+    return gh_json(url, timeout=60)
+
+
+BASE = Path(__file__).parent.parent
+OUT = BASE / 'data' / 'sibling_files.json'
 
 
 def tree_paths(repo):
