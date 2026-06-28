@@ -1,10 +1,10 @@
 # SKILL.md Crawl: crawl-3-2026-06-28
 
 **Date:** 2026-06-28  
-**Total repos:** 6  
-**Total files:** 4211  
+**Total repos:** 8  
+**Total files:** 4233  
 **Errors:** 0  
-**Queries:** `crawl-list:recrawl-mega.md`  
+**Queries:** `crawl-list:seed-list-004.md`  
 
 | Repo | Type | Stars | Last Pushed | File Path | Description |
 |------|------|-------|-------------|-----------|-------------|
@@ -4219,3 +4219,25 @@
 | [BbgnsurfTech/claude-skills-collection](https://github.com/BbgnsurfTech/claude-skills-collection) | domain-collection | 20 | 2025-12-18 | `plugins/claude-code-plugins-plus/plugins/testing/test-report-generator/skills/test-report-generator/SKILL.md` | Comprehensive collection of Claude AI skills, plugins, and resources from offici |
 | [BbgnsurfTech/claude-skills-collection](https://github.com/BbgnsurfTech/claude-skills-collection) | domain-collection | 20 | 2025-12-18 | `plugins/claude-code-plugins-plus/plugins/testing/unit-test-generator/skills/unit-test-generator/SKILL.md` | Comprehensive collection of Claude AI skills, plugins, and resources from offici |
 | [BbgnsurfTech/claude-skills-collection](https://github.com/BbgnsurfTech/claude-skills-collection) | domain-collection | 20 | 2025-12-18 | `plugins/claude-code-plugins-plus/plugins/testing/visual-regression-tester/skills/visual-regression-tester/SKILL.md` | Comprehensive collection of Claude AI skills, plugins, and resources from offici |
+| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | domain-collection | 28423 | 2026-06-10 | `skills/composition-patterns/SKILL.md` | Vercel's official collection of agent skills |
+| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | domain-collection | 28423 | 2026-06-10 | `skills/deploy-to-vercel/SKILL.md` | Vercel's official collection of agent skills |
+| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | domain-collection | 28423 | 2026-06-10 | `skills/react-best-practices/SKILL.md` | Vercel's official collection of agent skills |
+| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | domain-collection | 28423 | 2026-06-10 | `skills/react-native-skills/SKILL.md` | Vercel's official collection of agent skills |
+| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | domain-collection | 28423 | 2026-06-10 | `skills/react-view-transitions/SKILL.md` | Vercel's official collection of agent skills |
+| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | domain-collection | 28423 | 2026-06-10 | `skills/vercel-cli-with-tokens/SKILL.md` | Vercel's official collection of agent skills |
+| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | domain-collection | 28423 | 2026-06-10 | `skills/vercel-optimize/SKILL.md` | Vercel's official collection of agent skills |
+| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | domain-collection | 28423 | 2026-06-10 | `skills/web-design-guidelines/SKILL.md` | Vercel's official collection of agent skills |
+| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | domain-collection | 28423 | 2026-06-10 | `skills/writing-guidelines/SKILL.md` | Vercel's official collection of agent skills |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | single-skill | 97386 | 2026-06-28 | `.claude/skills/banner-design/SKILL.md` | An AI SKILL that provide design intelligence for building professional UI/UX mul |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | single-skill | 97386 | 2026-06-28 | `.claude/skills/brand/SKILL.md` | An AI SKILL that provide design intelligence for building professional UI/UX mul |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | single-skill | 97386 | 2026-06-28 | `.claude/skills/design-system/SKILL.md` | An AI SKILL that provide design intelligence for building professional UI/UX mul |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | single-skill | 97386 | 2026-06-28 | `.claude/skills/design/SKILL.md` | An AI SKILL that provide design intelligence for building professional UI/UX mul |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | single-skill | 97386 | 2026-06-28 | `.claude/skills/slides/SKILL.md` | An AI SKILL that provide design intelligence for building professional UI/UX mul |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | single-skill | 97386 | 2026-06-28 | `.claude/skills/ui-styling/SKILL.md` | An AI SKILL that provide design intelligence for building professional UI/UX mul |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | single-skill | 97386 | 2026-06-28 | `.claude/skills/ui-ux-pro-max/SKILL.md` | An AI SKILL that provide design intelligence for building professional UI/UX mul |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | single-skill | 97386 | 2026-06-28 | `cli/assets/skills/banner-design/SKILL.md` | An AI SKILL that provide design intelligence for building professional UI/UX mul |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | single-skill | 97386 | 2026-06-28 | `cli/assets/skills/brand/SKILL.md` | An AI SKILL that provide design intelligence for building professional UI/UX mul |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | single-skill | 97386 | 2026-06-28 | `cli/assets/skills/design-system/SKILL.md` | An AI SKILL that provide design intelligence for building professional UI/UX mul |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | single-skill | 97386 | 2026-06-28 | `cli/assets/skills/design/SKILL.md` | An AI SKILL that provide design intelligence for building professional UI/UX mul |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | single-skill | 97386 | 2026-06-28 | `cli/assets/skills/slides/SKILL.md` | An AI SKILL that provide design intelligence for building professional UI/UX mul |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | single-skill | 97386 | 2026-06-28 | `cli/assets/skills/ui-styling/SKILL.md` | An AI SKILL that provide design intelligence for building professional UI/UX mul |

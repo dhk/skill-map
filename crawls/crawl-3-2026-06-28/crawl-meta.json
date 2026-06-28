@@ -3,10 +3,10 @@
   "status": "complete",
   "crawl_date": "2026-06-28",
   "queries_run": [
-    "crawl-list:recrawl-mega.md"
+    "crawl-list:seed-list-004.md"
   ],
-  "total_repos": 6,
-  "total_files": 4211,
+  "total_repos": 8,
+  "total_files": 4233,
   "errors": 0,
   "repo_breakdown": {
     "anthropics/skills": {
@@ -32,25 +32,30 @@
     "BbgnsurfTech/claude-skills-collection": {
       "skills": 1337,
       "errors": 0
+    },
+    "vercel-labs/agent-skills": {
+      "skills": 9,
+      "errors": 0
+    },
+    "nextlevelbuilder/ui-ux-pro-max-skill": {
+      "skills": 13,
+      "errors": 0
     }
   },
   "input_quality": {
-    "list_id": "recrawl-mega-001",
-    "list_source": "drift-check",
-    "repos_in_list": 5,
-    "repos_found_skills": 5,
+    "list_id": "seed-list-004",
+    "list_source": "ecosystem-map-roundup",
+    "repos_in_list": 2,
+    "repos_found_skills": 2,
     "repos_empty": 0,
     "repos_not_found": 0,
     "repos_error": 0,
     "hit_rate": 1.0,
-    "skills_per_hit_repo": 842.2,
-    "total_skills": 4211,
+    "skills_per_hit_repo": 2116.5,
+    "total_skills": 4233,
     "outcomes": {
-      "alirezarezvani/claude-skills": "found",
-      "borghei/claude-skills": "found",
-      "affaan-m/ECC": "found",
-      "davila7/claude-code-templates": "found",
-      "BbgnsurfTech/claude-skills-collection": "found"
+      "vercel-labs/agent-skills": "found",
+      "nextlevelbuilder/ui-ux-pro-max-skill": "found"
     }
   }
 }
