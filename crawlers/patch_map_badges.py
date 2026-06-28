@@ -34,6 +34,12 @@ def main():
             node['bp_grade'] = s['grade']
             node['bp_score'] = s['overall']
             n += 1
+    # RECOMMEND(review2, P1): this matched 26/39 graded nodes after the
+    # merged-corpus + graphio changes (was 39/39 on main). The other 13 keep
+    # STALE grades from a prior run instead of being refreshed. Likely the
+    # source_url → (repo, file_path) join drops rows now (branch/path mismatch
+    # vs the merged corpus keys). Investigate the parse() join; report matched
+    # vs total (e.g. f'patched {n}/{graded} map badges') so a drop is visible.
     save_graph(g, content, match)
     print(f'patched {n} map badges')
 
