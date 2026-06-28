@@ -26,24 +26,24 @@ def main():
     n_skills, n_repos = s['n_skills'], s['n_repos']
     median, when = s['median_quality'], s['pct_with_when']
 
-    # REVIEW(self-defeating): the stale values to hunt for are themselves hard-coded
-    # (73.5, 4,902, 5,320, "only 43%", "39 repos"...). This is the one drift the
-    # guard cannot catch automatically: when the LIVE numbers move to a new value,
-    # someone must hand-add the previous live number to this list or the next round
-    # of staleness ships unflagged. Consider flagging any "<n> skills / <n> repos"
-    # figure that doesn't match the live stats, rather than enumerating known-bad
-    # constants.
-    # current values that should appear; flag well-known *stale* alternates only
-    # when they show up outside historical/correction context.
+    # Curated stale-value patterns (kept for the specific phrasings that recur).
     stale_patterns = [
         (re.compile(r'\b(73\.5|79\.5|79\.8|76\.2)\s*/?\s*100|\bmedian (?:quality )?(?:of )?(73\.5|79\.5|79\.8|76\.2)\b'),
          f'median quality (live: {median})'),
-        (re.compile(r'\b(4,902|4,900|5,320)\s+(?:crawled\s+)?skills?\b|\b(39|40)\s+repos\b'),
-         f'corpus size (live: {n_skills:,} skills / {n_repos} repos)'),
         (re.compile(r'\bonly\s+43%\b'), f'WHEN-trigger rate (live: {when}%)'),
     ]
     hist_ctx = re.compile(r'correction|earlier pass|first reported|update \(|historical|was reported|crawl-\d+-\d|^>',
                           re.I)
+
+    # GENERIC drift check: flag a stale corpus total WITHOUT hand-enumerating old
+    # constants — but ONLY on lines phrased as the headline ("N skills across …",
+    # "collected/​swept/​crawled N …"). That cue is what distinguishes the corpus
+    # total from the many legitimate per-repo "66 skills" counts in the docs.
+    def _num(s):
+        return int(s.replace(',', ''))
+    headline_cue = re.compile(r'across|collected|crawled|swept|sweep|corpus|in total|total of', re.I)
+    skills_fig = re.compile(r'\b(\d[\d,]*)\s+(?:crawled\s+|published\s+|full\s+)?skills?\b', re.I)
+    repos_fig = re.compile(r'\b(\d[\d,]*)\s+repos(?:itories)?\b', re.I)
 
     issues = []
     for md in sorted(DOCS.glob('*.md')):
@@ -55,6 +55,20 @@ def main():
             for pat, label in stale_patterns:
                 if pat.search(line):
                     issues.append((md.name, i, label, line.strip()[:90]))
+            if not headline_cue.search(line):
+                continue
+            for m in skills_fig.finditer(line):
+                # floor of 1,000 keeps sample sizes ("across 172 skills") from
+                # masquerading as a stale corpus total.
+                if _num(m.group(1)) >= 1000 and _num(m.group(1)) != n_skills:
+                    issues.append((md.name, i,
+                                   f'headline skill count {m.group(1)} (live: {n_skills:,})',
+                                   line.strip()[:90]))
+            for m in repos_fig.finditer(line):
+                if _num(m.group(1)) != n_repos:
+                    issues.append((md.name, i,
+                                   f'headline repo count {m.group(1)} (live: {n_repos})',
+                                   line.strip()[:90]))
 
     if not issues:
         print(f'docs consistent with live corpus '

@@ -112,15 +112,53 @@ KNOWN_KEYS = {
 }
 
 
+try:
+    import yaml as _yaml
+except ImportError:           # PyYAML optional: fall back to the hand parser
+    _yaml = None
+
+
+def _fm_manual(fm_text):
+    """Fallback frontmatter parser: flat `key: value` + block scalars (|, >)."""
+    fm = {}
+    lines = fm_text.splitlines()
+    i = 0
+    while i < len(lines):
+        mm = re.match(r'^([A-Za-z0-9_-]+):\s*(.*)$', lines[i])
+        if not mm:
+            i += 1
+            continue
+        key, val = mm.group(1).strip(), mm.group(2).strip()
+        if re.match(r'^[|>][-+0-9]*$', val):          # block scalar
+            block = []
+            i += 1
+            while i < len(lines) and (lines[i].strip() == '' or
+                                      re.match(r'^\s+', lines[i])):
+                block.append(lines[i].strip())
+                i += 1
+            fm[key] = ' '.join(b for b in block if b).strip()
+            continue
+        fm[key] = val.strip('"\'')
+        i += 1
+    return fm
+
+
+def _coerce_fm(d):
+    """Normalise a parsed YAML mapping for scoring: scalars → str, keep
+    list/dict (e.g. a nested `metadata:` block) as-is so presence is detectable."""
+    out = {}
+    for k, v in d.items():
+        out[str(k)] = v if isinstance(v, (dict, list)) else ('' if v is None else str(v))
+    return out
+
+
 def parse_skill(md):
-    """Split a SKILL.md into frontmatter (dict) and body (str)."""
-    # REVIEW(fragile): hand-rolled YAML. It handles flat `key: value` and block
-    # scalars (|, >) only. Nested maps (the `metadata:` block is in KNOWN_KEYS but
-    # its children are flattened/dropped), flow lists `[a, b]`, multi-line lists,
-    # and values containing a colon are all mis-parsed — which then mis-scores
-    # frontmatter and mis-detects junk_keys. A real YAML parser (PyYAML is already
-    # an implicit transitive dep) would be both more correct and less code, with
-    # a try/except fallback for genuinely malformed frontmatter.
+    """Split a SKILL.md into frontmatter (dict) and body (str).
+
+    Uses PyYAML when available (handles nested maps, flow lists, quoted/colon
+    values correctly) and falls back to a small hand parser when PyYAML is absent
+    or the frontmatter is malformed — so scoring never crashes on a bad header.
+    """
     md = md or ''
     fm = {}
     body = md
@@ -128,26 +166,15 @@ def parse_skill(md):
         m = re.match(r'^\s*---\s*\n(.*?)\n---\s*\n?(.*)$', md, re.S)
         if m:
             body = m.group(2)
-            lines = m.group(1).splitlines()
-            i = 0
-            while i < len(lines):
-                mm = re.match(r'^([A-Za-z0-9_-]+):\s*(.*)$', lines[i])
-                if not mm:
-                    i += 1
-                    continue
-                key, val = mm.group(1).strip(), mm.group(2).strip()
-                # YAML block scalar (|, |-, >, >- ...): gather indented lines
-                if re.match(r'^[|>][-+0-9]*$', val):
-                    block = []
-                    i += 1
-                    while i < len(lines) and (lines[i].strip() == '' or
-                                              re.match(r'^\s+', lines[i])):
-                        block.append(lines[i].strip())
-                        i += 1
-                    fm[key] = ' '.join(b for b in block if b).strip()
-                    continue
-                fm[key] = val.strip('"\'')
-                i += 1
+            fm_text = m.group(1)
+            if _yaml is not None:
+                try:
+                    loaded = _yaml.safe_load(fm_text)
+                    fm = _coerce_fm(loaded) if isinstance(loaded, dict) else {}
+                except _yaml.YAMLError:
+                    fm = _fm_manual(fm_text)      # malformed → best-effort
+            else:
+                fm = _fm_manual(fm_text)
     return {'frontmatter': fm, 'body': body, 'raw': md,
             'has_yaml': bool(fm) or md.lstrip().startswith('---')}
 

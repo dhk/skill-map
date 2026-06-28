@@ -10,6 +10,27 @@ The pipeline is genuinely well-built — idempotent stages, immutable snapshots,
 single `gen_stats`/`check_docs` source of truth, resilient mid-crawl writes. The
 findings below are about the seams between stages, not the core design.
 
+## How many skills do we *really* have?
+
+`crawlers/count_skills.py` answers this with a dedup funnel (writes
+`data/unique_counts.json`):
+
+| stage | count |
+|---|---|
+| raw crawl records | 5,393 |
+| Claude SKILL.md with content | 4,975 |
+| Gemini files (metadata only, catalogued not built) | 418 |
+| distinct `(repo, file_path)` | 4,975 |
+| distinct **exact** bodies | 3,846 |
+| **distinct skills (exact + ≥0.80 near-dup collapsed)** | **3,769** |
+| distinct concepts (same idea, any wording) | 2,681 |
+
+So the honest headline is **~3,769 unique skills**, not 4,902/4,975 — about **24%
+of fetched files are exact or near-duplicate copies** of another skill (the
+mega-collections re-publishing each other). It reuses the same clustering method
+as `lineage_trace.py`, so the number is consistent with the copy/lineage analysis.
+This is a candidate to fold into `gen_stats`/STATS.md as the canonical figure.
+
 ---
 
 ## 1. Fragile dependencies & hidden assumptions
@@ -181,6 +202,32 @@ re-crawls flow through the LLM judges and the lineage/originator/curiosities
 chain, and the judges' content lookups can no longer `KeyError` on
 later-crawl skills. Verified against live data (5,393 merged records, 4,975 with
 content).
+
+**D. Remaining seams closed.**
+- **`graphio.py`** — one `load_graph`/`save_graph`/`skill_nodes` helper; the four
+  scripts that hand-rolled the `const GRAPH = …` regex (tag_skills, reclassify,
+  enrich_urls, patch_map_badges) + classify_tags now share it. No more
+  inconsistent-`re.S` time bomb.
+- **`skill_quality.parse_skill`** uses PyYAML (with the hand parser as fallback
+  for absent/malformed YAML). Regression-checked: 99% of scores identical, mean
+  |Δ|0.18; the 54 movers are genuine fixes (e.g. multi-line plain-scalar
+  descriptions the old parser read as empty).
+- **`reclassify.py`** — counts are derived from membership (the hard-coded ones
+  were wildly off: `Platform & APIs` said 195, actual 25); a keyword
+  `classify_domain()` auto-places anything not in the explicit MOVES override; I/O
+  via graphio.
+- **`track_history.py`** scores WITH siblings (matches STATS) and iterates crawls
+  in numeric order (`_crawl_n`).
+- **`enrich_urls.py`** matches on `(org, dir)` not bare basename, uses the
+  crawl-captured `default_branch` (HEAD fallback) instead of hard-coded `main`,
+  reads the merged corpus.
+- **`crawl.py`** — shared `is_skill_file()` so repo-scoped and global-search agree
+  on membership; global-search now captures blob SHAs (incremental); hardened
+  `git push -u origin <branch>` with detached-HEAD guard.
+- **`check_docs.py`** — generic headline-drift check (flags any "N skills across…
+  / N repos" ≠ live) on top of the curated list; caught stale 4,953/41 the old
+  list missed.
+- **`curiosities.py`** — dead `most_code` placeholder removed.
 
 ## What's solid (don't change)
 

@@ -1,0 +1,11 @@
+{
+ "raw_crawl_records": 5393,
+ "claude_with_content": 4975,
+ "gemini_metadata_only": 418,
+ "distinct_location": 4975,
+ "distinct_exact_bodies": 3846,
+ "distinct_skills_near_dup": 3769,
+ "distinct_concepts": 2681,
+ "duplicate_share_pct": 24.2,
+ "near_dup_threshold": 0.8
+}

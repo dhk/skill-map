@@ -7,10 +7,13 @@ Usage:  python crawlers/patch_map_badges.py
 """
 import json
 import re
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from graphio import load_graph, save_graph
+
 BASE = Path(__file__).parent.parent
-HTML = BASE / 'index.html'
 Q = BASE / 'data' / 'skill_quality.json'
 
 
@@ -20,9 +23,7 @@ def parse(url):
 
 
 def main():
-    html = HTML.read_text()
-    m = re.search(r'const GRAPH = (\{.*?\});\n', html, re.S)
-    g = json.loads(m.group(1))
+    g, content, match = load_graph()
     qmap = {(s['repo'], s['file_path']): s for s in json.load(open(Q))['skills']}
     n = 0
     for node in g['nodes']:
@@ -33,8 +34,7 @@ def main():
             node['bp_grade'] = s['grade']
             node['bp_score'] = s['overall']
             n += 1
-    html = html[:m.start()] + 'const GRAPH = ' + json.dumps(g, separators=(',', ':')) + ';\n' + html[m.end():]
-    HTML.write_text(html)
+    save_graph(g, content, match)
     print(f'patched {n} map badges')
 
 

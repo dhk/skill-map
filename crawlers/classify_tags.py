@@ -30,13 +30,14 @@ Usage:
 """
 import argparse
 import json
-import re
 import sys
 from collections import Counter
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from graphio import load_graph, save_graph, skill_nodes
+
 BASE = Path(__file__).parent.parent
-HTML_PATH = BASE / 'index.html'
 DET_CACHE = BASE / 'data' / 'skill_tags_det.json'
 LLM_CACHE = BASE / 'data' / 'skill_tags.json'
 
@@ -176,27 +177,11 @@ def classify(label, description, domain=''):
     return tags
 
 
-# ── graph I/O (shared assumption noted in code review: index.html as DB) ───
-def load_graph():
-    content = HTML_PATH.read_text()
-    m = re.search(r'const GRAPH = (\{.*?\});\n', content, re.S)
-    if not m:
-        sys.exit("Could not find GRAPH in index.html")
-    return json.loads(m.group(1)), content, m
-
-
-def skill_nodes(graph):
-    return [n for n in graph['nodes'] if n.get('type') in ('skill', 'dhk')]
-
-
 def patch_html(graph, content, match, cache):
-    for node in graph['nodes']:
-        if node['type'] not in ('skill', 'dhk'):
-            continue
+    for node in skill_nodes(graph):
         if node['id'] in cache:
             node.update(cache[node['id']])
-    out = json.dumps(graph, separators=(',', ':'))
-    HTML_PATH.write_text(content[:match.start(1)] + out + content[match.end(1):])
+    save_graph(graph, content, match)
     print(f'patched index.html with {len(cache)} tag sets')
 
 

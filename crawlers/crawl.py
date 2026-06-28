@@ -40,6 +40,16 @@ GLOBAL_QUERIES = [
     "filename:SKILLS.md",
 ]
 
+# One definition of "is this a skill file", shared by the repo-scoped tree walk
+# and the global-search path (which previously disagreed: the tree walk matched
+# only SKILL.md while the queries also pulled skill.md/SKILLS.md). SKILLS.md is
+# deliberately excluded — in practice it's a repo-level index, not a skill.
+_SKILL_FILE_RE = re.compile(r'^skill\.md$', re.I)
+
+
+def is_skill_file(name: str) -> bool:
+    return bool(_SKILL_FILE_RE.match(name))
+
 
 # ---------------------------------------------------------------------------
 # GitHub helpers — PyGithub handles auth, rate-limit headers, pagination
@@ -109,10 +119,7 @@ def walk_repo_tree(gh: Github, repo_full_name: str) -> list[dict]:
 
     results = []
     for item in tree.tree:
-        # REVIEW(assumption): matches only files named SKILL.md (case-insensitive);
-        # GLOBAL_QUERIES also accepts skill.md/SKILLS.md, so the two crawl paths
-        # disagree on membership. Unchanged here — flagged for a follow-up.
-        if item.type == "blob" and Path(item.path).name.upper() == "SKILL.MD":
+        if item.type == "blob" and is_skill_file(Path(item.path).name):
             # REVIEW(assumption): Gemini detection keys only on the ".gemini/"
             # prefix; other Gemini layouts are mislabelled "claude".
             is_gemini = item.path.startswith(".gemini/")
@@ -299,25 +306,33 @@ def upsert(results: list[dict], index: dict[str, int], result: dict) -> None:
 
 
 def git_commit_push(crawl_id: str) -> None:
-    # REVIEW(fragile): bare `git push` with no remote/branch pushes to whatever
-    # the current branch's upstream happens to be — silently wrong if the crawler
-    # is ever run on a detached HEAD or a branch with no/unexpected upstream. It
-    # also commits ONLY crawls/<id>/; the derived data/ + docs/ that run_pipeline
-    # regenerates from this crawl are left uncommitted, so the repo can ship a new
-    # crawl whose published stats/figures are stale. Pin `push -u origin <branch>`
-    # and decide explicitly whether derived artifacts ride along.
+    # Pushes the new crawl snapshot. Resolves the current branch and pushes it
+    # explicitly with `-u origin <branch>` rather than a bare `git push` that
+    # depends on ambient upstream config (and silently fails on a detached HEAD).
+    # NOTE: intentionally commits only crawls/<id>/ — derived data/ + docs/ are
+    # rebuilt and committed separately by run_pipeline, so they don't ride along
+    # here. Run the pipeline after a crawl to keep published artifacts in sync.
     import subprocess
+
+    def git(*args):
+        return subprocess.run(["git", "-C", str(BASE_DIR), *args],
+                              capture_output=True, text=True)
+
+    branch = git("rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
+    if not branch or branch == "HEAD":
+        console.print("  [red]git: detached HEAD or no branch — skipping push[/red]")
+        return
     rel = f"crawls/{crawl_id}/"
     for cmd in [
-        ["git", "-C", str(BASE_DIR), "add", rel],
-        ["git", "-C", str(BASE_DIR), "commit", "-m", f"feat: {crawl_id} — SKILL.md sweep"],
-        ["git", "-C", str(BASE_DIR), "push"],
+        ["add", rel],
+        ["commit", "-m", f"feat: {crawl_id} — SKILL.md sweep"],
+        ["push", "-u", "origin", branch],
     ]:
-        r = subprocess.run(cmd, capture_output=True, text=True)
+        r = git(*cmd)
         if r.returncode != 0:
-            console.print(f"  [red]git: {r.stderr.strip()}[/red]")
+            console.print(f"  [red]git {cmd[0]}: {r.stderr.strip()}[/red]")
             return
-    console.print("  [green]Committed and pushed[/green]")
+    console.print(f"  [green]Committed and pushed to {branch}[/green]")
 
 
 # ---------------------------------------------------------------------------
@@ -602,16 +617,13 @@ def crawl(
                         if key not in seen_keys:
                             seen_keys.add(key)
                             raw_url = f"https://raw.githubusercontent.com/{repo_full_name}/HEAD/{file_path}"
-                            # REVIEW(fragile): global-search results carry NO blob
-                            # SHA (the "" below). The SHA-diff skip in the fetch
-                            # phase requires a truthy file_sha, so global-search
-                            # mode can NEVER skip unchanged files — every global
-                            # crawl re-fetches the entire corpus, defeating the
-                            # incrementality the repo-scoped path relies on. Fetch
-                            # the blob SHA here (search items expose .sha) to make
-                            # both modes incremental.
+                            # Capture the blob SHA so global-search mode is also
+                            # incremental (the fetch-phase SHA-diff skip needs a
+                            # truthy file_sha). `.sha` is exposed on search items;
+                            # guard in case the attribute is ever absent.
+                            file_sha = getattr(item, "sha", "") or ""
                             raw_items.append((
-                                repo_full_name, file_path, "",
+                                repo_full_name, file_path, file_sha,
                                 raw_url, item.repository.html_url, "search", "claude",
                             ))
                             new += 1
@@ -700,9 +712,10 @@ def crawl(
                 "file_raw_url": raw_url,
                 "skill_md_content": None if is_gemini else "",
                 # DATA-EXPANSION: folder siblings captured during the tree walk.
-                # [] for global-search results (no tree walked) — fetch_siblings.py
-                # falls back to the API only for those.
-                "sibling_files": siblings_by_key.get(key, []),
+                # None for global-search results (no tree walked) so fetch_siblings.py
+                # backfills them via API; a real [] (repo-scoped, genuinely no
+                # siblings) is trusted as-is.
+                "sibling_files": siblings_by_key.get(key),
                 "fetch_error": None,
             }
 

@@ -39,8 +39,10 @@ Usage:
 import json, re, os, subprocess, argparse, sys, time
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from graphio import load_graph, save_graph, skill_nodes
+
 BASE = Path(__file__).parent.parent
-HTML_PATH  = BASE / 'index.html'
 CACHE_PATH = BASE / 'data' / 'skill_tags.json'
 
 DIMENSIONS = {
@@ -64,22 +66,6 @@ Dimensions and allowed values:
   integration : {integration}
 
 Reply format: {{"action":"...","complexity":"...","output_type":"...","integration":"..."}}"""
-
-
-def load_graph():
-    # REVIEW(fragile, repeated in 4 files): this `const GRAPH = ({.*?});\n` regex
-    # is duplicated in reclassify.py, enrich_urls.py, and patch_map_badges.py with
-    # INCONSISTENT flags — some pass re.S (DOTALL), some don't. The no-DOTALL ones
-    # only work because index.html happens to keep GRAPH minified onto one line;
-    # the day anyone pretty-prints that block, half these scripts silently stop
-    # matching. index.html is being used as a database. Extract one shared
-    # load_graph/save_graph helper (or store the graph as a real .json the page
-    # fetches) so the parsing assumption lives in exactly one place.
-    content = HTML_PATH.read_text()
-    m = re.search(r'const GRAPH = (\{.*?\});\n', content)
-    if not m:
-        sys.exit("Could not find GRAPH in index.html")
-    return json.loads(m.group(1)), content, m
 
 
 def load_cache():
@@ -130,14 +116,10 @@ def call_claude(prompt, dry_run=False):
 
 
 def patch_html(graph, content, match, cache):
-    for node in graph['nodes']:
-        if node['type'] not in ('skill', 'dhk'):
-            continue
+    for node in skill_nodes(graph):
         if node['id'] in cache:
             node.update(cache[node['id']])
-    out = json.dumps(graph, separators=(',', ':'))
-    new_content = content[:match.start(1)] + out + content[match.end(1):]
-    HTML_PATH.write_text(new_content)
+    save_graph(graph, content, match)
     print(f"Patched index.html with tags from {len(cache)} cached skills.")
 
 
@@ -151,7 +133,7 @@ def main():
     graph, content, match = load_graph()
     cache = load_cache()
 
-    skills = [n for n in graph['nodes'] if n['type'] in ('skill', 'dhk')]
+    skills = skill_nodes(graph)
     print(f"Skills: {len(skills)} total, {len(cache)} cached")
 
     if args.patch:
