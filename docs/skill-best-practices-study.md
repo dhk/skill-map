@@ -21,6 +21,7 @@ Anthropic gold standard, three ways:
 | [skill-author-checklist.md](skill-author-checklist.md) | The human authoring checklist, tagged with what's machine-checkable vs needs judgment. |
 | **[STATS.md](STATS.md)** | Live headline numbers (auto-generated; the source of truth for figures). |
 | [originators.md](originators.md) | Who invents vs who copies — the originator leaderboard. |
+| [adopted-conventions.md](adopted-conventions.md) | What conventions the best practitioners actually adopted (empirical). |
 | [curiosities.md](curiosities.md) | **The oddities** — popular-but-undiscoverable, viral copies, coercive tone, risky-no-guardrails, delightful names. |
 | [incremental-crawl-system.md](incremental-crawl-system.md) | How re-crawls recompute every finding + track what changed / is new / is odd. |
 | [llm-judge-tuning.md](llm-judge-tuning.md) | Why the LLM judge scored Anthropic "weak," the fix, and the maturity (commit-count) finding. |
@@ -60,9 +61,11 @@ thing: add `Use this when…` to every description.
 ## Reproduce
 
 ```bash
-python crawlers/score_corpus.py        # heuristic pass over the corpus
-python crawlers/sample_llm.py          # LLM cross-check (uses claude -p)
+python crawlers/run_pipeline.py        # rebuilds EVERYTHING from the crawl snapshots
+python crawlers/run_pipeline.py --crawl LIST   # crawl new/updated repos first, then rebuild
 ```
 
-Data artifacts: `data/skill_quality.json` (per-skill + per-repo + per-signature),
-`data/skill_types.json`, `data/llm_sample.json`.
+One command regenerates all data, figures, the live map badges, `STATS.md`, and
+validates the docs (`check_docs.py`). See
+[incremental-crawl-system.md](incremental-crawl-system.md). Live numbers always in
+[STATS.md](STATS.md).

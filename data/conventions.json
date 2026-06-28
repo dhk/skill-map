@@ -1,0 +1,117 @@
+{
+ "elite_cut": 85,
+ "elite_repos": [
+  "Jeffallan/claude-skills",
+  "JimLiu/baoyu-skills",
+  "openai/skills",
+  "alirezarezvani/claude-skills",
+  "freshtechbro/claudedesignskills",
+  "foxj77/claude-code-skills",
+  "borghei/claude-skills",
+  "daymade/claude-code-skills",
+  "coreyhaines31/marketingskills",
+  "anthropics/skills",
+  "posit-dev/skills",
+  "julianobarbosa/claude-code-skills",
+  "wshobson/agents",
+  "QuestForTech-Investments/claude-code-skills",
+  "AgriciDaniel/claude-seo",
+  "dmccreary/claude-skills",
+  "deanpeters/Product-Manager-Skills",
+  "flonat/claude-research",
+  "johnlindquist/claude"
+ ],
+ "elite": {
+  "license": 42,
+  "name_eq_dir": 99,
+  "headings": 100,
+  "code_example": 85,
+  "numbered_steps": 72,
+  "scripts_dir": 48,
+  "ref_dir": 66,
+  "metadata": 41,
+  "allowed_tools": 5,
+  "n": 1598,
+  "top_fm_keys": [
+   [
+    "name",
+    1597
+   ],
+   [
+    "description",
+    1597
+   ],
+   [
+    "license",
+    678
+   ],
+   [
+    "metadata",
+    657
+   ],
+   [
+    "version",
+    87
+   ],
+   [
+    "allowed-tools",
+    79
+   ],
+   [
+    "argument-hint",
+    78
+   ],
+   [
+    "intent",
+    54
+   ]
+  ]
+ },
+ "rest": {
+  "scripts_dir": 28,
+  "name_eq_dir": 64,
+  "headings": 98,
+  "code_example": 61,
+  "numbered_steps": 75,
+  "ref_dir": 35,
+  "allowed_tools": 22,
+  "metadata": 11,
+  "provenance_keys": 20,
+  "license": 14,
+  "n": 3355,
+  "top_fm_keys": [
+   [
+    "name",
+    3341
+   ],
+   [
+    "description",
+    3339
+   ],
+   [
+    "version",
+    768
+   ],
+   [
+    "allowed-tools",
+    737
+   ],
+   [
+    "origin",
+    493
+   ],
+   [
+    "license",
+    456
+   ],
+   [
+    "metadata",
+    364
+   ],
+   [
+    "source",
+    174
+   ]
+  ]
+ }
+}

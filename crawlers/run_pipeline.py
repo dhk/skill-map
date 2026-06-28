@@ -42,6 +42,7 @@ STAGES = [
     ('track_history.py', [], False, False),
     ('lineage_trace.py', [], True, True),
     ('originator_leaderboard.py', [], False, False),
+    ('gen_conventions.py', [], False, False),
     ('curiosities.py', [], False, False),
     ('render_copy_network.py', [], False, False),
     ('render_sankey.py', [], False, False),
