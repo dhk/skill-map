@@ -9,7 +9,7 @@ High stars, but the skills barely say *when* to use them — the crowd rewarded 
 - **rohitg00/awesome-claude-code-toolkit** — 2,191★ but only **2.5%** of its 40 skills carry a WHEN-trigger.
 - **ykdojo/claude-code-tips** — 8,909★ but only **16.7%** of its 6 skills carry a WHEN-trigger.
 - **can1357/oh-my-pi** — 14,469★ but only **20.0%** of its 15 skills carry a WHEN-trigger.
-- **affaan-m/ECC** — 221,085★ but only **21.7%** of its 881 skills carry a WHEN-trigger.
+- **affaan-m/ECC** — 222,705★ but only **21.7%** of its 881 skills carry a WHEN-trigger.
 - **FlorianBruniaux/claude-code-ultimate-guide** — 5,192★ but only **28.6%** of its 91 skills carry a WHEN-trigger.
 - **muratcankoylan/Agent-Skills-for-Context-Engineering** — 16,727★ but only **33.3%** of its 21 skills carry a WHEN-trigger.
 
@@ -26,8 +26,8 @@ Same skill, many repos — the closest thing to a viral hit.
 
 ## 🌱 Small origin, big spread
 
-- `frontend-design` first appeared in **johnlindquist/claude** (24★) — then surfaced in **davila7/claude-code-templates** (28,276★).
-- `sample-skill` first appeared in **borghei/claude-skills** (300★) — then surfaced in **alirezarezvani/claude-skills** (18,963★).
+- `frontend-design` first appeared in **johnlindquist/claude** (24★) — then surfaced in **davila7/claude-code-templates** (28,337★).
+- `sample-skill` first appeared in **borghei/claude-skills** (315★) — then surfaced in **alirezarezvani/claude-skills** (19,235★).
 
 ## 😤 Skills that yell at the model
 
@@ -79,5 +79,16 @@ Copies that diverged — usually one repo kept the reference/script files and th
 
 ## 🆕 New since last crawl (crawl-3-2026-06-28)
 
-- **+0** skills added, **1** changed, **129** removed.
+- **+0** skills added, **1** changed, **0** removed.
 - Biggest movers: `anthropics/claude-api` (score +0, +3533 words)
+
+## ❄️ Frozen vs evolving
+
+Re-crawled repos and whether anything actually moved:
+
+- **`anthropics/skills`** — evolving: 1 of 18 re-observed skills changed.
+- **`BbgnsurfTech/claude-skills-collection`** — ❄️ frozen: 1337 skills, **zero** changed since first crawl.
+- **`affaan-m/ECC`** — ❄️ frozen: 881 skills, **zero** changed since first crawl.
+- **`davila7/claude-code-templates`** — ❄️ frozen: 872 skills, **zero** changed since first crawl.
+- **`alirezarezvani/claude-skills`** — ❄️ frozen: 345 skills, **zero** changed since first crawl.
+- **`borghei/claude-skills`** — ❄️ frozen: 340 skills, **zero** changed since first crawl.

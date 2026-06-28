@@ -1297,9 +1297,9 @@
   },
   "affaan-m/ECC": {
    "n_skills": 881,
-   "stars": 221085,
+   "stars": 222705,
    "owner_type": "User",
-   "source": "personal-mixed",
+   "source": "domain-collection",
    "median_quality": 65.8,
    "mean_quality": 66.8,
    "quality_stdev": 13.2,
@@ -1412,7 +1412,7 @@
   },
   "davila7/claude-code-templates": {
    "n_skills": 872,
-   "stars": 28276,
+   "stars": 28337,
    "owner_type": "User",
    "source": "domain-collection",
    "median_quality": 81.8,

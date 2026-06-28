@@ -183,6 +183,27 @@ def main():
                                f'(score {m[1]:+.0f}, {m[2]:+d} words)' for m in d['top_movers'][:5]))
         L.append('')
 
+        # 12. Frozen vs evolving — repos re-crawled and what moved
+        observed = defaultdict(lambda: [0, 0])  # repo -> [re-observed skills, changed]
+        for key, h in hist['skills'].items():
+            if len(set(h.get('shas', []))) >= 1 and len(h.get('quality', [])) >= 1:
+                repo = h['repo']
+                # re-observed = appeared in >1 crawl
+                if h['first_seen'] != h['last_seen']:
+                    observed[repo][0] += 1
+                    if len(h.get('shas', [])) > 1:
+                        observed[repo][1] += 1
+        frozen = [(r, t) for r, (t, c) in observed.items() if t >= 50 and c == 0]
+        evolving = [(r, c, t) for r, (t, c) in observed.items() if c > 0]
+        if frozen or evolving:
+            L.append('## ❄️ Frozen vs evolving\n')
+            L.append('Re-crawled repos and whether anything actually moved:\n')
+            for r, c, t in sorted(evolving, key=lambda x: -x[1]):
+                L.append(f'- **`{r}`** — evolving: {c} of {t} re-observed skills changed.')
+            for r, t in sorted(frozen, key=lambda x: -x[1])[:6]:
+                L.append(f'- **`{r}`** — ❄️ frozen: {t} skills, **zero** changed since first crawl.')
+            L.append('')
+
     OUT.write_text('\n'.join(L))
     print(f'wrote {OUT} ({len(L)} lines)')
     # echo the punchiest bits
