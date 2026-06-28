@@ -188,10 +188,13 @@ classifies from the same inputs the LLM saw. `--compare` scores it against the
 Every axis beats its baseline by 1.5–2.4×, from label+description+domain alone and
 at zero marginal cost. `output_type` is weakest because the LLM's own calls there
 are inconsistent (docx→"media" but pptx→"generate" on near-identical text).
-Classifying from the full corpus (body + frontmatter + the now-captured siblings)
-rather than the truncated graph node would lift every axis further — the
-recommendation stands: deterministic default, optional LLM only for the
-ambiguous tail.
+
+**This is not parity.** All-4-axes *exact* agreement with the LLM is only ~12%, so
+the deterministic tagger is a **default / gap-filler**, not a replacement: the
+pipeline runs `classify_tags --fill`, which tags only *untagged* nodes and never
+overwrites an existing LLM tag, with an optional LLM pass reserved for the
+ambiguous tail. Classifying from the full corpus (body + frontmatter + the
+now-captured siblings) rather than the truncated graph node would lift every axis.
 
 **C. Canonical merged-corpus loader** (`score_corpus.py` + the three consumers).
 `load_all_crawls()` now sorts by numeric crawl index (`_crawl_n`) so `crawl-10`
