@@ -54,21 +54,25 @@ def main():
             sha = r.get('file_sha')
             dir_name = path.replace('\\', '/').split('/')[-2] if '/' in path else None
             score = score_skill(r['skill_md_content'], dir_name)['overall']
+            words = len(r['skill_md_content'].split())
             if key not in hist['skills']:
                 added.append(key)
                 hist['skills'][key] = {
                     'first_seen': crawl_id, 'last_seen': crawl_id,
-                    'name': dir_name, 'repo': repo,
-                    'shas': [sha], 'quality': [{'crawl': crawl_id, 'score': score}]}
+                    'name': dir_name, 'repo': repo, 'shas': [sha],
+                    'quality': [{'crawl': crawl_id, 'score': score}],
+                    'words': [{'crawl': crawl_id, 'n': words}]}
             else:
                 h = hist['skills'][key]
                 h['last_seen'] = crawl_id
                 if sha and sha != h['shas'][-1]:
                     h['shas'].append(sha)
                     prev = h['quality'][-1]['score']
+                    prev_w = h.get('words', [{'n': words}])[-1]['n']
                     h['quality'].append({'crawl': crawl_id, 'score': score})
+                    h.setdefault('words', []).append({'crawl': crawl_id, 'n': words})
                     changed.append(key)
-                    movers.append((key, round(score - prev, 1)))
+                    movers.append((key, round(score - prev, 1), words - prev_w))
 
         # removal: only for repos this crawl actually re-observed
         for repo in repos_here:
@@ -78,7 +82,7 @@ def main():
                 removed.append(key)
             live_by_repo[repo] = now
 
-        movers.sort(key=lambda x: -abs(x[1]))
+        movers.sort(key=lambda x: -max(abs(x[1]), abs(x[2]) / 100))
         delta = {
             'skills_added': len(added),
             'skills_changed': len(changed),
@@ -102,9 +106,9 @@ def main():
     if d['repos_added']:
         print(f'  new repos: {", ".join(d["repos_added"])}')
     if d['top_movers']:
-        print('  biggest quality movers:')
-        for key, dv in d['top_movers'][:8]:
-            print(f'    {dv:+5.1f}  {key.replace(chr(9), " / ")}')
+        print('  biggest movers (quality Δ, words Δ):')
+        for key, dv, dw in d['top_movers'][:8]:
+            print(f'    score {dv:+5.1f}  words {dw:+6d}  {key.replace(chr(9), " / ")}')
 
 
 if __name__ == '__main__':

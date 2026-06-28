@@ -77,7 +77,7 @@ Copies that diverged — usually one repo kept the reference/script files and th
 - **`test-driven-development`** — 84.5 in obra vs 61.5 in BbgnsurfTech (Δ23).
 - **`dispatching-parallel-agents`** — 77.5 in obra vs 56.5 in BbgnsurfTech (Δ21).
 
-## 🆕 New since last crawl (crawl-2-2026-06-27)
+## 🆕 New since last crawl (crawl-3-2026-06-28)
 
-- **+51** skills added, **0** changed, **0** removed.
-- New repos: mksglu/context-mode, rohitg00/awesome-claude-code-toolkit
+- **+0** skills added, **1** changed, **0** removed.
+- Biggest movers: `anthropics/claude-api` (score +0, +3533 words)

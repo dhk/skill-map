@@ -178,9 +178,9 @@ def main():
         if d['repos_added']:
             L.append(f'- New repos: {", ".join(d["repos_added"])}')
         if d['top_movers']:
-            L.append('- Biggest quality movers: ' +
-                     ', '.join(f'`{k.split(chr(9))[0].split("/")[0]}/{k.split("/")[-2]}` '
-                               f'({dv:+.0f})' for k, dv in d['top_movers'][:5]))
+            L.append('- Biggest movers: ' +
+                     ', '.join(f'`{m[0].split(chr(9))[0].split("/")[0]}/{m[0].split("/")[-2]}` '
+                               f'(score {m[1]:+.0f}, {m[2]:+d} words)' for m in d['top_movers'][:5]))
         L.append('')
 
     OUT.write_text('\n'.join(L))

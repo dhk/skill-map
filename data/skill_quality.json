@@ -311,7 +311,7 @@
  "repos": {
   "anthropics/skills": {
    "n_skills": 18,
-   "stars": 154694,
+   "stars": 155930,
    "owner_type": "Organization",
    "source": "canonical",
    "median_quality": 88.8,
@@ -1772,10 +1772,10 @@
     "no-anti-trigger"
    ],
    "desc_words": 124,
-   "body_words": 5675,
+   "body_words": 9208,
    "desc_has_when": true,
    "desc_has_anti": false,
-   "ref_files": 30
+   "ref_files": 36
   },
   {
    "repo": "anthropics/skills",
