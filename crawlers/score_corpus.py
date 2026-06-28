@@ -55,9 +55,27 @@ def latest_content_by_key():
 
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--calibrate', action='store_true',
+                    help='re-derive skill_quality thresholds from the canonical '
+                         'reference skills instead of the frozen defaults')
+    args = ap.parse_args()
+
     results = load_all_crawls()
     sib_path = BASE / 'data' / 'sibling_files.json'
     siblings = json.load(open(sib_path)) if sib_path.exists() else {}
+
+    if args.calibrate:
+        import skill_quality
+        CANON = {'anthropics/skills', 'openai/skills', 'posit-dev/skills'}
+        canon_md = [it['skill_md_content'] for it in results
+                    if it.get('skill_md_content') and
+                    (it.get('repo_source') == 'canonical'
+                     or it['repo_full_name'] in CANON)]
+        derived = skill_quality.calibrate(canon_md)
+        print(f'calibrated thresholds from {len(canon_md)} canonical skills: {derived}'
+              if derived else 'calibrate: too few canonical samples — using defaults')
 
     per_skill = []
     by_repo = defaultdict(list)

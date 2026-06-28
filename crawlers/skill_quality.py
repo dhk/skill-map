@@ -27,13 +27,12 @@ import re
 import sys
 import json
 
-# ── Thresholds (derived from canonical reference skills) ──────────────
-# REVIEW(assumption / fragile): every threshold below is a magic constant frozen
-# from one snapshot of anthropics/skills (desc median 43 words, body ~1194, etc.).
-# They are NOT recomputed from the live corpus, so as the canonical reference
-# evolves these silently drift from "what the gold standard actually does now".
-# Since score_corpus already loads the full corpus, the canonical percentiles
-# could be derived at runtime and these constants become a fallback, not the law.
+# ── Thresholds (defaults; calibrate() can re-derive from the canonical set) ───
+# These are the FALLBACK defaults, frozen from one snapshot of anthropics/skills.
+# calibrate() below re-derives the soft word-count cutoffs from the actual
+# canonical reference skills at runtime, so the rubric tracks the gold standard as
+# it evolves; the constants apply when calibrate() isn't called or has too few
+# samples. (score_corpus exposes --calibrate.)
 #
 # REVIEW(LLM-replaceable, the GOOD direction): this whole module is the
 # deterministic counterpart to sample_llm.py / judge_llm.py. Of the LLM judge's
@@ -43,11 +42,47 @@ import json
 # appropriateness). The remaining LLM passes should be scoped to just those.
 # anthropics/skills: desc median 43 words, body median ~1194 words,
 # name+description always present, license common, headings standard.
-DESC_MIN_WORDS = 8       # below this a description can't say what+when
+DESC_MIN_WORDS = 8       # below this a description can't say what+when (hard floor)
 DESC_LOW_WORDS = 14      # canonical descriptions rarely shorter
 DESC_HIGH_WORDS = 80     # above this it's bloated for a trigger string
 BODY_STUB_WORDS = 40     # below this the body is a stub, not a skill
 BODY_LONG_WORDS = 2200   # above this without reference files = poor disclosure
+
+
+def _percentile(xs, q):
+    xs = sorted(xs)
+    if not xs:
+        return None
+    k = (len(xs) - 1) * q / 100
+    f = int(k)
+    return xs[f] if f + 1 >= len(xs) else xs[f] + (xs[f + 1] - xs[f]) * (k - f)
+
+
+def calibrate(canonical_md, lo_pct=10, hi_pct=90, min_samples=8):
+    """Re-derive the soft word-count thresholds from the canonical reference
+    skills (an iterable of raw SKILL.md strings) so the rubric isn't frozen to a
+    2026 snapshot. Updates module globals in place and returns the derived dict;
+    no-op (keeps the constant defaults) if there are too few samples. DESC_MIN_WORDS
+    stays a hard floor."""
+    global DESC_LOW_WORDS, DESC_HIGH_WORDS, BODY_STUB_WORDS, BODY_LONG_WORDS
+    descs, bodies = [], []
+    for md in canonical_md:
+        p = parse_skill(md)
+        dw = len(p['frontmatter'].get('description', '').split())
+        bw = len(p['body'].split())
+        if dw:
+            descs.append(dw)
+        if bw:
+            bodies.append(bw)
+    if len(descs) < min_samples or len(bodies) < min_samples:
+        return None
+    DESC_LOW_WORDS = max(DESC_MIN_WORDS, round(_percentile(descs, lo_pct)))
+    DESC_HIGH_WORDS = round(_percentile(descs, hi_pct))
+    BODY_STUB_WORDS = max(20, round(_percentile(bodies, lo_pct)))
+    BODY_LONG_WORDS = round(_percentile(bodies, hi_pct))
+    return {'DESC_LOW_WORDS': DESC_LOW_WORDS, 'DESC_HIGH_WORDS': DESC_HIGH_WORDS,
+            'BODY_STUB_WORDS': BODY_STUB_WORDS, 'BODY_LONG_WORDS': BODY_LONG_WORDS,
+            'n_canonical': len(descs)}
 
 # Phrases that signal a "when to use" trigger in the description.
 WHEN_PATTERNS = [
