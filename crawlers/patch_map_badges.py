@@ -38,14 +38,11 @@ def main():
             # Clear a stale/wrong badge rather than leave it from a prior run.
             node.pop('bp_score', None)
             cleared += 1
-    # RECOMMEND(review2, P1): symptom fixed here — unmatched nodes no longer keep
-    # STALE grades, and we log matched/cleared so a drop is visible. ROOT CAUSE is
-    # upstream in enrich_urls: the (org,dir) rewrite drops the deep-link for ~16
-    # nodes whose crawled SKILL.md lives in a mega-collection *copy* (attributed to
-    # org X but fetched from davila7/affaan-m/...), so they fall back to a bare org
-    # URL and no longer join the corpus. Real COVERAGE fix: link to the skill's
-    # ACTUAL crawled repo+path, keep the attributed org as a label only. See
-    # docs/CODE-REVIEW-RESPONSE.md (P1 #2).
+    # Unmatched nodes have their badge CLEARED (no stale/wrong grade lingers); we
+    # log matched/cleared so a drop is visible. The earlier 26/39 drop is RESOLVED:
+    # enrich_urls now deep-links to each skill's ACTUAL crawled location (falling
+    # back from (org,dir) to the corpus copy), so the badge join recovers them
+    # (41 matched, 0 stale). See docs/CODE-REVIEW-RESPONSE.md (P1 #2).
     save_graph(g, content, match)
     print(f'patched {matched} map badges; cleared {cleared} stale')
 
