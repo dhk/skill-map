@@ -31,6 +31,39 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from graphio import load_graph, save_graph, skill_nodes
 from score_corpus import load_all_crawls
+from ghapi import gh_json, has_token
+
+BASE = Path(__file__).parent.parent
+BRANCH_CACHE = BASE / 'data' / 'repo_branches.json'
+
+
+def resolve_branches(results, offline=False):
+    """repo -> default_branch. Prefers the value the crawl captured; for older
+    snapshots that predate that, uses a cached sidecar, then (unless --offline and
+    if a token is present) the repos API — so matched skills get a real branch URL
+    instead of /tree/HEAD/. HEAD remains the fallback when unknown."""
+    cache = json.loads(BRANCH_CACHE.read_text()) if BRANCH_CACHE.exists() else {}
+    branch = {}
+    need = set()
+    for r in results:
+        repo = r['repo_full_name']
+        if repo in branch:
+            continue
+        b = r.get('repo_default_branch') or cache.get(repo)
+        if b:
+            branch[repo] = b
+        else:
+            need.add(repo)
+    if need and not offline and has_token():
+        for repo in sorted(need):
+            try:
+                b = gh_json(f'https://api.github.com/repos/{repo}').get('default_branch')
+            except Exception:
+                b = None
+            if b:
+                branch[repo] = cache[repo] = b
+        BRANCH_CACHE.write_text(json.dumps(cache, indent=0))
+    return branch
 
 
 def build_index(results):
@@ -61,16 +94,19 @@ def pick_best(candidates):
     return max(candidates, key=lambda r: r.get('repo_stars') or 0)
 
 
-def make_source_url(result):
+def make_source_url(result, branch_map):
     repo_url = result['repo_url'].rstrip('/')
     skill_dir_path = '/'.join(result['file_path'].split('/')[:-1])  # strip SKILL.md
-    branch = result.get('repo_default_branch') or 'HEAD'
+    branch = (result.get('repo_default_branch')
+              or branch_map.get(result['repo_full_name']) or 'HEAD')
     return f"{repo_url}/tree/{branch}/{skill_dir_path}"
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--crawl', help='single crawl data.json (default: merged corpus)')
+    ap.add_argument('--offline', action='store_true',
+                    help='skip default_branch resolution (HEAD fallback)')
     args = ap.parse_args()
 
     if args.crawl:
@@ -78,6 +114,7 @@ def main():
     else:
         results = load_all_crawls()
     by_org_dir, by_dir = build_index(results)
+    branch_map = resolve_branches(results, offline=args.offline)
 
     graph, content, match = load_graph()
     exact = located = fallback = 0
@@ -92,7 +129,7 @@ def main():
             if best:
                 located += 1
         if best:
-            node['source_url'] = make_source_url(best)
+            node['source_url'] = make_source_url(best, branch_map)
         else:
             node['source_url'] = f"https://github.com/{node['id'].split('/')[0]}"
             fallback += 1
