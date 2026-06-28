@@ -135,6 +135,42 @@ already hold in memory.
 
 ---
 
+## Prototypes implemented on this branch
+
+Two of the highest-leverage fixes above are now prototyped (the rest remain as
+inline `REVIEW(...)` notes):
+
+**A. Siblings + `default_branch` captured during the crawl** (`crawl.py`,
+`fetch_siblings.py`). `walk_repo_tree` now stores each skill's `sibling_files`
+(same contract as `data/sibling_files.json`, cap 60) straight from the tree it
+already walks, checks the truncation flag, and `get_repo_meta` captures
+`repo_default_branch`. `fetch_siblings.py` gained a fast path that harvests those
+from the crawl snapshots and only hits the unauthenticated API for repos crawled
+*before* this change. Verified: all 4,975 existing skills route to the legacy
+backfill (no silent-empty regression); every future crawl populates siblings with
+zero extra network calls, deleting that whole pass. The sibling helper output is
+byte-for-byte identical to the old API-derived format.
+
+**B. Deterministic tagger** (`classify_tags.py`) — a drop-in for `tag_skills.py`'s
+per-skill `claude -p` classifier. Same 4 dimensions, same cache/patch shape,
+classifies from the same inputs the LLM saw. `--compare` scores it against the
+157 real LLM tags:
+
+| axis | deterministic | majority-class baseline |
+|---|---|---|
+| action | **53%** | 22% |
+| complexity | **66%** | 60% |
+| output_type | **48%** | 27% |
+| integration | **57%** | 38% |
+
+Every axis beats its baseline by 1.5–2.4×, from label+description+domain alone and
+at zero marginal cost. `output_type` is weakest because the LLM's own calls there
+are inconsistent (docx→"media" but pptx→"generate" on near-identical text).
+Classifying from the full corpus (body + frontmatter + the now-captured siblings)
+rather than the truncated graph node would lift every axis further — the
+recommendation stands: deterministic default, optional LLM only for the
+ambiguous tail.
+
 ## What's solid (don't change)
 
 `score_corpus` / `skill_quality` / `repo_signature` are clean, fast, fully

@@ -31,13 +31,10 @@ def gh(url):
 
 
 def tree_paths(repo):
-    # REVIEW(duplicate work + unauth): this re-fetches the SAME recursive tree that
-    # crawl.py.walk_repo_tree already walked — just over the unauthenticated API
-    # (60 req/hr; the bare except in main() turns rate-limit/404 into a skipped
-    # repo and a blinded disclosure axis). If the crawl stored the per-repo blob
-    # list (it has it in hand), this entire script + its network pass go away. It
-    # also IGNORES the truncation flag (`t['truncated']`), so huge repos lose
-    # sibling files silently — same latent bug as the crawl's tree walk.
+    # LEGACY FALLBACK only: crawl.py now captures sibling_files during its
+    # authenticated tree walk and main() prefers those, so this unauthenticated
+    # re-fetch runs only for repos crawled before that change. (Still ignores the
+    # truncation flag — acceptable for a backfill path that will age out.)
     owner, name = repo.split('/', 1)
     info = gh(f'https://api.github.com/repos/{owner}/{name}')
     branch = info.get('default_branch', 'main')
@@ -47,12 +44,27 @@ def tree_paths(repo):
 
 def main():
     res = load_all_crawls()
+
+    # FAST PATH: harvest siblings the crawl already captured (crawl.py now stores
+    # `sibling_files` per skill from the tree it walked). Anything covered here
+    # needs no network call at all.
+    out = {}
     skills_by_repo = defaultdict(list)
     for x in res:
-        if x.get('skill_md_content'):
+        if not x.get('skill_md_content'):
+            continue
+        key = f"{x['repo_full_name']}\t{x['file_path']}"
+        sib = x.get('sibling_files')
+        if sib is not None:                       # present (incl. []) → trust crawl
+            out[key] = sib[:60]
+        else:                                     # older crawl: needs API backfill
             skills_by_repo[x['repo_full_name']].append(x['file_path'])
 
-    out = {}
+    from_crawl = len(out)
+    print(f'{from_crawl} skills annotated from crawl snapshots (no network); '
+          f'{len(skills_by_repo)} repos need API backfill')
+
+    # SLOW PATH (legacy): only repos whose crawl predates sibling capture.
     for i, (repo, paths) in enumerate(sorted(skills_by_repo.items()), 1):
         try:
             allp = tree_paths(repo)
@@ -68,7 +80,8 @@ def main():
         print(f'  [{i}/{len(skills_by_repo)}] {repo}: {len(paths)} skills, '
               f'{len(allp)} files in tree')
     OUT.write_text(json.dumps(out, indent=0))
-    print(f'wrote {OUT} ({len(out)} skills annotated)')
+    print(f'wrote {OUT} ({len(out)} skills annotated; {from_crawl} from crawl, '
+          f'{len(out) - from_crawl} from API)')
 
 
 if __name__ == '__main__':
