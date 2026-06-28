@@ -22,6 +22,11 @@ Measured agreement vs the 157 LLM-tagged skills (label+description+domain only):
     complexity / integration are well within deterministic reach; keep an optional
     LLM pass only for the residual ambiguous tail, not as the default for all.
 
+# RECOMMEND(review2, P1): frame honestly — ALL-4-AXES exact agreement with the
+# LLM is only ~12% (per-axis 48-66%). This is NOT parity; it is a free DEFAULT/
+# gap-filler (--fill keeps existing LLM tags, never downgrades) + an optional LLM
+# pass for the ambiguous tail. Keep that framing everywhere (docs/CODE-REVIEW.md).
+
 Usage:
     python crawlers/classify_tags.py --compare      # agreement vs LLM cache
     python crawlers/classify_tags.py                # write data/skill_tags_det.json

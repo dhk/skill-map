@@ -1,45 +1,109 @@
-# Code Review — Response & Action List
+# Code Review Response & Action List (review2)
 
-Second-pass review of the changes in `docs/CODE-REVIEW.md`. I verified the
-prototypes against live runs (pipeline green, score parity held at median 82.5,
-WHEN +1pt from the better parser, all modules parse, re-run produced byte-identical
-data JSON). **Verdict: sound, mergeable. No correctness changes are required.**
+Second-pass triage of PR #5 (`docs/CODE-REVIEW.md` + the fixes on
+`claude/skill-map-code-review-hx98b1`). Two reviewers converged here; this is the
+merged result.
 
-Markup for the other agent below. Inline markers carry the same tag — walk them
-with `grep -rn "RECOMMEND(review2" .`. Priorities: **P0** = do before merge,
-**P1** = should, **P2/backlog** = optional.
+**Verdict: sound, mergeable.** Verified against live runs — pipeline green, score
+parity held (median 82.5, WHEN +1pt from the better YAML parser), all modules
+parse, and a re-run produced byte-identical derived JSON (only the Sankey PNG
+differs, due to matplotlib timestamp metadata). No correctness changes are
+*required* to merge.
 
-## P0 — before merge (one item)
-| # | Where | Action |
-|---|---|---|
-| 1 | `docs/internal-skill-map.md:264` | Stale `1,119` skills. Update to the live count (4,975 files / ~3,769 unique). The branch's own generic `check_docs` flags it, so the pipeline's doc gate now fails on it. Inline marker added. |
+Inline counterparts carry the same tag: `grep -rn 'RECOMMEND(review2' .`
+Priorities: **P0** = before merge · **P1** = should · **backlog** = optional.
+
+---
+
+## P0 — merge blocker (1) — ✅ DONE
+
+- [x] **`docs/internal-skill-map.md:264` — stale `1,119 skills`.** The branch's
+  own generic `check_docs` flagged it, so the PR failed its own doc gate. Fixed:
+  the cell now reads `4,975 crawled skills (~3,769 unique)` — matches the live
+  corpus and carries the honest dedup number. `check_docs` no longer flags it.
+
+> The 2 remaining `check_docs` hits are intentional prose — an **article-draft
+> hook** (`article-series.md`) and an **approximate** `~4,900` in
+> `design-brief.md`. Author's call, not blockers.
+
+---
 
 ## P1 — recommended polish
-| # | Where | Action |
-|---|---|---|
-| 2 | `crawlers/enrich_urls.py` (root cause) → `patch_map_badges.py` (symptom) | **Root-caused.** The `(org,dir)` rewrite dropped the `…/tree/<branch>/<path>` deep-link on **16 map nodes (42→26)**, so badges refresh only 26/39 and **13 keep stale grades**. These 16 are skills the map attributes to org X (openai, angular, supabase…) but whose crawled `SKILL.md` lives in a mega-collection *copy* (davila7, affaan-m…). New code links to the attributed org, can't find the skill there, and falls back to a bare org root (`https://github.com/openai`) — losing the deep-link. **Fix:** link to the skill's *actual crawled location* (repo+path from the corpus) and keep the attributed org as a label only; then `patch_map_badges` should log `n/total`. |
-| 3 | Deterministic tagger framing (`docs/CODE-REVIEW.md` §B, `classify_tags.py`) | Keep, but label honestly: all-4-axis agreement vs LLM is **12%** (per-axis 48–66%). It's a free *default + LLM-tail*, not parity — don't wire it to *replace* `tag_skills` outright; make the LLM pass the documented fallback for the ambiguous tail. |
 
-## Backlog — the still-open inline `REVIEW(...)` notes, ranked
-These were correctly left as notes by the first pass. My suggested order:
-| Pri | Item | Where | Why |
-|---|---|---|---|
-| P1 | Thread `$GITHUB_TOKEN` into all unauth API calls | `fetch_siblings.py`, `lineage_trace.py`, `judge_llm.fetch_siblings` | 60 req/hr + bare `except` turns rate-limit exhaustion into silently-dropped data. `maturity_crawl.py` already does it — copy the pattern. Highest-risk open item. |
-| P1 | Check the tree-API `truncated` flag | `crawl.py`, `fetch_siblings.py` | Recursive trees truncate at ~100k entries; today skills past the cutoff vanish silently on large monorepos. Log/raise on `truncated=True`. |
-| P2 | One-crawl-per-day resumption | `crawl.py:find_today_dir` | Two different lists on the same day merge into one dir; metrics reflect only the last list. Suffix the dir by list_id or time. |
-| P2 | Move `default_branch` capture fully upstream | `crawl.py`/`enrich_urls.py` | Prototype A captures it; finish removing the `/tree/main/` hard-codes so master/develop repos stop 404-ing source links. |
-| P2 | Frozen rubric thresholds | `skill_quality.py` | Constants pinned from one anthropics snapshot; fine for now, but note they're not recomputed as the canonical set evolves. |
-| P3 | `reclassify.py` domain map | `reclassify.py` | Counts now derived (good); the keyword `classify_domain()` is heuristic — acceptable, but flag it as the remaining hand-maintained surface. |
+- [x] **`patch_map_badges.py` — badge join refreshed only 26/39; 13 kept stale
+  grades.** *Symptom fixed on this branch:* unmatched nodes now have their badge
+  **cleared** (no stale/wrong grade lingers) and the script logs `matched/cleared`.
+  Marker: `RECOMMEND(review2, P1)` in `patch_map_badges.py`.
+  **Root cause (still open, backlog):** it's upstream in `enrich_urls.py`. The
+  `(org,dir)` rewrite dropped the deep-link on ~16 map nodes (42→26) — skills the
+  map attributes to org X (openai, angular, supabase…) but whose crawled
+  `SKILL.md` actually lives in a mega-collection *copy* (davila7, affaan-m…). The
+  new code links to the attributed org, can't find the skill there, and falls
+  back to a bare org root — losing the deep-link. **Real fix:** link to the
+  skill's *actual crawled location* (repo+path from the corpus); keep the
+  attributed org as a label only.
 
-## Already done — do NOT re-flag
-The first pass already landed these; verified present:
-- Unique-skill count **is** folded into `STATS.md` (`gen_stats.py` lines 38–71) → "~3,769 unique skills."
-- Numeric crawl sort (`_crawl_n`), `latest_content_by_key()`, judges/lineage off the crawl-1 pin.
-- `graphio.py` shared by 5 scripts; PyYAML parse with hand-parser fallback (scores 99% identical).
-- `track_history` scores with siblings; `enrich_urls` `(org,dir)` match; `git push -u origin <branch>`.
+- [ ] **Honest framing for the deterministic tagger.** Marker:
+  `RECOMMEND(review2, P1)` in `classify_tags.py`. Per-axis agreement is decent
+  (48–66%) but **all-4-axes exact agreement is ~12% — not parity.** It is a free
+  *default / gap-filler* (`--fill` keeps existing LLM tags, never downgrades) plus
+  an *optional LLM pass for the ambiguous tail*. Keep that framing everywhere
+  (`docs/CODE-REVIEW.md` §B, PR body); never describe it as replacing the LLM.
 
-## Don't touch
-`score_corpus` / `skill_quality` / `repo_signature` / `gen_stats` + `check_docs`
-are clean and are the right "derive, don't hand-write" core. The committed derived
-data is already consistent with a fresh pipeline run (only the Sankey PNG differs,
-due to matplotlib timestamp metadata) — so no forced regen needed on merge.
+---
+
+## Backlog — still-open `REVIEW(...)` notes, ranked
+
+1. **Thread `$GITHUB_TOKEN` into the unauth API calls** *(highest risk)* —
+   `lineage_trace.py`, legacy `fetch_siblings` backfill, `judge_llm.fetch_siblings`:
+   60 req/hr + bare `except` turns rate-limit exhaustion into silently-dropped
+   data. `maturity_crawl.py` already threads it — copy the pattern.
+2. **Check the tree-API `truncated` flag** — `crawl.py` warns but doesn't handle;
+   `fetch_siblings` legacy path ignores it. >100k-entry monorepos lose files past
+   the cutoff. Add a paginated/contents fallback.
+3. **`enrich_urls` deep-link coverage** (the P1 #2 root cause) — link to the
+   actual crawled repo+path so mega-collection copies keep their deep-link/badge.
+4. **One-crawl-per-day resumption** (`crawl.py:find_today_dir`) — two lists on the
+   same UTC day merge into one dir; metrics reflect only the last. Key on `list_id`.
+5. **Finish `default_branch` upstream** — captured now, but existing snapshots
+   predate it, so `enrich_urls` still emits `/tree/HEAD/`. Resolves on next crawl.
+6. **Frozen thresholds** (`skill_quality.py`) — rubric constants pinned from one
+   snapshot; derive canonical percentiles at runtime, keep constants as fallback.
+7. **`reclassify.py` keyword map** *(lowest)* — `classify_domain()` is keyword-only;
+   a topic-aware version (join to crawl `repo_topics`, now captured) would beat it.
+
+---
+
+## ✅ Already done — DO NOT re-flag
+
+Landed on this branch; verified present:
+
+- Unique-skill count folded into `STATS.md` (`gen_stats.py`) → "~3,769 unique skills".
+- Stale single-crawl pin removed → judges/lineage read the merged corpus
+  (`load_all_crawls()` / `latest_content_by_key()`); numeric `_crawl_n` sort.
+- Hand-rolled YAML → PyYAML with fallback (99% scores identical; 54 movers are fixes).
+- 4 inconsistent `const GRAPH` regexes → single `graphio.py` helper (5 scripts).
+- `enrich_urls` `(org,dir)` match; `track_history` scores with siblings + numeric
+  order; `git push -u origin <branch>`; `crawl.py` shared `is_skill_file()` +
+  global-search blob SHAs.
+- `lineage_trace` `Counter` `UnboundLocalError` (no-dates path) fixed.
+- `sample_llm.py` retired; `reclassify` + `classify_tags --fill` wired into `run_pipeline`.
+- Dead code (`curiosities.most_code`) removed.
+
+## 🛑 Don't touch — load-bearing / correct-as-is
+
+- `score_corpus` / `skill_quality` / `repo_signature` / `gen_stats` + `check_docs`
+  are the clean "derive, don't hand-write" core.
+- `graphio.GRAPH_RE` uses `re.S` and `save_graph` writes minified — keep both;
+  the old no-DOTALL copies only worked by accident.
+- `classify_tags --fill` preserves existing tags — do NOT switch the pipeline to
+  `--patch` (that overwrites 157 LLM tags with ~12%-parity deterministic ones).
+- `sibling_files = None` vs `[]` (`crawl.py`) — `None` = not walked (→ API
+  backfill); `[]` = walked, genuinely empty. Don't collapse them.
+- Reduced map deep-links/badges (28/26) is the *correct* result of dropping
+  cross-repo mis-links — don't "restore" coverage by loosening the match (fix the
+  root cause in `enrich_urls` instead).
+- `count_skills` near-dup threshold 0.80 matches `lineage_trace` on purpose.
+- `maturity_crawl.py` / `sample_llm.py` kept-but-retired — intentional (history).
+- Committed derived data is consistent with a fresh pipeline run; no forced regen
+  needed on merge (only the Sankey PNG differs, on matplotlib metadata).

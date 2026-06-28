@@ -25,7 +25,7 @@ def parse(url):
 def main():
     g, content, match = load_graph()
     qmap = {(s['repo'], s['file_path']): s for s in json.load(open(Q))['skills']}
-    n = 0
+    matched = cleared = 0
     for node in g['nodes']:
         if node.get('type') != 'skill':
             continue
@@ -33,15 +33,21 @@ def main():
         if s:
             node['bp_grade'] = s['grade']
             node['bp_score'] = s['overall']
-            n += 1
-    # RECOMMEND(review2, P1): this matched 26/39 graded nodes after the
-    # merged-corpus + graphio changes (was 39/39 on main). The other 13 keep
-    # STALE grades from a prior run instead of being refreshed. Likely the
-    # source_url → (repo, file_path) join drops rows now (branch/path mismatch
-    # vs the merged corpus keys). Investigate the parse() join; report matched
-    # vs total (e.g. f'patched {n}/{graded} map badges') so a drop is visible.
+            matched += 1
+        elif node.pop('bp_grade', None) is not None:
+            # Clear a stale/wrong badge rather than leave it from a prior run.
+            node.pop('bp_score', None)
+            cleared += 1
+    # RECOMMEND(review2, P1): symptom fixed here — unmatched nodes no longer keep
+    # STALE grades, and we log matched/cleared so a drop is visible. ROOT CAUSE is
+    # upstream in enrich_urls: the (org,dir) rewrite drops the deep-link for ~16
+    # nodes whose crawled SKILL.md lives in a mega-collection *copy* (attributed to
+    # org X but fetched from davila7/affaan-m/...), so they fall back to a bare org
+    # URL and no longer join the corpus. Real COVERAGE fix: link to the skill's
+    # ACTUAL crawled repo+path, keep the attributed org as a label only. See
+    # docs/CODE-REVIEW-RESPONSE.md (P1 #2).
     save_graph(g, content, match)
-    print(f'patched {n} map badges')
+    print(f'patched {matched} map badges; cleared {cleared} stale')
 
 
 if __name__ == '__main__':
