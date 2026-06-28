@@ -39,13 +39,13 @@
   "repo": "johnlindquist/claude",
   "n_skills": 50,
   "ancestor_credit": 2.0,
-  "novel_concepts": 38,
-  "originality_rate": 76.0,
+  "novel_concepts": 37,
+  "originality_rate": 74.0,
   "copies_in": 1,
   "copy_ratio": 2.0,
   "signature": "domain-pack",
   "stars": 24,
-  "originator_score": 24.8
+  "originator_score": 24.4
  },
  {
   "repo": "foxj77/claude-code-skills",
@@ -348,6 +348,18 @@
   "originator_score": 16.0
  },
  {
+  "repo": "vercel-labs/agent-skills",
+  "n_skills": 9,
+  "ancestor_credit": 0,
+  "novel_concepts": 7,
+  "originality_rate": 77.8,
+  "copies_in": 0,
+  "copy_ratio": 0.0,
+  "signature": "canonical-reference",
+  "stars": 28423,
+  "originator_score": 15.6
+ },
+ {
   "repo": "Jeffallan/claude-skills",
   "n_skills": 66,
   "ancestor_credit": 0,
@@ -420,6 +432,18 @@
   "originator_score": 6.4
  },
  {
+  "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+  "n_skills": 13,
+  "ancestor_credit": 0,
+  "novel_concepts": 4,
+  "originality_rate": 30.8,
+  "copies_in": 0,
+  "copy_ratio": 0.0,
+  "signature": "boutique",
+  "stars": 97386,
+  "originator_score": 6.2
+ },
+ {
   "repo": "affaan-m/ECC",
   "n_skills": 881,
   "ancestor_credit": 0,
@@ -435,13 +459,13 @@
   "repo": "davila7/claude-code-templates",
   "n_skills": 872,
   "ancestor_credit": 0,
-  "novel_concepts": 503,
-  "originality_rate": 57.7,
+  "novel_concepts": 500,
+  "originality_rate": 57.3,
   "copies_in": 276,
   "copy_ratio": 31.7,
   "signature": "mega-collection",
   "stars": 28337,
-  "originator_score": 5.2
+  "originator_score": 5.1
  },
  {
   "repo": "BbgnsurfTech/claude-skills-collection",

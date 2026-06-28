@@ -1,30 +1,30 @@
 {
- "n_skills": 4953,
- "n_repos": 41,
+ "n_skills": 4975,
+ "n_repos": 43,
  "median_quality": 82.5,
  "mean_quality": 80.0,
- "pct_with_when": 68.1,
+ "pct_with_when": 68.0,
  "pct_with_anti_trigger": 2.5,
  "pct_uses_refs": 26.6,
  "grade_dist": {
-  "A": 2033,
-  "B": 2100,
+  "A": 2048,
+  "B": 2105,
   "C": 690,
-  "D": 76,
+  "D": 78,
   "F": 54
  },
  "flag_freq": [
   [
    "no-anti-trigger",
-   4807
+   4826
   ],
   [
    "output-format-unstated",
-   3114
+   3129
   ],
   [
    "no-when-trigger",
-   1559
+   1568
   ],
   [
    "nonstandard-frontmatter",
@@ -49,10 +49,10 @@
  ],
  "signatures": {
   "canonical-reference": {
-   "n_repos": 5,
-   "n_skills": 118,
+   "n_repos": 6,
+   "n_skills": 127,
    "median_quality": 90.0,
-   "pct_with_when": 87.3
+   "pct_with_when": 86.6
   },
   "domain-pack": {
    "n_repos": 12,
@@ -61,10 +61,10 @@
    "pct_with_when": 73.2
   },
   "boutique": {
-   "n_repos": 6,
-   "n_skills": 49,
+   "n_repos": 7,
+   "n_skills": 62,
    "median_quality": 82.5,
-   "pct_with_when": 89.8
+   "pct_with_when": 77.4
   },
   "single-skill": {
    "n_repos": 7,
@@ -91,10 +91,13 @@
   "crawl-3-2026-06-28"
  ],
  "latest_delta": {
-  "skills_added": 0,
+  "skills_added": 22,
   "skills_changed": 1,
   "skills_removed": 0,
-  "repos_added": [],
+  "repos_added": [
+   "nextlevelbuilder/ui-ux-pro-max-skill",
+   "vercel-labs/agent-skills"
+  ],
   "top_movers": [
    [
     "anthropics/skills\tskills/claude-api/SKILL.md",
@@ -102,7 +105,23 @@
     3533
    ]
   ],
-  "sample_added": []
+  "sample_added": [
+   "vercel-labs/agent-skills\tskills/composition-patterns/SKILL.md",
+   "vercel-labs/agent-skills\tskills/deploy-to-vercel/SKILL.md",
+   "vercel-labs/agent-skills\tskills/react-best-practices/SKILL.md",
+   "vercel-labs/agent-skills\tskills/react-native-skills/SKILL.md",
+   "vercel-labs/agent-skills\tskills/react-view-transitions/SKILL.md",
+   "vercel-labs/agent-skills\tskills/vercel-cli-with-tokens/SKILL.md",
+   "vercel-labs/agent-skills\tskills/vercel-optimize/SKILL.md",
+   "vercel-labs/agent-skills\tskills/web-design-guidelines/SKILL.md",
+   "vercel-labs/agent-skills\tskills/writing-guidelines/SKILL.md",
+   "nextlevelbuilder/ui-ux-pro-max-skill\t.claude/skills/banner-design/SKILL.md",
+   "nextlevelbuilder/ui-ux-pro-max-skill\t.claude/skills/brand/SKILL.md",
+   "nextlevelbuilder/ui-ux-pro-max-skill\t.claude/skills/design-system/SKILL.md",
+   "nextlevelbuilder/ui-ux-pro-max-skill\t.claude/skills/design/SKILL.md",
+   "nextlevelbuilder/ui-ux-pro-max-skill\t.claude/skills/slides/SKILL.md",
+   "nextlevelbuilder/ui-ux-pro-max-skill\t.claude/skills/ui-styling/SKILL.md"
+  ]
  },
  "dup_clusters": 260,
  "top_originators": [
@@ -120,7 +139,7 @@
   ],
   [
    "johnlindquist/claude",
-   24.8
+   24.4
   ],
   [
    "foxj77/claude-code-skills",

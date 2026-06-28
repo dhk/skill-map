@@ -1,31 +1,31 @@
 {
  "corpus": {
-  "n_skills": 4953,
-  "n_repos": 41,
+  "n_skills": 4975,
+  "n_repos": 43,
   "median_quality": 82.5,
   "mean_quality": 80.0,
   "grade_dist": {
-   "A": 2033,
-   "B": 2100,
+   "A": 2048,
+   "B": 2105,
    "C": 690,
-   "D": 76,
+   "D": 78,
    "F": 54
   },
-  "pct_with_when": 68.1,
+  "pct_with_when": 68.0,
   "pct_with_anti_trigger": 2.5,
   "pct_uses_refs": 26.6,
   "flag_freq": [
    [
     "no-anti-trigger",
-    4807
+    4826
    ],
    [
     "output-format-unstated",
-    3114
+    3129
    ],
    [
     "no-when-trigger",
-    1559
+    1568
    ],
    [
     "nonstandard-frontmatter",
@@ -53,7 +53,7 @@
    ],
    [
     "missing-description",
-    22
+    24
    ],
    [
     "missing-name",
@@ -63,27 +63,28 @@
  },
  "signatures": {
   "canonical-reference": {
-   "n_repos": 5,
-   "n_skills": 118,
+   "n_repos": 6,
+   "n_skills": 127,
    "repos": [
     "anthropics/skills",
     "QuestForTech-Investments/claude-code-skills",
     "posit-dev/skills",
     "microsoft/vscode-docs",
-    "openai/skills"
+    "openai/skills",
+    "vercel-labs/agent-skills"
    ],
    "median_quality": 90.0,
-   "mean_quality": 87.4,
-   "pct_with_when": 87.3,
-   "pct_uses_refs": 44.9,
+   "mean_quality": 86.9,
+   "pct_with_when": 86.6,
+   "pct_uses_refs": 43.3,
    "top_flags": [
     [
      "no-anti-trigger",
-     106
+     112
     ],
     [
      "output-format-unstated",
-     90
+     95
     ],
     [
      "no-when-trigger",
@@ -152,36 +153,37 @@
    ]
   },
   "boutique": {
-   "n_repos": 6,
-   "n_skills": 49,
+   "n_repos": 7,
+   "n_skills": 62,
    "repos": [
     "obra/superpowers",
     "kepano/obsidian-skills",
     "dhk/adventures-in-ai",
     "ykdojo/claude-code-tips",
     "sebastianwessel/skills",
-    "mksglu/context-mode"
+    "mksglu/context-mode",
+    "nextlevelbuilder/ui-ux-pro-max-skill"
    ],
    "median_quality": 82.5,
-   "mean_quality": 80.0,
-   "pct_with_when": 89.8,
-   "pct_uses_refs": 22.4,
+   "mean_quality": 81.2,
+   "pct_with_when": 77.4,
+   "pct_uses_refs": 19.4,
    "top_flags": [
     [
      "no-anti-trigger",
-     47
+     60
     ],
     [
      "output-format-unstated",
-     44
+     54
+    ],
+    [
+     "no-when-trigger",
+     14
     ],
     [
      "nonstandard-frontmatter",
      10
-    ],
-    [
-     "no-when-trigger",
-     5
     ],
     [
      "no-progressive-disclosure",
@@ -323,7 +325,7 @@
     "D": 1
    },
    "signature": "canonical-reference",
-   "signature_rationale": "18 skills \u2192 domain-pack by scale; official org + high consistent quality (median 89, stdev 13.1) \u2192 promoted to canonical-reference",
+   "signature_rationale": "18 skills \u2192 domain-pack by scale; official org + high consistent quality (median 89, stdev 13.1, WHEN 89%) \u2192 promoted to canonical-reference",
    "pct_with_when": 88.9,
    "pct_uses_refs": 27.8,
    "top_flags": [
@@ -395,7 +397,7 @@
     "D": 1
    },
    "signature": "canonical-reference",
-   "signature_rationale": "24 skills \u2192 domain-pack by scale; official org + high consistent quality (median 86, stdev 11.1) \u2192 promoted to canonical-reference",
+   "signature_rationale": "24 skills \u2192 domain-pack by scale; official org + high consistent quality (median 86, stdev 11.1, WHEN 71%) \u2192 promoted to canonical-reference",
    "pct_with_when": 70.8,
    "pct_uses_refs": 45.8,
    "top_flags": [
@@ -1106,7 +1108,7 @@
     "B": 7
    },
    "signature": "canonical-reference",
-   "signature_rationale": "25 skills \u2192 domain-pack by scale; official org + high consistent quality (median 88, stdev 7.6) \u2192 promoted to canonical-reference",
+   "signature_rationale": "25 skills \u2192 domain-pack by scale; official org + high consistent quality (median 88, stdev 7.6, WHEN 88%) \u2192 promoted to canonical-reference",
    "pct_with_when": 88.0,
    "pct_uses_refs": 52.0,
    "top_flags": [
@@ -1281,7 +1283,7 @@
     "B": 2
    },
    "signature": "canonical-reference",
-   "signature_rationale": "7 skills \u2192 boutique by scale; official org + high consistent quality (median 85, stdev 3.4) \u2192 promoted to canonical-reference",
+   "signature_rationale": "7 skills \u2192 boutique by scale; official org + high consistent quality (median 85, stdev 3.4, WHEN 100%) \u2192 promoted to canonical-reference",
    "pct_with_when": 100.0,
    "pct_uses_refs": 57.1,
    "top_flags": [
@@ -1558,7 +1560,7 @@
     "B": 9
    },
    "signature": "canonical-reference",
-   "signature_rationale": "44 skills \u2192 domain-pack by scale; official org + high consistent quality (median 92, stdev 5.2) \u2192 promoted to canonical-reference",
+   "signature_rationale": "44 skills \u2192 domain-pack by scale; official org + high consistent quality (median 92, stdev 5.2, WHEN 93%) \u2192 promoted to canonical-reference",
    "pct_with_when": 93.2,
    "pct_uses_refs": 45.5,
    "top_flags": [
@@ -1686,6 +1688,68 @@
     [
      "nonstandard-frontmatter",
      7
+    ]
+   ]
+  },
+  "vercel-labs/agent-skills": {
+   "n_skills": 9,
+   "stars": 28423,
+   "owner_type": "Organization",
+   "source": "domain-collection",
+   "median_quality": 87.5,
+   "mean_quality": 81.4,
+   "quality_stdev": 15.5,
+   "grade_dist": {
+    "A": 7,
+    "D": 2
+   },
+   "signature": "canonical-reference",
+   "signature_rationale": "9 skills \u2192 boutique by scale; official org + high consistent quality (median 88, stdev 15.5, WHEN 78%) \u2192 promoted to canonical-reference",
+   "pct_with_when": 77.8,
+   "pct_uses_refs": 22.2,
+   "top_flags": [
+    [
+     "no-anti-trigger",
+     6
+    ],
+    [
+     "output-format-unstated",
+     5
+    ],
+    [
+     "missing-description",
+     2
+    ]
+   ]
+  },
+  "nextlevelbuilder/ui-ux-pro-max-skill": {
+   "n_skills": 13,
+   "stars": 97386,
+   "owner_type": "Organization",
+   "source": "single-skill",
+   "median_quality": 85.0,
+   "mean_quality": 85.8,
+   "quality_stdev": 6.3,
+   "grade_dist": {
+    "A": 8,
+    "B": 5
+   },
+   "signature": "boutique",
+   "signature_rationale": "13 skills \u2192 boutique by scale",
+   "pct_with_when": 30.8,
+   "pct_uses_refs": 7.7,
+   "top_flags": [
+    [
+     "no-anti-trigger",
+     13
+    ],
+    [
+     "output-format-unstated",
+     10
+    ],
+    [
+     "no-when-trigger",
+     9
     ]
    ]
   }
@@ -112344,6 +112408,491 @@
    ],
    "desc_words": 18,
    "body_words": 142,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "vercel-labs/agent-skills",
+   "file_path": "skills/composition-patterns/SKILL.md",
+   "name": "vercel-composition-patterns",
+   "overall": 53.0,
+   "grade": "D",
+   "scores": {
+    "frontmatter": 62,
+    "triggering": 0,
+    "disclosure": 75,
+    "structure": 90
+   },
+   "flags": [
+    "missing-description",
+    "output-format-unstated"
+   ],
+   "desc_words": 0,
+   "body_words": 332,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "vercel-labs/agent-skills",
+   "file_path": "skills/deploy-to-vercel/SKILL.md",
+   "name": "deploy-to-vercel",
+   "overall": 87.5,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 85,
+    "disclosure": 60,
+    "structure": 100
+   },
+   "flags": [
+    "no-anti-trigger"
+   ],
+   "desc_words": 31,
+   "body_words": 1719,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "vercel-labs/agent-skills",
+   "file_path": "skills/react-best-practices/SKILL.md",
+   "name": "vercel-react-best-practices",
+   "overall": 86.0,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 92,
+    "triggering": 85,
+    "disclosure": 75,
+    "structure": 90
+   },
+   "flags": [
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 41,
+   "body_words": 895,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "vercel-labs/agent-skills",
+   "file_path": "skills/react-native-skills/SKILL.md",
+   "name": "vercel-react-native-skills",
+   "overall": 53.0,
+   "grade": "D",
+   "scores": {
+    "frontmatter": 62,
+    "triggering": 0,
+    "disclosure": 75,
+    "structure": 90
+   },
+   "flags": [
+    "missing-description",
+    "output-format-unstated"
+   ],
+   "desc_words": 0,
+   "body_words": 523,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "vercel-labs/agent-skills",
+   "file_path": "skills/react-view-transitions/SKILL.md",
+   "name": "vercel-react-view-transitions",
+   "overall": 91.0,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 92,
+    "triggering": 85,
+    "disclosure": 100,
+    "structure": 90
+   },
+   "flags": [
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 80,
+   "body_words": 1471,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 3
+  },
+  {
+   "repo": "vercel-labs/agent-skills",
+   "file_path": "skills/vercel-cli-with-tokens/SKILL.md",
+   "name": "vercel-cli-with-tokens",
+   "overall": 92.0,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 100,
+    "disclosure": 60,
+    "structure": 100
+   },
+   "flags": [
+    "output-format-unstated"
+   ],
+   "desc_words": 35,
+   "body_words": 1495,
+   "desc_has_when": true,
+   "desc_has_anti": true,
+   "ref_files": 0
+  },
+  {
+   "repo": "vercel-labs/agent-skills",
+   "file_path": "skills/vercel-optimize/SKILL.md",
+   "name": "vercel-optimize",
+   "overall": 95.5,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 85,
+    "disclosure": 100,
+    "structure": 100
+   },
+   "flags": [
+    "no-anti-trigger"
+   ],
+   "desc_words": 73,
+   "body_words": 2049,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 11
+  },
+  {
+   "repo": "vercel-labs/agent-skills",
+   "file_path": "skills/web-design-guidelines/SKILL.md",
+   "name": "web-design-guidelines",
+   "overall": 87.5,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 85,
+    "disclosure": 60,
+    "structure": 100
+   },
+   "flags": [
+    "no-anti-trigger"
+   ],
+   "desc_words": 28,
+   "body_words": 136,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "vercel-labs/agent-skills",
+   "file_path": "skills/writing-guidelines/SKILL.md",
+   "name": "writing-guidelines",
+   "overall": 87.5,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 85,
+    "disclosure": 60,
+    "structure": 100
+   },
+   "flags": [
+    "no-anti-trigger"
+   ],
+   "desc_words": 31,
+   "body_words": 134,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "file_path": ".claude/skills/banner-design/SKILL.md",
+   "name": "banner-design",
+   "overall": 82.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 50,
+    "disclosure": 85,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 56,
+   "body_words": 1043,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "file_path": ".claude/skills/brand/SKILL.md",
+   "name": "brand",
+   "overall": 85.0,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 50,
+    "disclosure": 100,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 23,
+   "body_words": 307,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "file_path": ".claude/skills/design-system/SKILL.md",
+   "name": "design-system",
+   "overall": 95.5,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 85,
+    "disclosure": 100,
+    "structure": 100
+   },
+   "flags": [
+    "no-anti-trigger"
+   ],
+   "desc_words": 27,
+   "body_words": 795,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "file_path": ".claude/skills/design/SKILL.md",
+   "name": "design",
+   "overall": 85.0,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 50,
+    "disclosure": 100,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 76,
+   "body_words": 1455,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "file_path": ".claude/skills/slides/SKILL.md",
+   "name": "slides",
+   "overall": 77.5,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 50,
+    "disclosure": 100,
+    "structure": 70
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 16,
+   "body_words": 107,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "file_path": ".claude/skills/ui-styling/SKILL.md",
+   "name": "ui-styling",
+   "overall": 90.5,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 85,
+    "disclosure": 75,
+    "structure": 100
+   },
+   "flags": [
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 59,
+   "body_words": 1074,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "file_path": ".claude/skills/ui-ux-pro-max/SKILL.md",
+   "name": "ui-ux-pro-max",
+   "overall": 79.5,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 90,
+    "triggering": 40,
+    "disclosure": 100,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger"
+   ],
+   "desc_words": 119,
+   "body_words": 6560,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 1
+  },
+  {
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "file_path": "cli/assets/skills/banner-design/SKILL.md",
+   "name": "banner-design",
+   "overall": 82.0,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 50,
+    "disclosure": 85,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 56,
+   "body_words": 1043,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "file_path": "cli/assets/skills/brand/SKILL.md",
+   "name": "brand",
+   "overall": 85.0,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 50,
+    "disclosure": 100,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 23,
+   "body_words": 307,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "file_path": "cli/assets/skills/design-system/SKILL.md",
+   "name": "design-system",
+   "overall": 95.5,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 85,
+    "disclosure": 100,
+    "structure": 100
+   },
+   "flags": [
+    "no-anti-trigger"
+   ],
+   "desc_words": 27,
+   "body_words": 795,
+   "desc_has_when": true,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "file_path": "cli/assets/skills/design/SKILL.md",
+   "name": "design",
+   "overall": 85.0,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 50,
+    "disclosure": 100,
+    "structure": 100
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 76,
+   "body_words": 1455,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "file_path": "cli/assets/skills/slides/SKILL.md",
+   "name": "slides",
+   "overall": 77.5,
+   "grade": "B",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 50,
+    "disclosure": 100,
+    "structure": 70
+   },
+   "flags": [
+    "no-when-trigger",
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 16,
+   "body_words": 107,
+   "desc_has_when": false,
+   "desc_has_anti": false,
+   "ref_files": 0
+  },
+  {
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "file_path": "cli/assets/skills/ui-styling/SKILL.md",
+   "name": "ui-styling",
+   "overall": 95.5,
+   "grade": "A",
+   "scores": {
+    "frontmatter": 100,
+    "triggering": 85,
+    "disclosure": 100,
+    "structure": 100
+   },
+   "flags": [
+    "no-anti-trigger",
+    "output-format-unstated"
+   ],
+   "desc_words": 59,
+   "body_words": 1074,
    "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0

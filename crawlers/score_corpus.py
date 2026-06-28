@@ -84,6 +84,7 @@ def main():
         ov = [r['overall'] for r in recs]
         med = st.median(ov)
         std = st.pstdev(ov) if len(ov) > 1 else 0.0
+        when_rate = 100 * sum(r['desc_has_when'] for r in recs) / len(recs)
         meta = repo_meta[rn]
         sig = classify_repo({
             'n_skills': len(recs),
@@ -91,6 +92,7 @@ def main():
             'stars': meta['stars'],
             'median_quality': med,
             'quality_stdev': std,
+            'pct_with_when': when_rate,
             'source': meta['source'],
         })
         # flag frequency in this repo

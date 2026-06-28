@@ -38,23 +38,28 @@ def classify_repo(stats):
     med = stats.get('median_quality')
     std = stats.get('quality_stdev')
     source = stats.get('source') or ''
+    when = stats.get('pct_with_when')
 
     sig = _bucket_by_scale(n)
     rationale = [f'{n} skills → {sig} by scale']
     confidence = 0.7
 
     # Promotion to canonical-reference: official org, curated size, high &
-    # consistent quality. This is what makes anthropics/openai different from
-    # an equally-sized but sloppy domain-pack.
+    # consistent quality — AND strong triggering discipline. The defining trait
+    # of the gold standard is that its skills say WHEN to use them; a tidy,
+    # org-owned repo with poor triggers (e.g. a popular single design skill) is
+    # NOT canonical just because its heuristic scores are tight.
     is_official = (owner == 'Organization') or source == 'canonical'
     if (sig in ('domain-pack', 'boutique')
             and is_official
             and med is not None and med >= 80
-            and (std is None or std <= 18)):
+            and (std is None or std <= 18)
+            and (when is None or when >= 70)):
         sig = 'canonical-reference'
         rationale.append(
             f'official org + high consistent quality '
-            f'(median {med:.0f}, stdev {std if std is None else round(std,1)}) '
+            f'(median {med:.0f}, stdev {std if std is None else round(std,1)}, '
+            f'WHEN {when if when is None else round(when)}%) '
             f'→ promoted to canonical-reference')
         confidence = 0.85
 

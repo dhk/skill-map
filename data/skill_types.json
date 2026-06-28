@@ -1,18 +1,18 @@
 {
  "other/domain": {
-  "n": 2918,
+  "n": 2930,
   "median": 82.5,
-  "pct_when": 65.9
+  "pct_when": 65.8
  },
  "reference/guide": {
-  "n": 132,
+  "n": 133,
   "median": 80.0,
-  "pct_when": 50.8
+  "pct_when": 51.1
  },
  "generator/creator": {
-  "n": 484,
+  "n": 492,
   "median": 83.0,
-  "pct_when": 81.2
+  "pct_when": 80.7
  },
  "integration/connector": {
   "n": 140,
@@ -30,9 +30,9 @@
   "pct_when": 75.5
  },
  "workflow/orchestrator": {
-  "n": 425,
-  "median": 81.2,
-  "pct_when": 65.6
+  "n": 426,
+  "median": 81.5,
+  "pct_when": 65.7
  },
  "data/analytics": {
   "n": 248,

@@ -19,35 +19,40 @@
   "dmccreary/claude-skills",
   "deanpeters/Product-Manager-Skills",
   "flonat/claude-research",
-  "johnlindquist/claude"
+  "johnlindquist/claude",
+  "nextlevelbuilder/ui-ux-pro-max-skill"
  ],
  "elite": {
-  "license": 42,
+  "license": 43,
   "name_eq_dir": 99,
   "headings": 100,
   "code_example": 85,
-  "numbered_steps": 72,
+  "numbered_steps": 73,
   "scripts_dir": 48,
-  "ref_dir": 66,
-  "metadata": 41,
+  "ref_dir": 67,
+  "metadata": 42,
   "allowed_tools": 5,
-  "n": 1598,
+  "n": 1611,
   "top_fm_keys": [
    [
     "name",
-    1597
+    1610
    ],
    [
     "description",
-    1597
+    1610
    ],
    [
     "license",
-    678
+    686
    ],
    [
     "metadata",
-    657
+    669
+   ],
+   [
+    "argument-hint",
+    90
    ],
    [
     "version",
@@ -56,10 +61,6 @@
    [
     "allowed-tools",
     79
-   ],
-   [
-    "argument-hint",
-    78
    ],
    [
     "intent",
@@ -73,20 +74,20 @@
   "headings": 98,
   "code_example": 61,
   "numbered_steps": 75,
-  "ref_dir": 35,
+  "ref_dir": 34,
   "allowed_tools": 22,
   "metadata": 11,
   "provenance_keys": 20,
   "license": 14,
-  "n": 3355,
+  "n": 3364,
   "top_fm_keys": [
    [
     "name",
-    3341
+    3350
    ],
    [
     "description",
-    3339
+    3348
    ],
    [
     "version",
@@ -102,11 +103,11 @@
    ],
    [
     "license",
-    456
+    460
    ],
    [
     "metadata",
-    364
+    373
    ],
    [
     "source",
