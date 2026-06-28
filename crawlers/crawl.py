@@ -221,16 +221,25 @@ def next_crawl_n() -> int:
     return max(int(re.match(r"crawl-(\d+)-", n).group(1)) for n in existing) + 1
 
 
-def find_today_dir(crawl_date: str) -> Path | None:
-    # REVIEW(assumption): "one crawl per UTC day" — resumption keys purely on the
-    # date. Running two DIFFERENT crawl-lists on the same day silently appends both
-    # into one crawl dir, and the input_quality metrics / repo_outcomes written at
-    # the end reflect only the LAST list run (earlier list's outcomes are lost).
-    # If multiple lists per day is a real workflow, key the dir on list_id too.
+def list_slug(crawl_list: Optional[Path]) -> str:
+    """Stable slug for a crawl-list (its filename stem), or '' for global search.
+    Used to key the crawl dir so two different lists on the same day don't merge."""
+    if not crawl_list:
+        return ""
+    return re.sub(r"[^a-z0-9]+", "-", Path(crawl_list).stem.lower()).strip("-")
+
+
+def find_today_dir(crawl_date: str, slug: str = "") -> Path | None:
+    # Resume only the SAME input on the same UTC day: a per-list slug keeps two
+    # different crawl-lists (or a list vs global) from appending into one dir and
+    # clobbering each other's input_quality metrics. Exact-suffix match so a
+    # global (no-slug) run never resumes a slugged dir, and vice-versa.
     if not CRAWLS_DIR.exists():
         return None
+    suffix = f"-{slug}" if slug else ""
+    pat = re.compile(rf"^crawl-\d+-{re.escape(crawl_date)}{re.escape(suffix)}$")
     for d in CRAWLS_DIR.iterdir():
-        if d.is_dir() and re.match(rf"crawl-\d+-{re.escape(crawl_date)}", d.name):
+        if d.is_dir() and pat.match(d.name):
             return d
     return None
 
@@ -542,15 +551,16 @@ def crawl(
 
     gh = make_gh(token)
     crawl_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    slug = list_slug(crawl_list)        # '' for global search
 
-    existing_dir = find_today_dir(crawl_date)
+    existing_dir = find_today_dir(crawl_date, slug)
     if existing_dir:
         crawl_id = existing_dir.name
         crawl_dir = existing_dir
         console.print(f"[yellow]Resuming[/yellow] existing crawl: [bold]{crawl_id}[/bold]")
     else:
         n = next_crawl_n()
-        crawl_id = f"crawl-{n}-{crawl_date}"
+        crawl_id = f"crawl-{n}-{crawl_date}" + (f"-{slug}" if slug else "")
         crawl_dir = CRAWLS_DIR / crawl_id
         crawl_dir.mkdir(parents=True, exist_ok=True)
         console.print(f"[green]Starting[/green] new crawl: [bold]{crawl_id}[/bold]")
