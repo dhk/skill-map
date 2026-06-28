@@ -43,14 +43,15 @@ real figure, a dataset, and a reproducible command — not just opinion.
   curated/individual repos rise (they originate).
 - **Backed by:** lineage ancestry + the concept index in `audit_repo.py` +
   negative-space nodes already in the map.
-- **Needs (small):** an `originator_leaderboard` rollup from `lineage.json` —
-  the data exists; it's one script.
+- **Built:** `crawlers/originator_leaderboard.py` → [originators.md](originators.md).
+  anthropics (163) & openai (93) top it on ancestor credit; mega-collections
+  drop off — they aggregate, they don't invent.
 
 ## 3. "Who's Doing the Best Work? A Quality Census"
 **Thesis:** quality is concentrated, and popularity doesn't predict it.
 
-- **Hook:** corpus median 79.8/100; quality dips in mega-collections (77% of
-  all skills, median 78) vs curated repos at 85. Stars (r=0.16),
+- **Hook:** corpus median 82.5/100; quality dips in mega-collections (77% of
+  all skills, median 80) vs curated/canonical repos at 85–90. Stars (r=0.16),
   recency (0.10), and commit count (−0.002) **all fail to predict quality**.
 - **The reveal:** the repo *signature* predicts quality; nothing else does.
 - **Backed by:** the signature study (`what-i-learned-crawling-39-repos.md`),

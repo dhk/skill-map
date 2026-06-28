@@ -79,5 +79,5 @@ Copies that diverged — usually one repo kept the reference/script files and th
 
 ## 🆕 New since last crawl (crawl-3-2026-06-28)
 
-- **+0** skills added, **1** changed, **0** removed.
+- **+0** skills added, **1** changed, **129** removed.
 - Biggest movers: `anthropics/claude-api` (score +0, +3533 words)

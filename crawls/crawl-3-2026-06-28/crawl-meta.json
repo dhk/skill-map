@@ -1,32 +1,25 @@
 {
   "crawl_id": "crawl-3-2026-06-28",
-  "status": "complete",
+  "status": "running",
   "crawl_date": "2026-06-28",
   "queries_run": [
-    "crawl-list:recrawl-anthropics.md"
+    "crawl-list:recrawl-mega.md"
   ],
-  "total_repos": 1,
-  "total_files": 18,
+  "total_repos": 3,
+  "total_files": 1056,
   "errors": 0,
   "repo_breakdown": {
     "anthropics/skills": {
       "skills": 18,
       "errors": 0
-    }
-  },
-  "input_quality": {
-    "list_id": "recrawl-anthropics-001",
-    "list_source": "drift-check",
-    "repos_in_list": 1,
-    "repos_found_skills": 1,
-    "repos_empty": 0,
-    "repos_not_found": 0,
-    "repos_error": 0,
-    "hit_rate": 1.0,
-    "skills_per_hit_repo": 18.0,
-    "total_skills": 18,
-    "outcomes": {
-      "anthropics/skills": "found"
+    },
+    "alirezarezvani/claude-skills": {
+      "skills": 763,
+      "errors": 0
+    },
+    "borghei/claude-skills": {
+      "skills": 275,
+      "errors": 0
     }
   }
 }

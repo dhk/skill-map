@@ -11,16 +11,19 @@ content + `file_sha` per file). Snapshots are never mutated — re-crawling crea
 a new one. Every downstream tool reads **all** snapshots and merges them
 (newest `file_sha` wins per `(repo, file_path)`), so the corpus only grows.
 
-## The pipeline (run after any crawl)
+## One command rebuilds everything
 
 ```bash
-python crawlers/crawl.py crawl --crawl-list <list.md|json>   # 1. new snapshot
-python crawlers/fetch_siblings.py                            # 2. folder contents
-python crawlers/score_corpus.py                              # 3. re-score everything
-python crawlers/track_history.py                             # 4. per-skill timeline + delta
-python crawlers/lineage_trace.py                             # 5. copy/lineage (if repos overlap)
-python crawlers/curiosities.py                               # 6. the oddities report
+python crawlers/run_pipeline.py                  # rebuild all findings from snapshots
+python crawlers/run_pipeline.py --crawl LIST     # crawl first, then rebuild
+python crawlers/run_pipeline.py --fast           # skip slow network stages
 ```
+
+`run_pipeline.py` chains every stage in order so no derived artifact is ever left
+stale: siblings → score → types → history → lineage → originators → curiosities →
+figures (copy-network, sankey) → lineage.html → map badges → **STATS.md** →
+**check_docs** (warns if any narrative doc's headline numbers drifted). Stages are
+idempotent and read from the immutable snapshots, so the whole thing is replayable.
 
 | Stage | Tool | Produces | Idempotent? |
 |---|---|---|---|

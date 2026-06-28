@@ -739,7 +739,7 @@
   },
   "alirezarezvani/claude-skills": {
    "n_skills": 345,
-   "stars": 18963,
+   "stars": 19235,
    "owner_type": "User",
    "source": "domain-collection",
    "median_quality": 90.5,
@@ -780,7 +780,7 @@
   },
   "borghei/claude-skills": {
    "n_skills": 340,
-   "stars": 300,
+   "stars": 315,
    "owner_type": "User",
    "source": "domain-collection",
    "median_quality": 90.0,

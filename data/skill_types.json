@@ -1,47 +1,47 @@
 {
  "other/domain": {
-  "n": 2881,
+  "n": 2918,
+  "median": 82.5,
+  "pct_when": 65.9
+ },
+ "reference/guide": {
+  "n": 132,
   "median": 80.0,
-  "pct_when": 66.4
+  "pct_when": 50.8
  },
  "generator/creator": {
-  "n": 481,
-  "median": 80.5,
-  "pct_when": 81.7
+  "n": 484,
+  "median": 83.0,
+  "pct_when": 81.2
  },
- "workflow/orchestrator": {
-  "n": 422,
-  "median": 78.0,
-  "pct_when": 65.9
+ "integration/connector": {
+  "n": 140,
+  "median": 80.0,
+  "pct_when": 70.0
+ },
+ "test/quality": {
+  "n": 233,
+  "median": 80.0,
+  "pct_when": 67.8
  },
  "reviewer/auditor": {
   "n": 326,
-  "median": 79.5,
+  "median": 82.5,
   "pct_when": 75.5
  },
+ "workflow/orchestrator": {
+  "n": 425,
+  "median": 81.2,
+  "pct_when": 65.6
+ },
  "data/analytics": {
-  "n": 246,
-  "median": 78.0,
-  "pct_when": 70.3
- },
- "test/quality": {
-  "n": 232,
-  "median": 78.0,
-  "pct_when": 68.1
- },
- "integration/connector": {
-  "n": 138,
-  "median": 78.0,
-  "pct_when": 71.0
- },
- "reference/guide": {
-  "n": 129,
-  "median": 78.8,
-  "pct_when": 51.2
+  "n": 248,
+  "median": 80.0,
+  "pct_when": 69.8
  },
  "transformer/converter": {
   "n": 47,
-  "median": 82.5,
+  "median": 85.0,
   "pct_when": 72.3
  }
 }

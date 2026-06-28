@@ -1,0 +1,130 @@
+{
+ "n_skills": 4953,
+ "n_repos": 41,
+ "median_quality": 82.5,
+ "mean_quality": 80.0,
+ "pct_with_when": 68.1,
+ "pct_with_anti_trigger": 2.5,
+ "pct_uses_refs": 26.6,
+ "grade_dist": {
+  "A": 2033,
+  "B": 2100,
+  "C": 690,
+  "D": 76,
+  "F": 54
+ },
+ "flag_freq": [
+  [
+   "no-anti-trigger",
+   4807
+  ],
+  [
+   "output-format-unstated",
+   3114
+  ],
+  [
+   "no-when-trigger",
+   1559
+  ],
+  [
+   "nonstandard-frontmatter",
+   1129
+  ],
+  [
+   "thin-description",
+   388
+  ],
+  [
+   "non-slug-name",
+   368
+  ],
+  [
+   "no-progressive-disclosure",
+   97
+  ],
+  [
+   "high-stakes-no-safety",
+   92
+  ]
+ ],
+ "signatures": {
+  "canonical-reference": {
+   "n_repos": 5,
+   "n_skills": 118,
+   "median_quality": 90.0,
+   "pct_with_when": 87.3
+  },
+  "domain-pack": {
+   "n_repos": 12,
+   "n_skills": 410,
+   "median_quality": 85.0,
+   "pct_with_when": 73.2
+  },
+  "boutique": {
+   "n_repos": 6,
+   "n_skills": 49,
+   "median_quality": 82.5,
+   "pct_with_when": 89.8
+  },
+  "single-skill": {
+   "n_repos": 7,
+   "n_skills": 7,
+   "median_quality": 85.0,
+   "pct_with_when": 100.0
+  },
+  "mega-collection": {
+   "n_repos": 5,
+   "n_skills": 3775,
+   "median_quality": 80.0,
+   "pct_with_when": 63.6
+  },
+  "marketplace": {
+   "n_repos": 6,
+   "n_skills": 594,
+   "median_quality": 90.0,
+   "pct_with_when": 86.9
+  }
+ },
+ "crawls": [
+  "crawl-1-2026-06-24",
+  "crawl-2-2026-06-27",
+  "crawl-3-2026-06-28"
+ ],
+ "latest_delta": {
+  "skills_added": 0,
+  "skills_changed": 1,
+  "skills_removed": 129,
+  "repos_added": [],
+  "top_movers": [
+   [
+    "anthropics/skills\tskills/claude-api/SKILL.md",
+    0.0,
+    3533
+   ]
+  ],
+  "sample_added": []
+ },
+ "dup_clusters": 260,
+ "top_originators": [
+  [
+   "anthropics/skills",
+   163.3
+  ],
+  [
+   "openai/skills",
+   92.7
+  ],
+  [
+   "wshobson/agents",
+   39.7
+  ],
+  [
+   "johnlindquist/claude",
+   24.8
+  ],
+  [
+   "foxj77/claude-code-skills",
+   20.0
+  ]
+ ]
+}
