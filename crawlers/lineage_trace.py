@@ -24,7 +24,7 @@ import hashlib
 import urllib.request
 import urllib.parse
 from pathlib import Path
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 sys.path.insert(0, str(Path(__file__).parent))
 from score_corpus import load_all_crawls   # canonical merged-corpus loader
@@ -217,7 +217,6 @@ def main():
     bulk = set()
     for r, days in repo_days.items():
         if len(days) >= 3:
-            from collections import Counter
             if Counter(days).most_common(1)[0][1] / len(days) > 0.5:
                 bulk.add(r)
 

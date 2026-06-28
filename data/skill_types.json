@@ -2,7 +2,7 @@
  "other/domain": {
   "n": 2930,
   "median": 82.5,
-  "pct_when": 65.8
+  "pct_when": 67.0
  },
  "reference/guide": {
   "n": 133,
@@ -12,12 +12,12 @@
  "generator/creator": {
   "n": 492,
   "median": 83.0,
-  "pct_when": 80.7
+  "pct_when": 81.9
  },
  "integration/connector": {
   "n": 140,
   "median": 80.0,
-  "pct_when": 70.0
+  "pct_when": 70.7
  },
  "test/quality": {
   "n": 233,
@@ -26,18 +26,18 @@
  },
  "reviewer/auditor": {
   "n": 326,
-  "median": 82.5,
-  "pct_when": 75.5
+  "median": 83.0,
+  "pct_when": 77.0
  },
  "workflow/orchestrator": {
   "n": 426,
-  "median": 81.5,
-  "pct_when": 65.7
+  "median": 82.2,
+  "pct_when": 66.9
  },
  "data/analytics": {
   "n": 248,
   "median": 80.0,
-  "pct_when": 69.8
+  "pct_when": 70.6
  },
  "transformer/converter": {
   "n": 47,

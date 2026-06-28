@@ -56,6 +56,7 @@ STAGES = [
     ('render_sankey.py', [], False, False),
     ('build_lineage_page.py', [], False, False),
     ('patch_map_badges.py', [], False, False),
+    ('count_skills.py', [], False, False),     # unique-skill funnel → gen_stats reads it
     ('gen_stats.py', [], False, False),
     ('check_docs.py', [], False, False),
 ]

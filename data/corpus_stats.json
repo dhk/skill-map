@@ -1,22 +1,26 @@
 {
  "n_skills": 4975,
  "n_repos": 43,
+ "unique_skills": 3769,
+ "distinct_exact_bodies": 3846,
+ "distinct_concepts": 2681,
+ "duplicate_share_pct": 24.2,
  "median_quality": 82.5,
- "mean_quality": 80.0,
- "pct_with_when": 68.0,
+ "mean_quality": 80.2,
+ "pct_with_when": 69.0,
  "pct_with_anti_trigger": 2.5,
  "pct_uses_refs": 26.6,
  "grade_dist": {
-  "A": 2048,
-  "B": 2105,
-  "C": 690,
-  "D": 78,
+  "A": 2095,
+  "B": 2072,
+  "C": 681,
+  "D": 73,
   "F": 54
  },
  "flag_freq": [
   [
    "no-anti-trigger",
-   4826
+   4829
   ],
   [
    "output-format-unstated",
@@ -24,15 +28,15 @@
   ],
   [
    "no-when-trigger",
-   1568
+   1519
   ],
   [
    "nonstandard-frontmatter",
-   1129
+   1130
   ],
   [
    "thin-description",
-   388
+   384
   ],
   [
    "non-slug-name",
@@ -52,7 +56,7 @@
    "n_repos": 6,
    "n_skills": 127,
    "median_quality": 90.0,
-   "pct_with_when": 86.6
+   "pct_with_when": 88.2
   },
   "domain-pack": {
    "n_repos": 12,
@@ -76,7 +80,7 @@
    "n_repos": 5,
    "n_skills": 3775,
    "median_quality": 80.0,
-   "pct_with_when": 63.6
+   "pct_with_when": 65.0
   },
   "marketplace": {
    "n_repos": 6,
@@ -123,7 +127,7 @@
    "nextlevelbuilder/ui-ux-pro-max-skill\t.claude/skills/ui-styling/SKILL.md"
   ]
  },
- "dup_clusters": 260,
+ "dup_clusters": 261,
  "top_originators": [
   [
    "anthropics/skills",

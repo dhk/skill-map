@@ -3,21 +3,21 @@
   "n_skills": 4975,
   "n_repos": 43,
   "median_quality": 82.5,
-  "mean_quality": 80.0,
+  "mean_quality": 80.2,
   "grade_dist": {
-   "A": 2048,
-   "B": 2105,
-   "C": 690,
-   "D": 78,
+   "A": 2095,
+   "B": 2072,
+   "C": 681,
+   "D": 73,
    "F": 54
   },
-  "pct_with_when": 68.0,
+  "pct_with_when": 69.0,
   "pct_with_anti_trigger": 2.5,
   "pct_uses_refs": 26.6,
   "flag_freq": [
    [
     "no-anti-trigger",
-    4826
+    4829
    ],
    [
     "output-format-unstated",
@@ -25,15 +25,15 @@
    ],
    [
     "no-when-trigger",
-    1568
+    1519
    ],
    [
     "nonstandard-frontmatter",
-    1129
+    1130
    ],
    [
     "thin-description",
-    388
+    384
    ],
    [
     "non-slug-name",
@@ -53,7 +53,7 @@
    ],
    [
     "missing-description",
-    24
+    21
    ],
    [
     "missing-name",
@@ -74,13 +74,13 @@
     "vercel-labs/agent-skills"
    ],
    "median_quality": 90.0,
-   "mean_quality": 86.9,
-   "pct_with_when": 86.6,
+   "mean_quality": 87.5,
+   "pct_with_when": 88.2,
    "pct_uses_refs": 43.3,
    "top_flags": [
     [
      "no-anti-trigger",
-     112
+     114
     ],
     [
      "output-format-unstated",
@@ -237,13 +237,13 @@
     "BbgnsurfTech/claude-skills-collection"
    ],
    "median_quality": 80.0,
-   "mean_quality": 78.6,
-   "pct_with_when": 63.6,
+   "mean_quality": 78.8,
+   "pct_with_when": 65.0,
    "pct_uses_refs": 23.1,
    "top_flags": [
     [
      "no-anti-trigger",
-     3678
+     3679
     ],
     [
      "output-format-unstated",
@@ -251,15 +251,15 @@
     ],
     [
      "no-when-trigger",
-     1354
+     1305
     ],
     [
      "nonstandard-frontmatter",
-     914
+     915
     ],
     [
      "thin-description",
-     374
+     370
     ],
     [
      "non-slug-name",
@@ -1303,18 +1303,18 @@
    "owner_type": "User",
    "source": "domain-collection",
    "median_quality": 65.8,
-   "mean_quality": 66.8,
+   "mean_quality": 66.9,
    "quality_stdev": 13.2,
    "grade_dist": {
-    "A": 107,
-    "B": 274,
+    "A": 108,
+    "B": 275,
     "C": 412,
-    "D": 50,
+    "D": 48,
     "F": 38
    },
    "signature": "mega-collection",
    "signature_rationale": "881 skills \u2192 mega-collection by scale",
-   "pct_with_when": 21.7,
+   "pct_with_when": 22.0,
    "pct_uses_refs": 5.7,
    "top_flags": [
     [
@@ -1323,7 +1323,7 @@
     ],
     [
      "no-when-trigger",
-     685
+     682
     ],
     [
      "output-format-unstated",
@@ -1335,7 +1335,7 @@
     ],
     [
      "thin-description",
-     364
+     362
     ]
    ]
   },
@@ -1419,22 +1419,22 @@
    "source": "domain-collection",
    "median_quality": 81.8,
    "mean_quality": 80.4,
-   "quality_stdev": 9.6,
+   "quality_stdev": 9.5,
    "grade_dist": {
     "A": 324,
-    "B": 414,
+    "B": 415,
     "C": 126,
-    "D": 6,
+    "D": 5,
     "F": 2
    },
    "signature": "mega-collection",
    "signature_rationale": "872 skills \u2192 mega-collection by scale",
-   "pct_with_when": 62.4,
+   "pct_with_when": 62.5,
    "pct_uses_refs": 31.2,
    "top_flags": [
     [
      "no-anti-trigger",
-     851
+     852
     ],
     [
      "output-format-unstated",
@@ -1446,7 +1446,7 @@
     ],
     [
      "nonstandard-frontmatter",
-     286
+     287
     ],
     [
      "non-slug-name",
@@ -1584,17 +1584,17 @@
    "owner_type": "User",
    "source": "domain-collection",
    "median_quality": 80.0,
-   "mean_quality": 80.1,
+   "mean_quality": 80.6,
    "quality_stdev": 7.2,
    "grade_dist": {
-    "A": 282,
-    "B": 986,
-    "C": 60,
+    "A": 326,
+    "B": 951,
+    "C": 51,
     "D": 9
    },
    "signature": "mega-collection",
    "signature_rationale": "1337 skills \u2192 mega-collection by scale",
-   "pct_with_when": 80.0,
+   "pct_with_when": 83.4,
    "pct_uses_refs": 10.2,
    "top_flags": [
     [
@@ -1611,7 +1611,7 @@
     ],
     [
      "no-when-trigger",
-     262
+     216
     ],
     [
      "nonstandard-frontmatter",
@@ -1697,28 +1697,23 @@
    "owner_type": "Organization",
    "source": "domain-collection",
    "median_quality": 87.5,
-   "mean_quality": 81.4,
-   "quality_stdev": 15.5,
+   "mean_quality": 88.8,
+   "quality_stdev": 3.1,
    "grade_dist": {
-    "A": 7,
-    "D": 2
+    "A": 9
    },
    "signature": "canonical-reference",
-   "signature_rationale": "9 skills \u2192 boutique by scale; official org + high consistent quality (median 88, stdev 15.5, WHEN 78%) \u2192 promoted to canonical-reference",
-   "pct_with_when": 77.8,
+   "signature_rationale": "9 skills \u2192 boutique by scale; official org + high consistent quality (median 88, stdev 3.1, WHEN 100%) \u2192 promoted to canonical-reference",
+   "pct_with_when": 100.0,
    "pct_uses_refs": 22.2,
    "top_flags": [
     [
      "no-anti-trigger",
-     6
+     8
     ],
     [
      "output-format-unstated",
      5
-    ],
-    [
-     "missing-description",
-     2
     ]
    ]
   },
@@ -30602,7 +30597,7 @@
    "flags": [
     "no-anti-trigger"
    ],
-   "desc_words": 29,
+   "desc_words": 31,
    "body_words": 1216,
    "desc_has_when": true,
    "desc_has_anti": false,
@@ -43478,25 +43473,23 @@
    "repo": "affaan-m/ECC",
    "file_path": "docs/ja-JP/skills/energy-procurement/SKILL.md",
    "name": "energy-procurement",
-   "overall": 50.7,
-   "grade": "D",
+   "overall": 75.0,
+   "grade": "B",
    "scores": {
     "frontmatter": 90,
-    "triggering": 4,
+    "triggering": 85,
     "disclosure": 35,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
-    "thin-description",
     "no-anti-trigger",
     "no-progressive-disclosure",
     "nonstandard-frontmatter",
     "output-format-unstated"
    ],
-   "desc_words": 1,
+   "desc_words": 63,
    "body_words": 4308,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -44372,25 +44365,23 @@
    "repo": "affaan-m/ECC",
    "file_path": "docs/ja-JP/skills/inventory-demand-planning/SKILL.md",
    "name": "inventory-demand-planning",
-   "overall": 50.7,
-   "grade": "D",
+   "overall": 75.0,
+   "grade": "B",
    "scores": {
     "frontmatter": 90,
-    "triggering": 4,
+    "triggering": 85,
     "disclosure": 35,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
-    "thin-description",
     "no-anti-trigger",
     "no-progressive-disclosure",
     "nonstandard-frontmatter",
     "output-format-unstated"
    ],
-   "desc_words": 1,
+   "desc_words": 58,
    "body_words": 3628,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -53418,22 +53409,21 @@
    "repo": "affaan-m/ECC",
    "file_path": "skills/accessibility/SKILL.md",
    "name": "accessibility",
-   "overall": 71.5,
-   "grade": "B",
+   "overall": 85.0,
+   "grade": "A",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 60,
     "structure": 90
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 12,
+   "desc_words": 31,
    "body_words": 754,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -66628,10 +66618,10 @@
    "repo": "davila7/claude-code-templates",
    "file_path": "cli-tool/components/skills/development/agirails-agent-payments/SKILL.md",
    "name": "agirails-agent-payments",
-   "overall": 49.5,
+   "overall": 48.2,
    "grade": "D",
    "scores": {
-    "frontmatter": 70,
+    "frontmatter": 65,
     "triggering": 0,
     "disclosure": 35,
     "structure": 100
@@ -66639,6 +66629,7 @@
    "flags": [
     "missing-description",
     "no-progressive-disclosure",
+    "nonstandard-frontmatter",
     "output-format-unstated"
    ],
    "desc_words": 0,
@@ -67108,11 +67099,11 @@
    "repo": "davila7/claude-code-templates",
    "file_path": "cli-tool/components/skills/development/bash-pro/SKILL.md",
    "name": "bash-pro",
-   "overall": 59.0,
+   "overall": 62.0,
    "grade": "C",
    "scores": {
     "frontmatter": 80,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 35,
     "structure": 80
    },
@@ -67122,7 +67113,7 @@
     "no-progressive-disclosure",
     "nonstandard-frontmatter"
    ],
-   "desc_words": 9,
+   "desc_words": 21,
    "body_words": 2493,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -69462,21 +69453,21 @@
    "repo": "davila7/claude-code-templates",
    "file_path": "cli-tool/components/skills/development/mermaid-diagram-specialist/SKILL.md",
    "name": "mermaid-diagram-specialist",
-   "overall": 49.5,
-   "grade": "D",
+   "overall": 79.5,
+   "grade": "B",
    "scores": {
-    "frontmatter": 50,
-    "triggering": 0,
+    "frontmatter": 80,
+    "triggering": 75,
     "disclosure": 60,
     "structure": 100
    },
    "flags": [
-    "missing-description",
+    "no-anti-trigger",
     "nonstandard-frontmatter"
    ],
-   "desc_words": 0,
+   "desc_words": 12,
    "body_words": 1779,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -69873,11 +69864,11 @@
    "repo": "davila7/claude-code-templates",
    "file_path": "cli-tool/components/skills/development/php-pro/SKILL.md",
    "name": "php-pro",
-   "overall": 64.0,
+   "overall": 67.0,
    "grade": "C",
    "scores": {
     "frontmatter": 80,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 60,
     "structure": 80
    },
@@ -69886,7 +69877,7 @@
     "no-anti-trigger",
     "nonstandard-frontmatter"
    ],
-   "desc_words": 9,
+   "desc_words": 20,
    "body_words": 331,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -73345,11 +73336,11 @@
    "repo": "davila7/claude-code-templates",
    "file_path": "cli-tool/components/skills/productivity/debugger/SKILL.md",
    "name": "debugger",
-   "overall": 64.0,
+   "overall": 67.0,
    "grade": "C",
    "scores": {
     "frontmatter": 80,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 60,
     "structure": 80
    },
@@ -73359,7 +73350,7 @@
     "nonstandard-frontmatter",
     "output-format-unstated"
    ],
-   "desc_words": 8,
+   "desc_words": 15,
    "body_words": 172,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -106164,22 +106155,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/classification-model-builder/skills/classification-model-builder/SKILL.md",
    "name": "building-classification-models",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 9,
+   "desc_words": 24,
    "body_words": 369,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106187,22 +106177,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/clustering-algorithm-runner/skills/clustering-algorithm-runner/SKILL.md",
    "name": "running-clustering-algorithms",
-   "overall": 67.5,
-   "grade": "C",
+   "overall": 81.0,
+   "grade": "B",
    "scores": {
     "frontmatter": 92,
-    "triggering": 15,
+    "triggering": 60,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 8,
+   "desc_words": 21,
    "body_words": 384,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106210,22 +106199,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/computer-vision-processor/skills/computer-vision-processor/SKILL.md",
    "name": "processing-computer-vision-tasks",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 8,
+   "desc_words": 20,
    "body_words": 339,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106233,21 +106221,20 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/data-preprocessing-pipeline/skills/data-preprocessing-pipeline/SKILL.md",
    "name": "preprocessing-data-with-automated-pipelines",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 9,
+   "desc_words": 21,
    "body_words": 423,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106255,22 +106242,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/data-visualization-creator/skills/data-visualization-creator/SKILL.md",
    "name": "creating-data-visualizations",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 20,
    "body_words": 308,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106278,21 +106264,20 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/dataset-splitter/skills/dataset-splitter/SKILL.md",
    "name": "splitting-datasets",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 11,
+   "desc_words": 22,
    "body_words": 323,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106300,22 +106285,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/deep-learning-optimizer/skills/deep-learning-optimizer/SKILL.md",
    "name": "optimizing-deep-learning-models",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 11,
+   "desc_words": 30,
    "body_words": 372,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106323,22 +106307,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/experiment-tracking-setup/skills/experiment-tracking-setup/SKILL.md",
    "name": "setting-up-experiment-tracking",
-   "overall": 64.5,
-   "grade": "C",
+   "overall": 85.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 15,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 32,
    "body_words": 360,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106346,22 +106329,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/feature-engineering-toolkit/skills/feature-engineering-toolkit/SKILL.md",
    "name": "engineering-features-for-machine-learning",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 27,
    "body_words": 427,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106369,22 +106351,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/hyperparameter-tuner/skills/hyperparameter-tuner/SKILL.md",
    "name": "tuning-hyperparameters",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 9,
+   "desc_words": 29,
    "body_words": 470,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106392,21 +106373,20 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/jeremy-adk-orchestrator/skills/adk-deployment-specialist/SKILL.md",
    "name": "adk-deployment-specialist",
-   "overall": 79.0,
-   "grade": "B",
+   "overall": 92.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 100
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 11,
+   "desc_words": 31,
    "body_words": 1204,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106436,21 +106416,20 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/jeremy-gcp-starter-examples/skills/gcp-examples-expert/SKILL.md",
    "name": "gcp-examples-expert",
-   "overall": 79.0,
-   "grade": "B",
+   "overall": 92.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 100
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 9,
+   "desc_words": 32,
    "body_words": 1267,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106458,21 +106437,20 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/jeremy-genkit-pro/skills/genkit-production-expert/SKILL.md",
    "name": "genkit-production-expert",
-   "overall": 79.0,
-   "grade": "B",
+   "overall": 92.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 100
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 8,
+   "desc_words": 35,
    "body_words": 1126,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106480,22 +106458,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/jeremy-vertex-engine/skills/vertex-engine-inspector/SKILL.md",
    "name": "vertex-engine-inspector",
-   "overall": 79.0,
-   "grade": "B",
+   "overall": 92.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 100
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 34,
    "body_words": 1250,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106503,22 +106480,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/jeremy-vertex-validator/skills/validator-expert/SKILL.md",
    "name": "validator-expert",
-   "overall": 71.5,
-   "grade": "B",
+   "overall": 85.0,
+   "grade": "A",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 70
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 30,
    "body_words": 192,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106526,22 +106502,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/ml-model-trainer/skills/ml-model-trainer/SKILL.md",
    "name": "training-machine-learning-models",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 9,
+   "desc_words": 31,
    "body_words": 391,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106549,22 +106524,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/model-deployment-helper/skills/model-deployment-helper/SKILL.md",
    "name": "deploying-machine-learning-models",
-   "overall": 72.0,
-   "grade": "B",
+   "overall": 85.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 11,
+   "desc_words": 34,
    "body_words": 282,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106572,22 +106546,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/model-evaluation-suite/skills/model-evaluation-suite/SKILL.md",
    "name": "evaluating-machine-learning-models",
-   "overall": 67.5,
-   "grade": "C",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 15,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 11,
+   "desc_words": 39,
    "body_words": 325,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106595,22 +106568,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/model-explainability-tool/skills/model-explainability-tool/SKILL.md",
    "name": "explaining-machine-learning-models",
-   "overall": 67.5,
-   "grade": "C",
+   "overall": 81.0,
+   "grade": "B",
    "scores": {
     "frontmatter": 92,
-    "triggering": 15,
+    "triggering": 60,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 9,
+   "desc_words": 33,
    "body_words": 403,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106618,22 +106590,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/model-versioning-tracker/skills/model-versioning-tracker/SKILL.md",
    "name": "tracking-model-versions",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 12,
+   "desc_words": 38,
    "body_words": 320,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106641,22 +106612,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/neural-network-builder/skills/neural-network-builder/SKILL.md",
    "name": "building-neural-networks",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 11,
+   "desc_words": 37,
    "body_words": 363,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106664,22 +106634,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/nlp-text-analyzer/skills/nlp-text-analyzer/SKILL.md",
    "name": "analyzing-text-with-nlp",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 36,
    "body_words": 286,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106687,11 +106656,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/recommendation-engine/skills/recommendation-engine/SKILL.md",
    "name": "building-recommendation-systems",
-   "overall": 67.5,
-   "grade": "C",
+   "overall": 78.0,
+   "grade": "B",
    "scores": {
     "frontmatter": 92,
-    "triggering": 15,
+    "triggering": 50,
     "disclosure": 100,
     "structure": 80
    },
@@ -106700,7 +106669,7 @@
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 9,
+   "desc_words": 29,
    "body_words": 342,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -106710,11 +106679,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/regression-analysis-tool/skills/regression-analysis-tool/SKILL.md",
    "name": "performing-regression-analysis",
-   "overall": 67.5,
-   "grade": "C",
+   "overall": 78.0,
+   "grade": "B",
    "scores": {
     "frontmatter": 92,
-    "triggering": 15,
+    "triggering": 50,
     "disclosure": 100,
     "structure": 80
    },
@@ -106723,7 +106692,7 @@
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 30,
    "body_words": 350,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -106733,22 +106702,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/sentiment-analysis-tool/skills/sentiment-analysis-tool/SKILL.md",
    "name": "analyzing-text-sentiment",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 13,
+   "desc_words": 39,
    "body_words": 334,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106756,22 +106724,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/time-series-forecaster/skills/time-series-forecaster/SKILL.md",
    "name": "forecasting-time-series-data",
-   "overall": 67.5,
-   "grade": "C",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 15,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 11,
+   "desc_words": 40,
    "body_words": 353,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -106779,22 +106746,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/ai-ml/transfer-learning-adapter/skills/transfer-learning-adapter/SKILL.md",
    "name": "adapting-transfer-learning-models",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 36,
    "body_words": 427,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -107327,22 +107293,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/business-tools/excel-analyst-pro/skills/excel-dcf-modeler/SKILL.md",
    "name": "excel-dcf-modeler",
-   "overall": 79.0,
-   "grade": "B",
+   "overall": 92.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 100
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 11,
+   "desc_words": 34,
    "body_words": 1648,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -107350,22 +107315,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/business-tools/excel-analyst-pro/skills/excel-lbo-modeler/SKILL.md",
    "name": "excel-lbo-modeler",
-   "overall": 79.0,
-   "grade": "B",
+   "overall": 92.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 100
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 12,
+   "desc_words": 31,
    "body_words": 1654,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -107373,22 +107337,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/business-tools/excel-analyst-pro/skills/excel-pivot-wizard/SKILL.md",
    "name": "excel-pivot-wizard",
-   "overall": 79.0,
-   "grade": "B",
+   "overall": 92.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 100
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 11,
+   "desc_words": 32,
    "body_words": 1843,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -107396,22 +107359,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/business-tools/excel-analyst-pro/skills/excel-variance-analyzer/SKILL.md",
    "name": "excel-variance-analyzer",
-   "overall": 79.0,
-   "grade": "B",
+   "overall": 92.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 100
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 11,
+   "desc_words": 28,
    "body_words": 1478,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -107461,23 +107423,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/community/jeremy-firestore/skills/firestore-manager/SKILL.md",
    "name": "firestore-operations-manager",
-   "overall": 73.7,
-   "grade": "B",
+   "overall": 90.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 29,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 100
    },
    "flags": [
-    "no-when-trigger",
-    "thin-description",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 7,
+   "desc_words": 29,
    "body_words": 1609,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -108010,11 +107970,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/database/data-seeder-generator/skills/data-seeder-generator/SKILL.md",
    "name": "generating-database-seed-data",
-   "overall": 75.0,
+   "overall": 78.0,
    "grade": "B",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 100,
     "structure": 80
    },
@@ -108022,7 +107982,7 @@
     "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 11,
+   "desc_words": 35,
    "body_words": 397,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -109125,22 +109085,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/devops/secrets-manager-integrator/skills/secrets-manager-integrator/SKILL.md",
    "name": "integrating-secrets-managers",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 35,
    "body_words": 352,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -109148,22 +109107,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/devops/service-mesh-configurator/skills/service-mesh-configurator/SKILL.md",
    "name": "configuring-service-meshes",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 11,
+   "desc_words": 34,
    "body_words": 309,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -109171,22 +109129,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/devops/sugar/skills/sugar/SKILL.md",
    "name": "managing-autonomous-development",
-   "overall": 72.0,
-   "grade": "B",
+   "overall": 85.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 9,
+   "desc_words": 40,
    "body_words": 343,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -109194,11 +109151,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/devops/terraform-module-builder/skills/terraform-module-builder/SKILL.md",
    "name": "building-terraform-modules",
-   "overall": 75.0,
+   "overall": 78.0,
    "grade": "B",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 100,
     "structure": 80
    },
@@ -109207,7 +109164,7 @@
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 30,
    "body_words": 364,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -109238,22 +109195,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/examples/pi-pathfinder/skills/pi-pathfinder/SKILL.md",
    "name": "skill-adapter",
-   "overall": 80.0,
-   "grade": "B",
+   "overall": 93.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 100
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 9,
+   "desc_words": 35,
    "body_words": 919,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -109261,11 +109217,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/examples/security-agent/skills/security-agent/SKILL.md",
    "name": "performing-security-code-review",
-   "overall": 75.0,
+   "overall": 78.0,
    "grade": "B",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 100,
     "structure": 80
    },
@@ -109273,7 +109229,7 @@
     "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 11,
+   "desc_words": 34,
    "body_words": 326,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -109283,20 +109239,19 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/examples/skills-powerkit/skills/marketplace-manager/SKILL.md",
    "name": "marketplace-manager",
-   "overall": 75.7,
+   "overall": 82.0,
    "grade": "B",
    "scores": {
     "frontmatter": 100,
-    "triggering": 29,
+    "triggering": 50,
     "disclosure": 85,
     "structure": 100
    },
    "flags": [
     "no-when-trigger",
-    "thin-description",
     "no-anti-trigger"
    ],
-   "desc_words": 7,
+   "desc_words": 27,
    "body_words": 837,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -109306,11 +109261,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/examples/skills-powerkit/skills/plugin-auditor/SKILL.md",
    "name": "plugin-auditor",
-   "overall": 79.0,
+   "overall": 82.0,
    "grade": "B",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 85,
     "structure": 100
    },
@@ -109318,7 +109273,7 @@
     "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 8,
+   "desc_words": 30,
    "body_words": 1098,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -109328,11 +109283,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/examples/skills-powerkit/skills/plugin-creator/SKILL.md",
    "name": "plugin-creator",
-   "overall": 79.0,
+   "overall": 82.0,
    "grade": "B",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 85,
     "structure": 100
    },
@@ -109340,7 +109295,7 @@
     "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 9,
+   "desc_words": 30,
    "body_words": 630,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -109350,11 +109305,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/examples/skills-powerkit/skills/plugin-validator/SKILL.md",
    "name": "plugin-validator",
-   "overall": 79.0,
+   "overall": 82.0,
    "grade": "B",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 85,
     "structure": 100
    },
@@ -109362,7 +109317,7 @@
     "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 9,
+   "desc_words": 27,
    "body_words": 807,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -109372,11 +109327,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/examples/skills-powerkit/skills/version-bumper/SKILL.md",
    "name": "version-bumper",
-   "overall": 79.0,
+   "overall": 82.0,
    "grade": "B",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 85,
     "structure": 100
    },
@@ -109384,7 +109339,7 @@
     "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 8,
+   "desc_words": 25,
    "body_words": 995,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -109394,11 +109349,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/jeremy-google-adk/skills/adk-agent-builder/SKILL.md",
    "name": "adk-agent-builder",
-   "overall": 66.5,
+   "overall": 69.5,
    "grade": "C",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 35,
     "structure": 90
    },
@@ -109408,7 +109363,7 @@
     "no-progressive-disclosure",
     "output-format-unstated"
    ],
-   "desc_words": 9,
+   "desc_words": 20,
    "body_words": 2328,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -109418,11 +109373,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/jeremy-vertex-ai/skills/vertex-agent-builder/SKILL.md",
    "name": "vertex-agent-builder",
-   "overall": 74.0,
+   "overall": 77.0,
    "grade": "B",
    "scores": {
     "frontmatter": 100,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 60,
     "structure": 100
    },
@@ -109431,7 +109386,7 @@
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 23,
    "body_words": 2032,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -109441,11 +109396,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/packages/ai-ml-engineering-pack/skills/ai-ml-engineering-pack/SKILL.md",
    "name": "optimizing-prompts",
-   "overall": 75.0,
+   "overall": 78.0,
    "grade": "B",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 100,
     "structure": 80
    },
@@ -109454,7 +109409,7 @@
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 11,
+   "desc_words": 37,
    "body_words": 405,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -109464,22 +109419,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/packages/devops-automation-pack/skills/devops-automation-pack/SKILL.md",
    "name": "generating-conventional-commits",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 35,
    "body_words": 298,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -109487,11 +109441,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/packages/security-pro-pack/skills/security-pro-pack/SKILL.md",
    "name": "performing-security-audits",
-   "overall": 75.0,
+   "overall": 78.0,
    "grade": "B",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 100,
     "structure": 80
    },
@@ -109499,7 +109453,7 @@
     "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 10,
+   "desc_words": 29,
    "body_words": 377,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -109509,23 +109463,22 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/performance/alerting-rule-creator/skills/alerting-rule-creator/SKILL.md",
    "name": "creating-alerting-rules",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated",
     "high-stakes-no-safety"
    ],
-   "desc_words": 11,
+   "desc_words": 36,
    "body_words": 345,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -109533,21 +109486,20 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/performance/apm-dashboard-creator/skills/apm-dashboard-creator/SKILL.md",
    "name": "creating-apm-dashboards",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 9,
+   "desc_words": 37,
    "body_words": 387,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -109555,22 +109507,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/performance/application-profiler/skills/application-profiler/SKILL.md",
    "name": "profiling-application-performance",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 9,
+   "desc_words": 31,
    "body_words": 283,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -109578,22 +109529,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/performance/bottleneck-detector/skills/bottleneck-detector/SKILL.md",
    "name": "detecting-performance-bottlenecks",
-   "overall": 67.5,
-   "grade": "C",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 15,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 37,
    "body_words": 294,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -109601,22 +109551,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/performance/cache-performance-optimizer/skills/cache-performance-optimizer/SKILL.md",
    "name": "optimizing-cache-performance",
-   "overall": 72.0,
-   "grade": "B",
+   "overall": 85.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 35,
    "body_words": 272,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -109624,22 +109573,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/performance/capacity-planning-analyzer/skills/capacity-planning-analyzer/SKILL.md",
    "name": "analyzing-capacity-planning",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 11,
+   "desc_words": 35,
    "body_words": 322,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -109647,22 +109595,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/performance/cpu-usage-monitor/skills/cpu-usage-monitor/SKILL.md",
    "name": "monitoring-cpu-usage",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 12,
+   "desc_words": 37,
    "body_words": 326,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -109670,23 +109617,22 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/performance/distributed-tracing-setup/skills/distributed-tracing-setup/SKILL.md",
    "name": "setting-up-distributed-tracing",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated",
     "high-stakes-no-safety"
    ],
-   "desc_words": 10,
+   "desc_words": 34,
    "body_words": 296,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -110641,22 +110587,21 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/security/ssl-certificate-manager/skills/ssl-certificate-manager/SKILL.md",
    "name": "managing-ssltls-certificates",
-   "overall": 72.0,
-   "grade": "B",
+   "overall": 85.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 85,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 10,
+   "desc_words": 34,
    "body_words": 324,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -110664,21 +110609,20 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/security/vulnerability-scanner/skills/vulnerability-scanner/SKILL.md",
    "name": "scanning-for-vulnerabilities",
-   "overall": 67.5,
-   "grade": "C",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 15,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 9,
+   "desc_words": 32,
    "body_words": 305,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -110686,21 +110630,20 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/security/xss-vulnerability-scanner/skills/xss-vulnerability-scanner/SKILL.md",
    "name": "scanning-for-xss-vulnerabilities",
-   "overall": 75.0,
-   "grade": "B",
+   "overall": 88.5,
+   "grade": "A",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 85,
     "disclosure": 100,
     "structure": 80
    },
    "flags": [
-    "no-when-trigger",
     "no-anti-trigger"
    ],
-   "desc_words": 11,
+   "desc_words": 38,
    "body_words": 422,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -110708,11 +110651,11 @@
    "repo": "BbgnsurfTech/claude-skills-collection",
    "file_path": "plugins/claude-code-plugins-plus/plugins/skill-enhancers/web-to-github-issue/skills/web-to-github-issue/SKILL.md",
    "name": "creating-github-issues-from-web-research",
-   "overall": 75.0,
+   "overall": 78.0,
    "grade": "B",
    "scores": {
     "frontmatter": 92,
-    "triggering": 40,
+    "triggering": 50,
     "disclosure": 100,
     "structure": 80
    },
@@ -110721,7 +110664,7 @@
     "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 11,
+   "desc_words": 36,
    "body_words": 376,
    "desc_has_when": false,
    "desc_has_anti": false,
@@ -112416,21 +112359,21 @@
    "repo": "vercel-labs/agent-skills",
    "file_path": "skills/composition-patterns/SKILL.md",
    "name": "vercel-composition-patterns",
-   "overall": 53.0,
-   "grade": "D",
+   "overall": 86.0,
+   "grade": "A",
    "scores": {
-    "frontmatter": 62,
-    "triggering": 0,
+    "frontmatter": 92,
+    "triggering": 85,
     "disclosure": 75,
     "structure": 90
    },
    "flags": [
-    "missing-description",
+    "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 0,
+   "desc_words": 39,
    "body_words": 332,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },
@@ -112481,21 +112424,21 @@
    "repo": "vercel-labs/agent-skills",
    "file_path": "skills/react-native-skills/SKILL.md",
    "name": "vercel-react-native-skills",
-   "overall": 53.0,
-   "grade": "D",
+   "overall": 86.0,
+   "grade": "A",
    "scores": {
-    "frontmatter": 62,
-    "triggering": 0,
+    "frontmatter": 92,
+    "triggering": 85,
     "disclosure": 75,
     "structure": 90
    },
    "flags": [
-    "missing-description",
+    "no-anti-trigger",
     "output-format-unstated"
    ],
-   "desc_words": 0,
+   "desc_words": 40,
    "body_words": 523,
-   "desc_has_when": false,
+   "desc_has_when": true,
    "desc_has_anti": false,
    "ref_files": 0
   },

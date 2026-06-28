@@ -9,7 +9,7 @@ High stars, but the skills barely say *when* to use them — the crowd rewarded 
 - **rohitg00/awesome-claude-code-toolkit** — 2,191★ but only **2.5%** of its 40 skills carry a WHEN-trigger.
 - **ykdojo/claude-code-tips** — 8,909★ but only **16.7%** of its 6 skills carry a WHEN-trigger.
 - **can1357/oh-my-pi** — 14,469★ but only **20.0%** of its 15 skills carry a WHEN-trigger.
-- **affaan-m/ECC** — 222,705★ but only **21.7%** of its 881 skills carry a WHEN-trigger.
+- **affaan-m/ECC** — 222,705★ but only **22.0%** of its 881 skills carry a WHEN-trigger.
 - **FlorianBruniaux/claude-code-ultimate-guide** — 5,192★ but only **28.6%** of its 91 skills carry a WHEN-trigger.
 - **nextlevelbuilder/ui-ux-pro-max-skill** — 97,386★ but only **30.8%** of its 13 skills carry a WHEN-trigger.
 
