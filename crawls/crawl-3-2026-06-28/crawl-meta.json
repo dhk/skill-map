@@ -1,12 +1,12 @@
 {
   "crawl_id": "crawl-3-2026-06-28",
-  "status": "running",
+  "status": "complete",
   "crawl_date": "2026-06-28",
   "queries_run": [
     "crawl-list:recrawl-mega.md"
   ],
-  "total_repos": 3,
-  "total_files": 1056,
+  "total_repos": 6,
+  "total_files": 4211,
   "errors": 0,
   "repo_breakdown": {
     "anthropics/skills": {
@@ -18,8 +18,39 @@
       "errors": 0
     },
     "borghei/claude-skills": {
-      "skills": 275,
+      "skills": 340,
       "errors": 0
+    },
+    "affaan-m/ECC": {
+      "skills": 881,
+      "errors": 0
+    },
+    "davila7/claude-code-templates": {
+      "skills": 872,
+      "errors": 0
+    },
+    "BbgnsurfTech/claude-skills-collection": {
+      "skills": 1337,
+      "errors": 0
+    }
+  },
+  "input_quality": {
+    "list_id": "recrawl-mega-001",
+    "list_source": "drift-check",
+    "repos_in_list": 5,
+    "repos_found_skills": 5,
+    "repos_empty": 0,
+    "repos_not_found": 0,
+    "repos_error": 0,
+    "hit_rate": 1.0,
+    "skills_per_hit_repo": 842.2,
+    "total_skills": 4211,
+    "outcomes": {
+      "alirezarezvani/claude-skills": "found",
+      "borghei/claude-skills": "found",
+      "affaan-m/ECC": "found",
+      "davila7/claude-code-templates": "found",
+      "BbgnsurfTech/claude-skills-collection": "found"
     }
   }
 }
