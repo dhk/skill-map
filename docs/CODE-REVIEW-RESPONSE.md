@@ -17,7 +17,7 @@ with `grep -rn "RECOMMEND(review2" .`. Priorities: **P0** = do before merge,
 ## P1 — recommended polish
 | # | Where | Action |
 |---|---|---|
-| 2 | `crawlers/patch_map_badges.py:37` | Join now refreshes only **26/39** graded map nodes (was 39/39). The other 13 keep *stale* grades from a prior run — the `source_url → (repo, file_path)` join drops rows after the merged-corpus/graphio changes. Fix the join and log `n/total` so a drop is visible. Inline marker added. |
+| 2 | `crawlers/enrich_urls.py` (root cause) → `patch_map_badges.py` (symptom) | **Root-caused.** The `(org,dir)` rewrite dropped the `…/tree/<branch>/<path>` deep-link on **16 map nodes (42→26)**, so badges refresh only 26/39 and **13 keep stale grades**. These 16 are skills the map attributes to org X (openai, angular, supabase…) but whose crawled `SKILL.md` lives in a mega-collection *copy* (davila7, affaan-m…). New code links to the attributed org, can't find the skill there, and falls back to a bare org root (`https://github.com/openai`) — losing the deep-link. **Fix:** link to the skill's *actual crawled location* (repo+path from the corpus) and keep the attributed org as a label only; then `patch_map_badges` should log `n/total`. |
 | 3 | Deterministic tagger framing (`docs/CODE-REVIEW.md` §B, `classify_tags.py`) | Keep, but label honestly: all-4-axis agreement vs LLM is **12%** (per-axis 48–66%). It's a free *default + LLM-tail*, not parity — don't wire it to *replace* `tag_skills` outright; make the LLM pass the documented fallback for the ambiguous tail. |
 
 ## Backlog — the still-open inline `REVIEW(...)` notes, ranked
