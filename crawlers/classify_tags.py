@@ -190,7 +190,10 @@ def main():
     ap.add_argument('--compare', action='store_true',
                     help='score agreement vs the LLM cache (data/skill_tags.json)')
     ap.add_argument('--patch', action='store_true',
-                    help='patch index.html from a tag cache')
+                    help='patch index.html from a tag cache (overwrites all)')
+    ap.add_argument('--fill', action='store_true',
+                    help='patch ONLY untagged nodes, preserving existing (LLM) tags '
+                         '— safe for the pipeline')
     ap.add_argument('--from', dest='src', default=str(DET_CACHE),
                     help='cache file to --patch from')
     args = ap.parse_args()
@@ -208,6 +211,18 @@ def main():
                               n.get('domain', '')) for n in nodes}
     DET_CACHE.write_text(json.dumps(tags, indent=2))
     print(f'classified {len(tags)} skills (deterministic) → {DET_CACHE}')
+
+    if args.fill:
+        # Fill gaps only: keep existing (LLM) tags, deterministically tag the rest.
+        # No-op when every node is already tagged; auto-tags new nodes on re-runs.
+        filled = 0
+        for n in nodes:
+            if 'action' not in n:                 # untagged
+                n.update(tags[n['id']])
+                filled += 1
+        save_graph(graph, content, match)
+        print(f'filled {filled} untagged node(s); kept existing tags on the rest')
+        return
 
     if args.compare:
         if not LLM_CACHE.exists():

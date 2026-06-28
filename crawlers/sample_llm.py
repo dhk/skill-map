@@ -1,14 +1,18 @@
 """
-sample_llm.py — LLM deep-read on a stratified sample of the corpus.
+sample_llm.py — [RETIRED] v1 LLM judge. Superseded by judge_llm.py.
 
-The heuristic scorer (score_corpus.py) measures structure; it can't judge
-whether a description *actually* helps Claude decide when to invoke a skill,
-or whether the body is genuinely useful. This pass samples skills across
-signatures (and across the quality range within each) and asks `claude -p`
-to compare each against the Anthropic gold standard.
+RETIRED: judge_llm.py (v2) replaces this. The post-mortem in
+docs/llm-judge-tuning.md found v1 scored even canonical skills as "weak" for
+three reasons — two of them harness bugs still present here: it clips every skill
+to 6000 chars (penalising long/best skills as "truncated") and gives the judge no
+reference-file visibility or per-axis calibration. NOT part of the study pipeline.
+Use judge_llm.py instead. Kept only for historical comparison of the two prompts.
 
-Uses `claude -p` (existing OAuth session, no API key). Results cached in
-data/llm_sample.json so re-runs are incremental.
+Original docstring:
+  LLM deep-read on a stratified sample of the corpus. The heuristic scorer
+  (score_corpus.py) measures structure; this asks `claude -p` whether a
+  description actually helps Claude decide when to invoke a skill. Results cached
+  in data/llm_sample.json.
 
 Usage:
     python crawlers/sample_llm.py            # run sample

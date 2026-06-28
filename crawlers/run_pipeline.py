@@ -55,6 +55,8 @@ STAGES = [
     ('render_copy_network.py', [], False, False),
     ('render_sankey.py', [], False, False),
     ('build_lineage_page.py', [], False, False),
+    ('reclassify.py', [], False, False),            # domains + derived counts (deterministic)
+    ('classify_tags.py', ['--fill'], False, False), # fill any untagged nodes; keep LLM tags
     ('patch_map_badges.py', [], False, False),
     ('count_skills.py', [], False, False),     # unique-skill funnel → gen_stats reads it
     ('gen_stats.py', [], False, False),
