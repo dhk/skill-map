@@ -30,15 +30,13 @@ import sys
 import urllib.request
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from score_corpus import latest_content_by_key   # canonical merged-corpus loader
+
 BASE = Path(__file__).parent.parent
-# REVIEW(fragile, recurring bug): hard-pins the FIRST crawl snapshot. The same
-# hard-coded path appears in sample_llm.py, lineage_trace.py and maturity_crawl.py.
-# Meanwhile score_corpus.py / track_history.py read the MERGED corpus via
-# load_all_crawls(). So after any re-crawl the judge reads stale content while the
-# heuristic scores it's compared against are current — the two can describe
-# different versions of the same skill. Route every consumer through
-# load_all_crawls() (or a single shared "latest content per (repo,path)" loader).
-CRAWL = BASE / 'crawls' / 'crawl-1-2026-06-24' / 'data.json'
+# Reads the MERGED corpus (latest content per skill across all crawls) so the
+# judge never grades a stale first-snapshot copy while comparing it to current
+# heuristic scores. (Previously pinned crawls/crawl-1-…; see docs/CODE-REVIEW.md.)
 SCORES = BASE / 'data' / 'skill_quality.json'
 OUT = BASE / 'data' / 'llm_sample_v2.json'
 
@@ -168,9 +166,7 @@ def main():
     args = ap.parse_args()
 
     scores = json.load(open(SCORES))
-    crawl = {(r['repo_full_name'], r['file_path']): r
-             for r in json.load(open(CRAWL))['results']
-             if r.get('skill_md_content')}
+    crawl = latest_content_by_key()
     repo_sig = {rn: r['signature'] for rn, r in scores['repos'].items()}
 
     if args.validate:

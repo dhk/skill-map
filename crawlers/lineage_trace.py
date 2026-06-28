@@ -19,19 +19,20 @@ Usage:
 import argparse
 import json
 import re
+import sys
 import hashlib
 import urllib.request
 import urllib.parse
 from pathlib import Path
 from collections import defaultdict
 
+sys.path.insert(0, str(Path(__file__).parent))
+from score_corpus import load_all_crawls   # canonical merged-corpus loader
+
 BASE = Path(__file__).parent.parent
-# REVIEW(fragile): hard-pinned first crawl again (see judge_llm.py). This one is
-# the most consequential place to fix it — lineage runs in the pipeline and feeds
-# originator_leaderboard, curiosities, and both lineage figures. Clustering only
-# the first snapshot means any skill that only appears in a later crawl is invisible
-# to the entire copy/ancestry analysis. Use load_all_crawls().
-CRAWL = BASE / 'crawls' / 'crawl-1-2026-06-24' / 'data.json'
+# Clusters over the MERGED corpus (all crawls), so skills that first appear in a
+# later crawl are included in the copy/ancestry analysis. Lineage runs in the
+# pipeline and feeds originator_leaderboard, curiosities, and both figures.
 SCORES = BASE / 'data' / 'skill_quality.json'
 DATES = BASE / 'data' / 'commit_dates.json'
 OUT = BASE / 'data' / 'lineage.json'
@@ -171,8 +172,7 @@ def main():
     ap.add_argument('--no-fetch', action='store_true')
     args = ap.parse_args()
 
-    crawl = json.load(open(CRAWL))['results']
-    skills = [x for x in crawl if x.get('skill_md_content')]
+    skills = [x for x in load_all_crawls() if x.get('skill_md_content')]
     scores = json.load(open(SCORES))
     qual = {(s['repo'], s['file_path']): s['overall'] for s in scores['skills']}
     stars = {rn: r['stars'] for rn, r in scores['repos'].items()}

@@ -19,14 +19,16 @@ import json
 import subprocess
 import argparse
 import random
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from score_corpus import latest_content_by_key   # canonical merged-corpus loader
+
 BASE = Path(__file__).parent.parent
-# REVIEW(fragile): same hard-pinned first-crawl snapshot as judge_llm.py — see the
-# note there. This is the v1 judge that judge_llm.py's docstring says it REPLACES;
-# if it's superseded, retire it (like maturity_crawl.py was) so two judges with
-# different prompts don't both linger and confuse which output is canonical.
-CRAWL = BASE / 'crawls' / 'crawl-1-2026-06-24' / 'data.json'
+# Reads the merged corpus (latest content per skill) rather than a pinned first
+# snapshot. REVIEW(still open): this is the v1 judge that judge_llm.py says it
+# REPLACES — retire it (like maturity_crawl.py) so two judges don't both linger.
 SCORES = BASE / 'data' / 'skill_quality.json'
 OUT = BASE / 'data' / 'llm_sample.json'
 
@@ -70,9 +72,7 @@ def main():
     random.seed(7)
 
     scores = json.load(open(SCORES))
-    crawl = {(r['repo_full_name'], r['file_path']): r
-             for r in json.load(open(CRAWL))['results']
-             if r.get('skill_md_content')}
+    crawl = latest_content_by_key()
     repo_sig = {rn: r['signature'] for rn, r in scores['repos'].items()}
 
     # bucket skills by (signature, tier) where tier splits the quality range

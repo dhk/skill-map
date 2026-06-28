@@ -16,19 +16,20 @@ findings below are about the seams between stages, not the core design.
 
 ### High impact
 
-- **Stale single-crawl pin.** `judge_llm.py`, `sample_llm.py`, `lineage_trace.py`,
-  and `maturity_crawl.py` all hard-code `crawls/crawl-1-2026-06-24/data.json`,
-  while `score_corpus.py`/`track_history.py` read the **merged** corpus via
-  `load_all_crawls()`. After any re-crawl, the LLM judge and the lineage graph
-  read first-snapshot content but compare against current heuristic scores — they
-  can describe two different versions of the same skill, and any skill that first
-  appears in a later crawl is invisible to lineage/originator/curiosities. *Fix:
-  route every consumer through `load_all_crawls()` (promote it to a shared module).*
+- **Stale single-crawl pin.** ✅ *Fixed on this branch.* `judge_llm.py`,
+  `sample_llm.py`, and `lineage_trace.py` hard-coded
+  `crawls/crawl-1-2026-06-24/data.json` while `score_corpus`/`track_history` read
+  the **merged** corpus, so after any re-crawl the judge/lineage read
+  first-snapshot content but compared against current scores. They now route
+  through the canonical `load_all_crawls()` / new `latest_content_by_key()`
+  (4,975 skills with content vs crawl-1's subset). This also removes a latent
+  `KeyError`: the judges sample from the full corpus but used to look up content
+  in crawl-1 only. (`maturity_crawl.py` is retired; left pinned with a note.)
 
-- **`load_all_crawls()` "latest wins" sorts lexically.** It picks the most-recent
-  crawl by `sorted()` on the dir name. Once there are ≥10 crawls, `crawl-10-…`
-  sorts *before* `crawl-2-…`, so an older snapshot can silently win the merge.
-  *Fix: sort by the numeric `<n>`.*
+- **`load_all_crawls()` "latest wins" sorted lexically.** ✅ *Fixed on this
+  branch.* It picked the most-recent crawl by `sorted()` on the dir name, so once
+  there are ≥10 crawls `crawl-10-…` sorts *before* `crawl-2-…` and an older
+  snapshot silently wins the merge. Now sorts by the numeric `<n>` via `_crawl_n`.
 
 - **`index.html` is used as a database.** `tag_skills`, `reclassify`,
   `enrich_urls`, `patch_map_badges` each re-implement `const GRAPH = ({.*?});\n`
@@ -137,8 +138,8 @@ already hold in memory.
 
 ## Prototypes implemented on this branch
 
-Two of the highest-leverage fixes above are now prototyped (the rest remain as
-inline `REVIEW(...)` notes):
+The highest-leverage fixes above are now implemented (the rest remain as inline
+`REVIEW(...)` notes):
 
 **A. Siblings + `default_branch` captured during the crawl** (`crawl.py`,
 `fetch_siblings.py`). `walk_repo_tree` now stores each skill's `sibling_files`
@@ -170,6 +171,16 @@ Classifying from the full corpus (body + frontmatter + the now-captured siblings
 rather than the truncated graph node would lift every axis further — the
 recommendation stands: deterministic default, optional LLM only for the
 ambiguous tail.
+
+**C. Canonical merged-corpus loader** (`score_corpus.py` + the three consumers).
+`load_all_crawls()` now sorts by numeric crawl index (`_crawl_n`) so `crawl-10`
+can't lose to `crawl-2`, and a new `latest_content_by_key()` wrapper is the one
+"latest content per skill" definition. `judge_llm.py`, `sample_llm.py`, and
+`lineage_trace.py` were switched off their hard-coded crawl-1 pin onto it — so
+re-crawls flow through the LLM judges and the lineage/originator/curiosities
+chain, and the judges' content lookups can no longer `KeyError` on
+later-crawl skills. Verified against live data (5,393 merged records, 4,975 with
+content).
 
 ## What's solid (don't change)
 
