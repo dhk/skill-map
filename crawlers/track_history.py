@@ -53,6 +53,13 @@ def main():
             key = f'{repo}\t{path}'
             sha = r.get('file_sha')
             dir_name = path.replace('\\', '/').split('/')[-2] if '/' in path else None
+            # REVIEW(inconsistency): scores here WITHOUT sibling_files, while
+            # score_corpus.py scores the same skills WITH data/sibling_files.json.
+            # The disclosure axis credits reference/scripts siblings, so a skill's
+            # "quality" in skill_history.json can differ from its quality in
+            # skill_quality.json / STATS.md — and the history "top movers" can show
+            # a score delta that is really just the siblings sidecar appearing,
+            # not the skill changing. Pass the same siblings here for one number.
             score = score_skill(r['skill_md_content'], dir_name)['overall']
             words = len(r['skill_md_content'].split())
             if key not in hist['skills']:

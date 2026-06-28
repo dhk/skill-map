@@ -1,6 +1,26 @@
 """
 tag_skills.py — Classify skill nodes along 4 ontology dimensions using Claude CLI.
 
+REVIEW(LLM → deterministic): this is the strongest candidate in the repo for
+replacing an LLM call with deterministic code. It spends one `claude -p`
+invocation PER skill (~1,121 calls) on a closed-vocabulary classification, yet:
+  • `action` (generate|extract|transform|automate|analyze|configure|integrate)
+    is already produced deterministically by gen_types.py's regex map AND overlaps
+    skill_quality.WHAT_PATTERNS — the keyword table exists twice already.
+  • `output_type` (text|code|structured-data|media|action|report) is largely
+    readable from the body: fenced code → code; JSON/YAML/table → structured-data;
+    "report"/"summary" → report; image/audio verbs → media.
+  • `integration` (standalone|connector|orchestrator|modifier) keys on signals the
+    crawl already has: allowed-tools / mcp / api / sdk → connector; "orchestrat"/
+    pipeline/agent → orchestrator.
+  • `complexity` is the only genuinely fuzzy axis, and even it proxies well from
+    body length + numbered steps + reference-file count.
+The code already FALLS BACK to a deterministic default on any invalid LLM output
+(see call_claude), so a deterministic classifier would be more reproducible, free,
+and runnable inside run_pipeline.py — where this script currently is NOT wired,
+so tags drift out of sync on every re-crawl. Keep an optional LLM pass only for
+the residual ambiguous cases, not as the default for all 1,121.
+
 Dimensions:
   action        : what the skill does (generate|extract|transform|automate|analyze|configure|integrate)
   complexity    : barrier to entry (foundational|intermediate|advanced)
@@ -47,6 +67,14 @@ Reply format: {{"action":"...","complexity":"...","output_type":"...","integrati
 
 
 def load_graph():
+    # REVIEW(fragile, repeated in 4 files): this `const GRAPH = ({.*?});\n` regex
+    # is duplicated in reclassify.py, enrich_urls.py, and patch_map_badges.py with
+    # INCONSISTENT flags — some pass re.S (DOTALL), some don't. The no-DOTALL ones
+    # only work because index.html happens to keep GRAPH minified onto one line;
+    # the day anyone pretty-prints that block, half these scripts silently stop
+    # matching. index.html is being used as a database. Extract one shared
+    # load_graph/save_graph helper (or store the graph as a real .json the page
+    # fetches) so the parsing assumption lives in exactly one place.
     content = HTML_PATH.read_text()
     m = re.search(r'const GRAPH = (\{.*?\});\n', content)
     if not m:
@@ -85,6 +113,11 @@ def call_claude(prompt, dry_run=False):
     )
     raw = result.stdout.strip()
     # Extract JSON from response (claude might add surrounding text)
+    # REVIEW(fragile): `\{[^{}]+\}` only matches a FLAT brace group — any nested
+    # object in the reply makes this grab a truncated fragment or miss entirely.
+    # Also: classification is non-deterministic across runs, so the cached tags are
+    # not reproducible from the inputs (a re-run with --force can yield different
+    # labels for unchanged skills). A deterministic classifier removes both issues.
     m = re.search(r'\{[^{}]+\}', raw)
     if not m:
         raise ValueError(f"No JSON in response: {raw!r}")

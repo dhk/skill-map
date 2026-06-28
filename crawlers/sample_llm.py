@@ -22,6 +22,10 @@ import random
 from pathlib import Path
 
 BASE = Path(__file__).parent.parent
+# REVIEW(fragile): same hard-pinned first-crawl snapshot as judge_llm.py — see the
+# note there. This is the v1 judge that judge_llm.py's docstring says it REPLACES;
+# if it's superseded, retire it (like maturity_crawl.py was) so two judges with
+# different prompts don't both linger and confuse which output is canonical.
 CRAWL = BASE / 'crawls' / 'crawl-1-2026-06-24' / 'data.json'
 SCORES = BASE / 'data' / 'skill_quality.json'
 OUT = BASE / 'data' / 'llm_sample.json'
@@ -94,6 +98,9 @@ def main():
         key = (s['repo'], s['file_path'])
         if key in seen:
             continue
+        # REVIEW(known bug, kept here): judge_llm.py's docstring identifies this
+        # 6000-char clip as cause #1 of v1's pessimism (it penalised long, often
+        # best, skills as "truncated mid-sentence"). Another reason to retire v1.
         md = crawl[key]['skill_md_content'][:6000]
         prompt = PROMPT.format(repo=s['repo'], signature=sig, md=md)
         if args.dry_run:

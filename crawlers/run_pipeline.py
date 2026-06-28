@@ -34,6 +34,14 @@ from pathlib import Path
 HERE = Path(__file__).parent
 PY = sys.executable
 
+# REVIEW(reproducibility gap): the LLM/taxonomy steps are deliberately NOT here —
+# tag_skills.py, sample_llm.py, judge_llm.py, reclassify.py, and enrich_urls.py all
+# mutate published artifacts (index.html tags/domains/source_urls, llm_*.json) but
+# run only by hand. So "rebuild everything downstream of the crawls" is not true:
+# the map's domains, tags, and source links can be arbitrarily stale relative to
+# the snapshots. Either fold the deterministic ones (enrich_urls; a deterministic
+# tagger/classifier per the tag_skills/reclassify notes) into this list, or have
+# check_docs-style guards flag when they're out of date.
 # (script, args, hits_network, slow)
 STAGES = [
     ('fetch_siblings.py', [], True, True),

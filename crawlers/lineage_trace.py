@@ -26,6 +26,11 @@ from pathlib import Path
 from collections import defaultdict
 
 BASE = Path(__file__).parent.parent
+# REVIEW(fragile): hard-pinned first crawl again (see judge_llm.py). This one is
+# the most consequential place to fix it — lineage runs in the pipeline and feeds
+# originator_leaderboard, curiosities, and both lineage figures. Clustering only
+# the first snapshot means any skill that only appears in a later crawl is invisible
+# to the entire copy/ancestry analysis. Use load_all_crawls().
 CRAWL = BASE / 'crawls' / 'crawl-1-2026-06-24' / 'data.json'
 SCORES = BASE / 'data' / 'skill_quality.json'
 DATES = BASE / 'data' / 'commit_dates.json'
@@ -121,6 +126,13 @@ def cluster(skills):
 
 
 def gh(url):
+    # REVIEW(fragile / data-expansion): UNAUTHENTICATED (60 req/hr) yet first_commit_date
+    # makes 1–2 calls PER clustered file — thousands of files means certain rate-limit
+    # exhaustion, and the bare `except` below swallows it as date=None, which then
+    # silently flips ancestor_basis to 'no-dates'/'date-unreliable' and quietly drops
+    # flows. maturity_crawl.py already threads $GITHUB_TOKEN through the same API;
+    # do the same here. Better: capture first/last-commit dates DURING the crawl so
+    # this whole per-file commit-API pass disappears.
     req = urllib.request.Request(url, headers={
         'Accept': 'application/vnd.github+json', 'User-Agent': 'skill-map'})
     return urllib.request.urlopen(req, timeout=40)

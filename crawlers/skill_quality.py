@@ -28,6 +28,19 @@ import sys
 import json
 
 # ── Thresholds (derived from canonical reference skills) ──────────────
+# REVIEW(assumption / fragile): every threshold below is a magic constant frozen
+# from one snapshot of anthropics/skills (desc median 43 words, body ~1194, etc.).
+# They are NOT recomputed from the live corpus, so as the canonical reference
+# evolves these silently drift from "what the gold standard actually does now".
+# Since score_corpus already loads the full corpus, the canonical percentiles
+# could be derived at runtime and these constants become a fallback, not the law.
+#
+# REVIEW(LLM-replaceable, the GOOD direction): this whole module is the
+# deterministic counterpart to sample_llm.py / judge_llm.py. Of the LLM judge's
+# axes, frontmatter / triggering / disclosure / structure are ALREADY computed
+# here for free over the entire corpus; the LLM is only genuinely additive on the
+# three judgment axes it flags itself (scope, instruction quality, safety
+# appropriateness). The remaining LLM passes should be scoped to just those.
 # anthropics/skills: desc median 43 words, body median ~1194 words,
 # name+description always present, license common, headings standard.
 DESC_MIN_WORDS = 8       # below this a description can't say what+when
@@ -101,6 +114,13 @@ KNOWN_KEYS = {
 
 def parse_skill(md):
     """Split a SKILL.md into frontmatter (dict) and body (str)."""
+    # REVIEW(fragile): hand-rolled YAML. It handles flat `key: value` and block
+    # scalars (|, >) only. Nested maps (the `metadata:` block is in KNOWN_KEYS but
+    # its children are flattened/dropped), flow lists `[a, b]`, multi-line lists,
+    # and values containing a colon are all mis-parsed — which then mis-scores
+    # frontmatter and mis-detects junk_keys. A real YAML parser (PyYAML is already
+    # an implicit transitive dep) would be both more correct and less code, with
+    # a try/except fallback for genuinely malformed frontmatter.
     md = md or ''
     fm = {}
     body = md

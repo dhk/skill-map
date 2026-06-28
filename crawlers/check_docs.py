@@ -26,6 +26,13 @@ def main():
     n_skills, n_repos = s['n_skills'], s['n_repos']
     median, when = s['median_quality'], s['pct_with_when']
 
+    # REVIEW(self-defeating): the stale values to hunt for are themselves hard-coded
+    # (73.5, 4,902, 5,320, "only 43%", "39 repos"...). This is the one drift the
+    # guard cannot catch automatically: when the LIVE numbers move to a new value,
+    # someone must hand-add the previous live number to this list or the next round
+    # of staleness ships unflagged. Consider flagging any "<n> skills / <n> repos"
+    # figure that doesn't match the live stats, rather than enumerating known-bad
+    # constants.
     # current values that should appear; flag well-known *stale* alternates only
     # when they show up outside historical/correction context.
     stale_patterns = [

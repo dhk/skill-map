@@ -7,6 +7,26 @@ Usage (from repo root):
 Edit NEW_DOMAINS, MOVES, and RENAME to adjust the taxonomy, then re-run.
 The script reads the GRAPH JSON embedded in index.html, rebuilds nodes/links,
 and writes the result back in-place.
+
+REVIEW(fragile + LLM/deterministic + data-expansion — the worst offender):
+  1. MANUAL: MOVES is a ~100-entry hand-curated skill-id→domain map. It only
+     covers the skills present when someone last edited it; every new crawl adds
+     skills that fall through to RENAME and land in whatever bucket their old
+     domain mapped to. It does not scale and silently rots.
+  2. STALE-BY-CONSTRUCTION: each NEW_DOMAINS entry hard-codes a `count` (and
+     size). Nothing recomputes these from the graph, so the domain sizes shown on
+     the live map are frozen numbers that diverge from reality the moment the
+     corpus changes — exactly the drift gen_stats/check_docs exist to prevent.
+     Derive count = len(skills in domain) instead of typing it.
+  3. REPLACEABLE: domain assignment is a classification task. The crawl already
+     gathers repo_topics + repo_description + skill name/description (all unused
+     for this) — a deterministic topic/keyword classifier would auto-place most
+     skills and shrink MOVES to a tiny hand-override list for genuine edge cases.
+     This is also where an LLM classifier would be DEFENSIBLE (open-vocabulary,
+     semantic) — the opposite of tag_skills.py's closed-vocabulary case. Either
+     way, a one-shot hand-edited dict is the wrong tool.
+  4. This script is not in run_pipeline.py, so the taxonomy is a manual side-channel
+     that the reproducible pipeline knows nothing about.
 """
 import json, re, os
 

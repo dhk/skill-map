@@ -28,6 +28,15 @@ OUT = BASE / 'data' / 'skill_quality.json'
 def load_all_crawls():
     """Merge results across every crawls/*/data.json. On duplicate
     (repo, file_path), the most recent crawl (by dir name) wins."""
+    # REVIEW(this is the right pattern — make it THE loader): correct, merges all
+    # snapshots and lets later crawls supersede earlier ones. judge_llm.py,
+    # sample_llm.py, lineage_trace.py and maturity_crawl.py bypass it and pin
+    # crawl-1 directly (stale). Worth promoting to a shared crawls.py module that
+    # every consumer imports, so "latest content per skill" has one definition.
+    # NOTE the ordering assumption: "most recent by dir name" relies on the
+    # crawl-<n>-<date> names sorting chronologically. They do today, but a 2-digit
+    # vs 10+ crawl count (crawl-9 vs crawl-10) sorts lexically wrong — sort by the
+    # numeric <n>, not the raw string, before this becomes a silent bug.
     merged = {}
     for data_path in sorted(CRAWLS_DIR.glob('*/data.json')):
         for r in json.load(open(data_path)).get('results', []):

@@ -24,6 +24,12 @@ with open(args.crawl) as f:
     crawl_data = json.load(f)
 results = crawl_data['results']
 
+# REVIEW(fragile): nodes are matched to crawl results by the skill's DIRECTORY
+# NAME alone (last path segment). Many repos name skills identically (dozens of
+# "pdf", "review", "test" dirs), so pick_best falls back to org-name heuristics
+# and can attach the wrong repo's URL to a node. The graph node ids include the
+# org (org/skill) — match on (org, dir) at minimum, or carry the real (repo,
+# file_path) key from the crawl rather than re-keying on a non-unique basename.
 # Build index: skill_dir_name -> list of crawl results (exclude hidden dirs)
 by_dir = defaultdict(list)
 for r in results:
@@ -55,6 +61,12 @@ def make_source_url(skill_id, result):
     # file_path like "skills/docx/SKILL.md" -> directory "skills/docx"
     parts = result['file_path'].split('/')
     skill_dir_path = '/'.join(parts[:-1])  # strip SKILL.md
+    # REVIEW(fragile): hard-codes "/tree/main/". Any repo whose default branch is
+    # master/develop/etc. gets a 404 source link. The crawl uses /HEAD/ for raw
+    # URLs (which would work here too), and get_repo_meta could capture
+    # default_branch outright (see crawl.py note). patch_map_badges.py then parses
+    # these URLs with /tree/[^/]+/ — i.e. it already tolerates any branch on READ
+    # but enrich only ever WRITES "main", so the two disagree by construction.
     return f"{repo_url}/tree/main/{skill_dir_path}"
 
 def fallback_url(skill_id):

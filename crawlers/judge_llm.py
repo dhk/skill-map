@@ -31,6 +31,13 @@ import urllib.request
 from pathlib import Path
 
 BASE = Path(__file__).parent.parent
+# REVIEW(fragile, recurring bug): hard-pins the FIRST crawl snapshot. The same
+# hard-coded path appears in sample_llm.py, lineage_trace.py and maturity_crawl.py.
+# Meanwhile score_corpus.py / track_history.py read the MERGED corpus via
+# load_all_crawls(). So after any re-crawl the judge reads stale content while the
+# heuristic scores it's compared against are current — the two can describe
+# different versions of the same skill. Route every consumer through
+# load_all_crawls() (or a single shared "latest content per (repo,path)" loader).
 CRAWL = BASE / 'crawls' / 'crawl-1-2026-06-24' / 'data.json'
 SCORES = BASE / 'data' / 'skill_quality.json'
 OUT = BASE / 'data' / 'llm_sample_v2.json'
@@ -83,6 +90,13 @@ _sibling_cache = {}
 
 def fetch_siblings(repo, file_path):
     """List files in the skill's folder + one level into reference/scripts dirs."""
+    # REVIEW(rework / fragile): this re-fetches sibling files over the UNAUTH
+    # GitHub API (60 req/hr → judging more than ~60 skills will start failing with
+    # the bare-except returning "(could not list: ...)"). The pipeline ALREADY
+    # produced data/sibling_files.json via fetch_siblings.py for the whole corpus.
+    # Read that sidecar instead of a third live crawl — and per the crawl.py note,
+    # the tree walk could have stored siblings in the first place, removing all of
+    # these fetches.
     key = (repo, file_path)
     if key in _sibling_cache:
         return _sibling_cache[key]
@@ -113,6 +127,11 @@ def fetch_siblings(repo, file_path):
 
 
 def call_claude(prompt):
+    # REVIEW(fragile dependency): shells out to a `claude` binary on PATH and an
+    # ambient OAuth session — no API-key fallback, no model pinned, so results are
+    # non-reproducible across machines/sessions and unusable in CI. The judgment
+    # itself genuinely needs an LLM; the transport is what's brittle. Prefer the
+    # SDK/API with an explicit model id, and degrade gracefully when absent.
     r = subprocess.run(['claude', '-p', prompt],
                        capture_output=True, text=True, timeout=240)
     out = r.stdout.strip()

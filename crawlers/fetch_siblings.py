@@ -31,6 +31,13 @@ def gh(url):
 
 
 def tree_paths(repo):
+    # REVIEW(duplicate work + unauth): this re-fetches the SAME recursive tree that
+    # crawl.py.walk_repo_tree already walked — just over the unauthenticated API
+    # (60 req/hr; the bare except in main() turns rate-limit/404 into a skipped
+    # repo and a blinded disclosure axis). If the crawl stored the per-repo blob
+    # list (it has it in hand), this entire script + its network pass go away. It
+    # also IGNORES the truncation flag (`t['truncated']`), so huge repos lose
+    # sibling files silently — same latent bug as the crawl's tree walk.
     owner, name = repo.split('/', 1)
     info = gh(f'https://api.github.com/repos/{owner}/{name}')
     branch = info.get('default_branch', 'main')

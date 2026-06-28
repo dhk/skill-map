@@ -72,6 +72,11 @@ def search_code_page(gh: Github, query: str, page: int):
 
 def walk_repo_tree(gh: Github, repo_full_name: str) -> list[dict]:
     """Return all SKILL.md blobs with their git SHA via the trees API."""
+    # REVIEW(fragile): sha="HEAD" assumes the default branch's tip. The GitHub
+    # trees API TRUNCATES at ~100k entries and sets tree.truncated=True; we never
+    # check that flag, so on a very large monorepo SKILL.md files past the cutoff
+    # silently vanish from the corpus. Check `tree.truncated` and fall back to a
+    # paginated/contents walk when set.
     try:
         repo = gh.get_repo(repo_full_name)
         tree = repo.get_git_tree(sha="HEAD", recursive=True)
@@ -80,13 +85,35 @@ def walk_repo_tree(gh: Github, repo_full_name: str) -> list[dict]:
             return []
         raise
     results = []
+    # REVIEW(data-expansion / minimize-rework): this loop ALREADY walks the full
+    # recursive tree (every blob in the repo) but discards everything that isn't a
+    # SKILL.md. fetch_siblings.py then re-fetches these exact same trees over an
+    # UNAUTHENTICATED API (60 req/hr) just to recover each skill's sibling files,
+    # and judge_llm.py does a third fetch for the same reason. Capturing the folder
+    # file list here (e.g. all blob paths under each SKILL.md's parent dir, plus a
+    # repo-level default_branch — see get_repo_meta) would let the disclosure axis,
+    # the LLM judge, and enrich_urls all read from the crawl snapshot and delete
+    # two whole network passes. The data is in hand at this point — store it.
     for item in tree.tree:
+        # REVIEW(assumption): only matches files literally named SKILL.md
+        # (case-insensitive). But GLOBAL_QUERIES below also searches skill.md /
+        # SKILLS.md, so the global-search path and this repo-scoped path disagree
+        # on what counts as a skill. Pick one definition and share it.
         if item.type == "blob" and Path(item.path).name.upper() == "SKILL.MD":
+            # REVIEW(assumption): Gemini-format detection keys solely on the
+            # ".gemini/" path prefix; any other Gemini layout is silently
+            # mislabelled "claude" and gets its content fetched as if Markdown.
             is_gemini = item.path.startswith(".gemini/")
             results.append({
                 "repo_full_name": repo_full_name,
                 "file_path": item.path,
                 "file_sha": item.sha,
+                # REVIEW(fragile): the raw URL pins /HEAD/, which resolves at
+                # fetch time to whatever the default branch tip is *then* — not
+                # the commit we walked. If the repo is pushed between the tree
+                # walk and the raw fetch, file_sha and skill_md_content can
+                # describe different commits. Pin the resolved branch+commit SHA
+                # instead of HEAD for a reproducible, content-addressable URL.
                 "file_raw_url": f"https://raw.githubusercontent.com/{repo_full_name}/HEAD/{item.path}",
                 "repo_url": f"https://github.com/{repo_full_name}",
                 "file_format": "gemini" if is_gemini else "claude",
@@ -96,6 +123,14 @@ def walk_repo_tree(gh: Github, repo_full_name: str) -> list[dict]:
 
 def get_repo_meta(gh: Github, repo_full_name: str) -> dict:
     repo = gh.get_repo(repo_full_name)
+    # REVIEW(data-expansion): we already pay for a get_repo() call here but drop
+    # `default_branch`. Three downstream scripts then re-derive it: fetch_siblings
+    # and audit_repo re-call the repos API for it, and enrich_urls just HARD-CODES
+    # "main" (breaking source links for any master/other-branch repo). Capture
+    # repo.default_branch once here and the assumption disappears everywhere.
+    # repo_topics is captured but, notably, NOTHING consumes it — yet reclassify.py
+    # hand-maintains a ~100-line skill→domain MOVES dict that topics could largely
+    # replace. Wire topics into domain classification to kill that manual map.
     return {
         "repo_description": repo.description or "",
         "repo_stars": repo.stargazers_count,
@@ -110,6 +145,11 @@ def get_repo_meta(gh: Github, repo_full_name: str) -> dict:
 # Raw file fetch — unauthenticated (auth causes 404 via proxy on raw.gh.com)
 # ---------------------------------------------------------------------------
 
+# REVIEW(fragile / environment assumption): the module docstring on this section
+# says auth must be omitted because "auth causes 404 via proxy on raw.gh.com" —
+# that is a property of THIS sandbox's egress proxy, not of GitHub. On a normal
+# network unauthenticated raw fetches are rate-limited/cached differently, and
+# this coupling to the proxy isn't guarded or documented at the call site.
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=1, max=8),
@@ -137,6 +177,11 @@ def next_crawl_n() -> int:
 
 
 def find_today_dir(crawl_date: str) -> Path | None:
+    # REVIEW(assumption): "one crawl per UTC day" — resumption keys purely on the
+    # date. Running two DIFFERENT crawl-lists on the same day silently appends both
+    # into one crawl dir, and the input_quality metrics / repo_outcomes written at
+    # the end reflect only the LAST list run (earlier list's outcomes are lost).
+    # If multiple lists per day is a real workflow, key the dir on list_id too.
     if not CRAWLS_DIR.exists():
         return None
     for d in CRAWLS_DIR.iterdir():
@@ -243,6 +288,13 @@ def upsert(results: list[dict], index: dict[str, int], result: dict) -> None:
 
 
 def git_commit_push(crawl_id: str) -> None:
+    # REVIEW(fragile): bare `git push` with no remote/branch pushes to whatever
+    # the current branch's upstream happens to be — silently wrong if the crawler
+    # is ever run on a detached HEAD or a branch with no/unexpected upstream. It
+    # also commits ONLY crawls/<id>/; the derived data/ + docs/ that run_pipeline
+    # regenerates from this crawl are left uncommitted, so the repo can ship a new
+    # crawl whose published stats/figures are stale. Pin `push -u origin <branch>`
+    # and decide explicitly whether derived artifacts ride along.
     import subprocess
     rel = f"crawls/{crawl_id}/"
     for cmd in [
@@ -535,6 +587,14 @@ def crawl(
                         if key not in seen_keys:
                             seen_keys.add(key)
                             raw_url = f"https://raw.githubusercontent.com/{repo_full_name}/HEAD/{file_path}"
+                            # REVIEW(fragile): global-search results carry NO blob
+                            # SHA (the "" below). The SHA-diff skip in the fetch
+                            # phase requires a truthy file_sha, so global-search
+                            # mode can NEVER skip unchanged files — every global
+                            # crawl re-fetches the entire corpus, defeating the
+                            # incrementality the repo-scoped path relies on. Fetch
+                            # the blob SHA here (search items expose .sha) to make
+                            # both modes incremental.
                             raw_items.append((
                                 repo_full_name, file_path, "",
                                 raw_url, item.repository.html_url, "search", "claude",
