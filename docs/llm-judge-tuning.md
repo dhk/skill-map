@@ -184,3 +184,23 @@ pen-testing skill with no validation, scoping, or guardrails. The heuristic flag
 Takeaway: the heuristic gate is necessary but the `instruction` and `safety` axes
 are where the next round of real quality improvement lives — and neither is
 fakeable with pattern-matching.
+
+## Why not LLM-grade the whole corpus?
+
+The judge runs on a **stratified sample**, not all 4,953 skills, by design:
+
+- **Cost/time.** Each skill is a ~50s `claude -p` call. The full corpus is ~68
+  hours serial, and the session usage limit interrupts long runs (it bit us
+  mid-run twice). That's a second crawl's worth of effort for a cross-check.
+- **It's a *cross-check*, not the scorer.** The heuristic gate already grades all
+  4,953 for free; the LLM's job is to (a) validate the rubric across the quality
+  range and (b) judge the things structure can't see (scope, instruction, safety).
+  A stratified sample answers both — a census doesn't add proportional signal.
+- **Calibration over coverage.** Equal cells per (signature × tier) let us check
+  the judge *at every quality level*; a corpus-wide pass skewed 77% mega-collection
+  would bury the canonical comparison.
+
+If a corpus-wide LLM leaderboard is ever wanted, it's a deliberate separate job —
+a smaller/cheaper model, batched, run over a weekend — not the default. The
+two-layer model (heuristic gate everywhere + LLM judgment on a sample) is the
+right cost/signal trade-off for keeping the study current.
