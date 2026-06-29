@@ -228,6 +228,18 @@
   "originator_score": 18.4
  },
  {
+  "repo": "vercel-labs/agent-skills",
+  "n_skills": 9,
+  "ancestor_credit": 1.0,
+  "novel_concepts": 7,
+  "originality_rate": 77.8,
+  "copies_in": 1,
+  "copy_ratio": 11.1,
+  "signature": "canonical-reference",
+  "stars": 28423,
+  "originator_score": 18.3
+ },
+ {
   "repo": "muratcankoylan/Agent-Skills-for-Context-Engineering",
   "n_skills": 21,
   "ancestor_credit": 0,
@@ -348,18 +360,6 @@
   "originator_score": 16.0
  },
  {
-  "repo": "vercel-labs/agent-skills",
-  "n_skills": 9,
-  "ancestor_credit": 0,
-  "novel_concepts": 7,
-  "originality_rate": 77.8,
-  "copies_in": 0,
-  "copy_ratio": 0.0,
-  "signature": "canonical-reference",
-  "stars": 28423,
-  "originator_score": 15.6
- },
- {
   "repo": "Jeffallan/claude-skills",
   "n_skills": 66,
   "ancestor_credit": 0,
@@ -461,8 +461,8 @@
   "ancestor_credit": 0,
   "novel_concepts": 500,
   "originality_rate": 57.3,
-  "copies_in": 276,
-  "copy_ratio": 31.7,
+  "copies_in": 277,
+  "copy_ratio": 31.8,
   "signature": "mega-collection",
   "stars": 28337,
   "originator_score": 5.1

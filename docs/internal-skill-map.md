@@ -261,7 +261,7 @@ jobs:
 |-----------|-------------|
 | Static data (crawled once) | Rebuilt nightly from live org state |
 | 52 orgs, manually curated | Your org's actual teams |
-| 1,119 skills, public corpus | Whatever your org has built |
+| 4,975 crawled skills (~3,769 unique), public corpus | Whatever your org has built |
 | Personas are archetypal | Personas could map to your actual teams |
 | No auth (public) | Password gate or SSO |
 | No install path (no registry) | `git clone` from your internal GitHub works directly |

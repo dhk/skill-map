@@ -22,10 +22,12 @@ from collections import defaultdict
 
 sys.path.insert(0, str(Path(__file__).parent))
 from skill_quality import score_skill
+from score_corpus import _crawl_n   # numeric crawl-order key (crawl-10 after crawl-2)
 
 BASE = Path(__file__).parent.parent
 CRAWLS = BASE / 'crawls'
 OUT = BASE / 'data' / 'skill_history.json'
+SIB = BASE / 'data' / 'sibling_files.json'
 
 
 def crawl_results(data_path):
@@ -34,7 +36,8 @@ def crawl_results(data_path):
 
 
 def main():
-    crawl_dirs = sorted(d for d in CRAWLS.glob('*/data.json'))
+    crawl_dirs = sorted(CRAWLS.glob('*/data.json'), key=_crawl_n)
+    sib = json.load(open(SIB)) if SIB.exists() else {}
     hist = {'crawls': [], 'skills': {}, 'deltas': {}}
     seen_repos = set()
     # per-repo last-known live skill keys (for removal detection)
@@ -53,7 +56,9 @@ def main():
             key = f'{repo}\t{path}'
             sha = r.get('file_sha')
             dir_name = path.replace('\\', '/').split('/')[-2] if '/' in path else None
-            score = score_skill(r['skill_md_content'], dir_name)['overall']
+            # Score WITH siblings so a skill's quality here matches score_corpus /
+            # STATS.md (the disclosure axis credits reference/scripts siblings).
+            score = score_skill(r['skill_md_content'], dir_name, sib.get(key))['overall']
             words = len(r['skill_md_content'].split())
             if key not in hist['skills']:
                 added.append(key)

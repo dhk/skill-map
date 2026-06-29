@@ -19,14 +19,20 @@ Usage:
 import argparse
 import json
 import re
+import sys
 import hashlib
 import urllib.request
 import urllib.parse
 from pathlib import Path
-from collections import defaultdict
+from collections import defaultdict, Counter
+
+sys.path.insert(0, str(Path(__file__).parent))
+from score_corpus import load_all_crawls   # canonical merged-corpus loader
 
 BASE = Path(__file__).parent.parent
-CRAWL = BASE / 'crawls' / 'crawl-1-2026-06-24' / 'data.json'
+# Clusters over the MERGED corpus (all crawls), so skills that first appear in a
+# later crawl are included in the copy/ancestry analysis. Lineage runs in the
+# pipeline and feeds originator_leaderboard, curiosities, and both figures.
 SCORES = BASE / 'data' / 'skill_quality.json'
 DATES = BASE / 'data' / 'commit_dates.json'
 OUT = BASE / 'data' / 'lineage.json'
@@ -121,6 +127,13 @@ def cluster(skills):
 
 
 def gh(url):
+    # REVIEW(fragile / data-expansion): UNAUTHENTICATED (60 req/hr) yet first_commit_date
+    # makes 1–2 calls PER clustered file — thousands of files means certain rate-limit
+    # exhaustion, and the bare `except` below swallows it as date=None, which then
+    # silently flips ancestor_basis to 'no-dates'/'date-unreliable' and quietly drops
+    # flows. maturity_crawl.py already threads $GITHUB_TOKEN through the same API;
+    # do the same here. Better: capture first/last-commit dates DURING the crawl so
+    # this whole per-file commit-API pass disappears.
     req = urllib.request.Request(url, headers={
         'Accept': 'application/vnd.github+json', 'User-Agent': 'skill-map'})
     return urllib.request.urlopen(req, timeout=40)
@@ -159,8 +172,7 @@ def main():
     ap.add_argument('--no-fetch', action='store_true')
     args = ap.parse_args()
 
-    crawl = json.load(open(CRAWL))['results']
-    skills = [x for x in crawl if x.get('skill_md_content')]
+    skills = [x for x in load_all_crawls() if x.get('skill_md_content')]
     scores = json.load(open(SCORES))
     qual = {(s['repo'], s['file_path']): s['overall'] for s in scores['skills']}
     stars = {rn: r['stars'] for rn, r in scores['repos'].items()}
@@ -205,7 +217,6 @@ def main():
     bulk = set()
     for r, days in repo_days.items():
         if len(days) >= 3:
-            from collections import Counter
             if Counter(days).most_common(1)[0][1] / len(days) > 0.5:
                 bulk.add(r)
 

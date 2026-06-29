@@ -28,6 +28,19 @@ import sys
 import json
 
 # ── Thresholds (derived from canonical reference skills) ──────────────
+# REVIEW(assumption / fragile): every threshold below is a magic constant frozen
+# from one snapshot of anthropics/skills (desc median 43 words, body ~1194, etc.).
+# They are NOT recomputed from the live corpus, so as the canonical reference
+# evolves these silently drift from "what the gold standard actually does now".
+# Since score_corpus already loads the full corpus, the canonical percentiles
+# could be derived at runtime and these constants become a fallback, not the law.
+#
+# REVIEW(LLM-replaceable, the GOOD direction): this whole module is the
+# deterministic counterpart to sample_llm.py / judge_llm.py. Of the LLM judge's
+# axes, frontmatter / triggering / disclosure / structure are ALREADY computed
+# here for free over the entire corpus; the LLM is only genuinely additive on the
+# three judgment axes it flags itself (scope, instruction quality, safety
+# appropriateness). The remaining LLM passes should be scoped to just those.
 # anthropics/skills: desc median 43 words, body median ~1194 words,
 # name+description always present, license common, headings standard.
 DESC_MIN_WORDS = 8       # below this a description can't say what+when
@@ -99,8 +112,53 @@ KNOWN_KEYS = {
 }
 
 
+try:
+    import yaml as _yaml
+except ImportError:           # PyYAML optional: fall back to the hand parser
+    _yaml = None
+
+
+def _fm_manual(fm_text):
+    """Fallback frontmatter parser: flat `key: value` + block scalars (|, >)."""
+    fm = {}
+    lines = fm_text.splitlines()
+    i = 0
+    while i < len(lines):
+        mm = re.match(r'^([A-Za-z0-9_-]+):\s*(.*)$', lines[i])
+        if not mm:
+            i += 1
+            continue
+        key, val = mm.group(1).strip(), mm.group(2).strip()
+        if re.match(r'^[|>][-+0-9]*$', val):          # block scalar
+            block = []
+            i += 1
+            while i < len(lines) and (lines[i].strip() == '' or
+                                      re.match(r'^\s+', lines[i])):
+                block.append(lines[i].strip())
+                i += 1
+            fm[key] = ' '.join(b for b in block if b).strip()
+            continue
+        fm[key] = val.strip('"\'')
+        i += 1
+    return fm
+
+
+def _coerce_fm(d):
+    """Normalise a parsed YAML mapping for scoring: scalars → str, keep
+    list/dict (e.g. a nested `metadata:` block) as-is so presence is detectable."""
+    out = {}
+    for k, v in d.items():
+        out[str(k)] = v if isinstance(v, (dict, list)) else ('' if v is None else str(v))
+    return out
+
+
 def parse_skill(md):
-    """Split a SKILL.md into frontmatter (dict) and body (str)."""
+    """Split a SKILL.md into frontmatter (dict) and body (str).
+
+    Uses PyYAML when available (handles nested maps, flow lists, quoted/colon
+    values correctly) and falls back to a small hand parser when PyYAML is absent
+    or the frontmatter is malformed — so scoring never crashes on a bad header.
+    """
     md = md or ''
     fm = {}
     body = md
@@ -108,26 +166,15 @@ def parse_skill(md):
         m = re.match(r'^\s*---\s*\n(.*?)\n---\s*\n?(.*)$', md, re.S)
         if m:
             body = m.group(2)
-            lines = m.group(1).splitlines()
-            i = 0
-            while i < len(lines):
-                mm = re.match(r'^([A-Za-z0-9_-]+):\s*(.*)$', lines[i])
-                if not mm:
-                    i += 1
-                    continue
-                key, val = mm.group(1).strip(), mm.group(2).strip()
-                # YAML block scalar (|, |-, >, >- ...): gather indented lines
-                if re.match(r'^[|>][-+0-9]*$', val):
-                    block = []
-                    i += 1
-                    while i < len(lines) and (lines[i].strip() == '' or
-                                              re.match(r'^\s+', lines[i])):
-                        block.append(lines[i].strip())
-                        i += 1
-                    fm[key] = ' '.join(b for b in block if b).strip()
-                    continue
-                fm[key] = val.strip('"\'')
-                i += 1
+            fm_text = m.group(1)
+            if _yaml is not None:
+                try:
+                    loaded = _yaml.safe_load(fm_text)
+                    fm = _coerce_fm(loaded) if isinstance(loaded, dict) else {}
+                except _yaml.YAMLError:
+                    fm = _fm_manual(fm_text)      # malformed → best-effort
+            else:
+                fm = _fm_manual(fm_text)
     return {'frontmatter': fm, 'body': body, 'raw': md,
             'has_yaml': bool(fm) or md.lstrip().startswith('---')}
 

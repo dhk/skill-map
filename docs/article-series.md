@@ -13,7 +13,7 @@ real figure, a dataset, and a reproducible command — not just opinion.
 ## 1. "4,900 Skills, 1,300 Ideas: How Skills Propagate"
 **Thesis:** most of the ecosystem is copies. We can trace where each one came from.
 
-- **Hook:** of 4,953 crawled skills, 598 are cross-repo duplicates in 260
+- **Hook:** of 4,975 crawled skills, 598 are cross-repo duplicates in 260
   clusters — and the mega-collections are 100% single-commit bulk imports. The
   "ecosystem" is smaller than it looks.
 - **The reveal:** first-commit-date ancestry → an origin story for each copied

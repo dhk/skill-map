@@ -30,8 +30,13 @@ import sys
 import urllib.request
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from score_corpus import latest_content_by_key   # canonical merged-corpus loader
+
 BASE = Path(__file__).parent.parent
-CRAWL = BASE / 'crawls' / 'crawl-1-2026-06-24' / 'data.json'
+# Reads the MERGED corpus (latest content per skill across all crawls) so the
+# judge never grades a stale first-snapshot copy while comparing it to current
+# heuristic scores. (Previously pinned crawls/crawl-1-…; see docs/CODE-REVIEW.md.)
 SCORES = BASE / 'data' / 'skill_quality.json'
 OUT = BASE / 'data' / 'llm_sample_v2.json'
 
@@ -83,6 +88,13 @@ _sibling_cache = {}
 
 def fetch_siblings(repo, file_path):
     """List files in the skill's folder + one level into reference/scripts dirs."""
+    # REVIEW(rework / fragile): this re-fetches sibling files over the UNAUTH
+    # GitHub API (60 req/hr → judging more than ~60 skills will start failing with
+    # the bare-except returning "(could not list: ...)"). The pipeline ALREADY
+    # produced data/sibling_files.json via fetch_siblings.py for the whole corpus.
+    # Read that sidecar instead of a third live crawl — and per the crawl.py note,
+    # the tree walk could have stored siblings in the first place, removing all of
+    # these fetches.
     key = (repo, file_path)
     if key in _sibling_cache:
         return _sibling_cache[key]
@@ -113,6 +125,11 @@ def fetch_siblings(repo, file_path):
 
 
 def call_claude(prompt):
+    # REVIEW(fragile dependency): shells out to a `claude` binary on PATH and an
+    # ambient OAuth session — no API-key fallback, no model pinned, so results are
+    # non-reproducible across machines/sessions and unusable in CI. The judgment
+    # itself genuinely needs an LLM; the transport is what's brittle. Prefer the
+    # SDK/API with an explicit model id, and degrade gracefully when absent.
     r = subprocess.run(['claude', '-p', prompt],
                        capture_output=True, text=True, timeout=240)
     out = r.stdout.strip()
@@ -149,9 +166,7 @@ def main():
     args = ap.parse_args()
 
     scores = json.load(open(SCORES))
-    crawl = {(r['repo_full_name'], r['file_path']): r
-             for r in json.load(open(CRAWL))['results']
-             if r.get('skill_md_content')}
+    crawl = latest_content_by_key()
     repo_sig = {rn: r['signature'] for rn, r in scores['repos'].items()}
 
     if args.validate:

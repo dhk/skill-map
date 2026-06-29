@@ -1,0 +1,944 @@
+{
+  "anthropics/docx": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "modifier"
+  },
+  "anthropics/pptx": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "modifier"
+  },
+  "anthropics/xlsx": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "modifier"
+  },
+  "voltagent/voltagent-docs-bundle": {
+    "action": "extract",
+    "complexity": "foundational",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "googleworkspace/gws-docs": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "standalone"
+  },
+  "trailofbits/culture-index": {
+    "action": "extract",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "standalone"
+  },
+  "microsoft/azure-ai-document-intelligence-dotnet": {
+    "action": "extract",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "fal-ai-community/fal-restore": {
+    "action": "transform",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "modifier"
+  },
+  "WordPress/wordpress-router": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "orchestrator"
+  },
+  "openai/doc": {
+    "action": "transform",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "modifier"
+  },
+  "coreyhaines31/product-marketing-context": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "realkimbarrett/generic-language-killer": {
+    "action": "transform",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "modifier"
+  },
+  "anthropics/doc-coauthoring": {
+    "action": "integrate",
+    "complexity": "advanced",
+    "output_type": "text",
+    "integration": "connector"
+  },
+  "composiohq/composio": {
+    "action": "integrate",
+    "complexity": "advanced",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "better-auth/best-practices": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "connector"
+  },
+  "firecrawl/firecrawl-build-interact": {
+    "action": "extract",
+    "complexity": "advanced",
+    "output_type": "action",
+    "integration": "orchestrator"
+  },
+  "veniceai/venice-api-overview": {
+    "action": "integrate",
+    "complexity": "foundational",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "cloudflare/cloudflare": {
+    "action": "analyze",
+    "complexity": "advanced",
+    "output_type": "report",
+    "integration": "orchestrator"
+  },
+  "googleworkspace/gws-shared": {
+    "action": "configure",
+    "complexity": "foundational",
+    "output_type": "structured-data",
+    "integration": "modifier"
+  },
+  "trailofbits/building-secure-contracts": {
+    "action": "analyze",
+    "complexity": "advanced",
+    "output_type": "media",
+    "integration": "orchestrator"
+  },
+  "microsoft/entra-agent-id": {
+    "action": "integrate",
+    "complexity": "advanced",
+    "output_type": "report",
+    "integration": "connector"
+  },
+  "WordPress/wp-plugin-development": {
+    "action": "analyze",
+    "complexity": "advanced",
+    "output_type": "code",
+    "integration": "connector"
+  },
+  "openai/netlify-deploy": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "binance/query-token-audit": {
+    "action": "analyze",
+    "complexity": "advanced",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "anthropics/algorithmic-art": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "standalone"
+  },
+  "anthropics/theme-factory": {
+    "action": "transform",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "modifier"
+  },
+  "veniceai/venice-image-generate": {
+    "action": "transform",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "modifier"
+  },
+  "trailofbits/entry-point-analyzer": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "standalone"
+  },
+  "getsentry/sentry-flutter-sdk": {
+    "action": "integrate",
+    "complexity": "advanced",
+    "output_type": "media",
+    "integration": "connector"
+  },
+  "microsoft/podcast-generation": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "connector"
+  },
+  "fal-ai-community/fal-3d": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "standalone"
+  },
+  "openai/imagegen": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "connector"
+  },
+  "realkimbarrett/schwartz-awareness-mapper": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "standalone"
+  },
+  "binance/crypto-market-rank": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "connector"
+  },
+  "brave/images-search": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "connector"
+  },
+  "flutter/flutter-handling-concurrency": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "standalone"
+  },
+  "anthropics/canvas-design": {
+    "action": "transform",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "modifier"
+  },
+  "anthropics/frontend-design": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "standalone"
+  },
+  "anthropics/web-artifacts-builder": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "standalone"
+  },
+  "voltagent/create-voltagent": {
+    "action": "configure",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "orchestrator"
+  },
+  "angular/angular-developer": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "standalone"
+  },
+  "google-gemini/gemini-live-api-dev": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "stripe/stripe-best-practices": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "connector"
+  },
+  "callstackincubator/react-native-best-practices": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "standalone"
+  },
+  "tinybirdco/tinybird-cli-guidelines": {
+    "action": "configure",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "hashicorp/terraform-style-guide": {
+    "action": "transform",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "modifier"
+  },
+  "sanity-io/content-modeling-best-practices": {
+    "action": "configure",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "connector"
+  },
+  "firecrawl/firecrawl-build": {
+    "action": "extract",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "connector"
+  },
+  "anthropics/slack-gif-creator": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "modifier"
+  },
+  "anthropics/internal-comms": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "trycourier/courier-skills": {
+    "action": "integrate",
+    "complexity": "advanced",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "googleworkspace/gws-gmail": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "getsentry/sentry-create-alert": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "microsoft/azure-communication-callautomation-java": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "coreyhaines31/cold-email": {
+    "action": "transform",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "resend/resend": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "NVIDIA/Megatron-Bridge/perf-expert-parallel-overlap": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "anthropics/webapp-testing": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "sanity-io/content-experimentation-best-practices": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "orchestrator"
+  },
+  "cloudflare/web-perf": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "standalone"
+  },
+  "googleworkspace/gws-admin-reports": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "connector"
+  },
+  "trailofbits/dwarf-expert": {
+    "action": "transform",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "modifier"
+  },
+  "microsoft/azure-resource-manager-playwright-dotnet": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "openai/gh-fix-ci": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "modifier"
+  },
+  "coreyhaines31/ab-test-setup": {
+    "action": "configure",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "realkimbarrett/ad-angle-multiplier": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "flutter/flutter-testing-apps": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "connector"
+  },
+  "deanpeters/epic-hypothesis": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "standalone"
+  },
+  "phuryn/ab-test-analysis": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "anthropics/template": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "connector"
+  },
+  "google-gemini/gemini-api-dev": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "connector"
+  },
+  "replicate/replicate": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "veniceai/venice-chat": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "vercel-labs/next-best-practices": {
+    "action": "configure",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "googleworkspace/gws-drive": {
+    "action": "integrate",
+    "complexity": "foundational",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "expo/expo-api-routes": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "orchestrator"
+  },
+  "huggingface/hf-cli": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "trailofbits/sharp-edges": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "connector"
+  },
+  "getsentry/sentry-sdk-setup": {
+    "action": "analyze",
+    "complexity": "advanced",
+    "output_type": "code",
+    "integration": "orchestrator"
+  },
+  "microsoft/continual-learning": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "fal-ai-community/fal-platform": {
+    "action": "integrate",
+    "complexity": "advanced",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "voltagent/voltagent-best-practices": {
+    "action": "automate",
+    "complexity": "advanced",
+    "output_type": "action",
+    "integration": "orchestrator"
+  },
+  "voltagent/voltagent-core-reference": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "orchestrator"
+  },
+  "callstackincubator/github": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "orchestrator"
+  },
+  "sanity-io/sanity-best-practices": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "orchestrator"
+  },
+  "veniceai/venice-video": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "orchestrator"
+  },
+  "googleworkspace/gws-workflow": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "orchestrator"
+  },
+  "expo/expo-cicd-workflows": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "orchestrator"
+  },
+  "trailofbits/claude-in-chrome-troubleshooting": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "getsentry/sentry-workflow": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "orchestrator"
+  },
+  "microsoft/m365-agents-dotnet": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "orchestrator"
+  },
+  "fal-ai-community/fal-workflow": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "orchestrator"
+  },
+  "openai/linear": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "orchestrator"
+  },
+  "supabase/postgres-best-practices": {
+    "action": "configure",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "connector"
+  },
+  "tinybirdco/tinybird-best-practices": {
+    "action": "configure",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "neondatabase/neon-postgres": {
+    "action": "configure",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "connector"
+  },
+  "clickhouse/clickhouse-best-practices": {
+    "action": "configure",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "connector"
+  },
+  "cloudflare/durable-objects": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "orchestrator"
+  },
+  "netlify/netlify-db": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "google-labs-code/stitch-loop": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "standalone"
+  },
+  "huggingface/hugging-face-datasets": {
+    "action": "configure",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "trailofbits/testing-handbook-skills": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "getsentry/sentry-pr-code-review": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "connector"
+  },
+  "microsoft/azure-mgmt-mongodbatlas-dotnet": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "WordPress/wp-performance": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "google-gemini/vertex-ai-api-dev": {
+    "action": "integrate",
+    "complexity": "advanced",
+    "output_type": "code",
+    "integration": "connector"
+  },
+  "hashicorp/azure-verified-modules": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "hashicorp/new-terraform-provider": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "connector"
+  },
+  "cloudflare/cloudflare-email-service": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "orchestrator"
+  },
+  "netlify/netlify-edge-functions": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "connector"
+  },
+  "expo/expo-deployment": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "huggingface/hugging-face-jobs": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "getsentry/sentry-setup-ai-monitoring": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "connector"
+  },
+  "openai/cloudflare-deploy": {
+    "action": "automate",
+    "complexity": "advanced",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "browserbase/functions": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "firebase/firebase-hosting-basics": {
+    "action": "automate",
+    "complexity": "foundational",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "garrytan/land-and-deploy": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "stripe/upgrade-stripe": {
+    "action": "integrate",
+    "complexity": "advanced",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "veniceai/venice-billing": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "veniceai/venice-x402": {
+    "action": "transform",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "modifier"
+  },
+  "trailofbits/constant-time-analysis": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "microsoft/azure-keyvault-keys-rust": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "coinbase/fund": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "connector"
+  },
+  "deanpeters/finance-based-pricing-advisor": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "connector"
+  },
+  "sanity-io/seo-aeo-best-practices": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "typefully/typefully": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "googleworkspace/gws-modelarmor": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "microsoft/azure-ai-contentsafety-java": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "coreyhaines31/ai-seo": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "modifier"
+  },
+  "brave/llm-context": {
+    "action": "extract",
+    "complexity": "intermediate",
+    "output_type": "structured-data",
+    "integration": "connector"
+  },
+  "deanpeters/pestel-analysis": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "connector"
+  },
+  "phuryn/marketing-ideas": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "addyosmani/seo": {
+    "action": "extract",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "AgriciDaniel/claude-seo": {
+    "action": "generate",
+    "complexity": "advanced",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "degausai/wonda": {
+    "action": "transform",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "modifier"
+  },
+  "openai/notion-spec-to-implementation": {
+    "action": "transform",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "openai/sentry": {
+    "action": "extract",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "connector"
+  },
+  "coreyhaines31/launch-strategy": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "realkimbarrett/offer-extraction": {
+    "action": "extract",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "datadog-labs/dd-llmo-eval-bootstrap": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "deanpeters/eol-message": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "phuryn/create-prd": {
+    "action": "automate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "garrytan/office-hours": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "code",
+    "integration": "standalone"
+  },
+  "makenotion/spec-to-implementation": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "addyosmani/core-web-vitals": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "redhat/cve-skillpack": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "Paramchoudhary/ResumeSkills": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "dhk/captains-log": {
+    "action": "transform",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "modifier"
+  },
+  "dhk/close-day": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "dhk/plan-day": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "dhk/reading-list-builder": {
+    "action": "generate",
+    "complexity": "foundational",
+    "output_type": "media",
+    "integration": "standalone"
+  },
+  "dhk/daily-briefing": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "media",
+    "integration": "orchestrator"
+  },
+  "dhk/snapshot-create": {
+    "action": "generate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "standalone"
+  },
+  "dhk/tricorder": {
+    "action": "generate",
+    "complexity": "advanced",
+    "output_type": "report",
+    "integration": "standalone"
+  },
+  "dhk/weekly-reset": {
+    "action": "integrate",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "connector"
+  },
+  "Xquik-dev/x-twitter-scraper": {
+    "action": "extract",
+    "complexity": "intermediate",
+    "output_type": "text",
+    "integration": "orchestrator"
+  },
+  "Xquik-dev/tweetclaw": {
+    "action": "analyze",
+    "complexity": "intermediate",
+    "output_type": "action",
+    "integration": "standalone"
+  }
+}

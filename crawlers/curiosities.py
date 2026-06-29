@@ -114,7 +114,6 @@ def main():
     # 6. Extremes
     L.append('## 📏 Extremes\n')
     most_sib = sorted(sib.items(), key=lambda kv: -len(kv[1]))[:1]
-    most_code = max(skills, key=lambda s: s.get('body_words', 0))  # placeholder
     L.append(f'- **Longest skill:** `{longest[1]}` — {longest[0]:,} words in one '
              'SKILL.md (the corpus median is ~810).')
     if most_sib:

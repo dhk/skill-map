@@ -1,0 +1,109 @@
+# Code Review Response & Action List (review2)
+
+Second-pass triage of PR #5 (`docs/CODE-REVIEW.md` + the fixes on
+`claude/skill-map-code-review-hx98b1`). Two reviewers converged here; this is the
+merged result.
+
+**Verdict: sound, mergeable.** Verified against live runs — pipeline green, score
+parity held (median 82.5, WHEN +1pt from the better YAML parser), all modules
+parse, and a re-run produced byte-identical derived JSON (only the Sankey PNG
+differs, due to matplotlib timestamp metadata). No correctness changes are
+*required* to merge.
+
+Inline counterparts carry the same tag: `grep -rn 'RECOMMEND(review2' .`
+Priorities: **P0** = before merge · **P1** = should · **backlog** = optional.
+
+---
+
+## P0 — merge blocker (1) — ✅ DONE
+
+- [x] **`docs/internal-skill-map.md:264` — stale `1,119 skills`.** The branch's
+  own generic `check_docs` flagged it, so the PR failed its own doc gate. Fixed:
+  the cell now reads `4,975 crawled skills (~3,769 unique)` — matches the live
+  corpus and carries the honest dedup number. `check_docs` no longer flags it.
+
+> The 2 remaining `check_docs` hits are intentional prose — an **article-draft
+> hook** (`article-series.md`) and an **approximate** `~4,900` in
+> `design-brief.md`. Author's call, not blockers.
+
+---
+
+## P1 — recommended polish
+
+- [x] **`patch_map_badges.py` — badge join refreshed only 26/39; 13 kept stale
+  grades.** *Symptom fixed on this branch:* unmatched nodes now have their badge
+  **cleared** (no stale/wrong grade lingers) and the script logs `matched/cleared`.
+  Marker: `RECOMMEND(review2, P1)` in `patch_map_badges.py`.
+  **Root cause (still open, backlog):** it's upstream in `enrich_urls.py`. The
+  `(org,dir)` rewrite dropped the deep-link on ~16 map nodes (42→26) — skills the
+  map attributes to org X (openai, angular, supabase…) but whose crawled
+  `SKILL.md` actually lives in a mega-collection *copy* (davila7, affaan-m…). The
+  new code links to the attributed org, can't find the skill there, and falls
+  back to a bare org root — losing the deep-link. **Real fix:** link to the
+  skill's *actual crawled location* (repo+path from the corpus); keep the
+  attributed org as a label only.
+
+- [ ] **Honest framing for the deterministic tagger.** Marker:
+  `RECOMMEND(review2, P1)` in `classify_tags.py`. Per-axis agreement is decent
+  (48–66%) but **all-4-axes exact agreement is ~12% — not parity.** It is a free
+  *default / gap-filler* (`--fill` keeps existing LLM tags, never downgrades) plus
+  an *optional LLM pass for the ambiguous tail*. Keep that framing everywhere
+  (`docs/CODE-REVIEW.md` §B, PR body); never describe it as replacing the LLM.
+
+---
+
+## Backlog — still-open `REVIEW(...)` notes, ranked
+
+1. **Thread `$GITHUB_TOKEN` into the unauth API calls** *(highest risk)* —
+   `lineage_trace.py`, legacy `fetch_siblings` backfill, `judge_llm.fetch_siblings`:
+   60 req/hr + bare `except` turns rate-limit exhaustion into silently-dropped
+   data. `maturity_crawl.py` already threads it — copy the pattern.
+2. **Check the tree-API `truncated` flag** — `crawl.py` warns but doesn't handle;
+   `fetch_siblings` legacy path ignores it. >100k-entry monorepos lose files past
+   the cutoff. Add a paginated/contents fallback.
+3. **`enrich_urls` deep-link coverage** (the P1 #2 root cause) — link to the
+   actual crawled repo+path so mega-collection copies keep their deep-link/badge.
+4. **One-crawl-per-day resumption** (`crawl.py:find_today_dir`) — two lists on the
+   same UTC day merge into one dir; metrics reflect only the last. Key on `list_id`.
+5. **Finish `default_branch` upstream** — captured now, but existing snapshots
+   predate it, so `enrich_urls` still emits `/tree/HEAD/`. Resolves on next crawl.
+6. **Frozen thresholds** (`skill_quality.py`) — rubric constants pinned from one
+   snapshot; derive canonical percentiles at runtime, keep constants as fallback.
+7. **`reclassify.py` keyword map** *(lowest)* — `classify_domain()` is keyword-only;
+   a topic-aware version (join to crawl `repo_topics`, now captured) would beat it.
+
+---
+
+## ✅ Already done — DO NOT re-flag
+
+Landed on this branch; verified present:
+
+- Unique-skill count folded into `STATS.md` (`gen_stats.py`) → "~3,769 unique skills".
+- Stale single-crawl pin removed → judges/lineage read the merged corpus
+  (`load_all_crawls()` / `latest_content_by_key()`); numeric `_crawl_n` sort.
+- Hand-rolled YAML → PyYAML with fallback (99% scores identical; 54 movers are fixes).
+- 4 inconsistent `const GRAPH` regexes → single `graphio.py` helper (5 scripts).
+- `enrich_urls` `(org,dir)` match; `track_history` scores with siblings + numeric
+  order; `git push -u origin <branch>`; `crawl.py` shared `is_skill_file()` +
+  global-search blob SHAs.
+- `lineage_trace` `Counter` `UnboundLocalError` (no-dates path) fixed.
+- `sample_llm.py` retired; `reclassify` + `classify_tags --fill` wired into `run_pipeline`.
+- Dead code (`curiosities.most_code`) removed.
+
+## 🛑 Don't touch — load-bearing / correct-as-is
+
+- `score_corpus` / `skill_quality` / `repo_signature` / `gen_stats` + `check_docs`
+  are the clean "derive, don't hand-write" core.
+- `graphio.GRAPH_RE` uses `re.S` and `save_graph` writes minified — keep both;
+  the old no-DOTALL copies only worked by accident.
+- `classify_tags --fill` preserves existing tags — do NOT switch the pipeline to
+  `--patch` (that overwrites 157 LLM tags with ~12%-parity deterministic ones).
+- `sibling_files = None` vs `[]` (`crawl.py`) — `None` = not walked (→ API
+  backfill); `[]` = walked, genuinely empty. Don't collapse them.
+- Reduced map deep-links/badges (28/26) is the *correct* result of dropping
+  cross-repo mis-links — don't "restore" coverage by loosening the match (fix the
+  root cause in `enrich_urls` instead).
+- `count_skills` near-dup threshold 0.80 matches `lineage_trace` on purpose.
+- `maturity_crawl.py` / `sample_llm.py` kept-but-retired — intentional (history).
+- Committed derived data is consistent with a fresh pipeline run; no forced regen
+  needed on merge (only the Sankey PNG differs, on matplotlib metadata).

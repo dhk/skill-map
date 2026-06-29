@@ -40,6 +40,16 @@ GLOBAL_QUERIES = [
     "filename:SKILLS.md",
 ]
 
+# One definition of "is this a skill file", shared by the repo-scoped tree walk
+# and the global-search path (which previously disagreed: the tree walk matched
+# only SKILL.md while the queries also pulled skill.md/SKILLS.md). SKILLS.md is
+# deliberately excluded — in practice it's a repo-level index, not a skill.
+_SKILL_FILE_RE = re.compile(r'^skill\.md$', re.I)
+
+
+def is_skill_file(name: str) -> bool:
+    return bool(_SKILL_FILE_RE.match(name))
+
 
 # ---------------------------------------------------------------------------
 # GitHub helpers — PyGithub handles auth, rate-limit headers, pagination
@@ -70,8 +80,27 @@ def search_code_page(gh: Github, query: str, page: int):
     return gh.search_code(query).get_page(page)
 
 
+SIBLING_CAP = 60   # matches fetch_siblings.py's cap so the data is interchangeable
+
+
+def _siblings_for(file_path: str, all_paths: list[str]) -> list[str]:
+    """Repo-relative paths under the skill's folder (excl. the skill file),
+    capped. Identical contract to fetch_siblings.py so data/sibling_files.json
+    can be populated straight from the crawl instead of a second network pass."""
+    sp = file_path.replace("\\", "/")
+    d = "/".join(sp.split("/")[:-1])
+    sibs = [p for p in all_paths
+            if p != sp and (p.startswith(d + "/") if d else "/" not in p)]
+    return sibs[:SIBLING_CAP]
+
+
 def walk_repo_tree(gh: Github, repo_full_name: str) -> list[dict]:
-    """Return all SKILL.md blobs with their git SHA via the trees API."""
+    """Return all SKILL.md blobs with their git SHA via the trees API, each
+    annotated with its sibling files (captured here so downstream stages don't
+    re-fetch the tree). REVIEW(remaining): sha="HEAD" still assumes the default
+    branch tip; the raw URL still pins /HEAD/ rather than the walked commit; and
+    SKILL.md matching differs from GLOBAL_QUERIES (skill.md/SKILLS.md). See notes
+    below — those are unchanged by this data-capture fix."""
     try:
         repo = gh.get_repo(repo_full_name)
         tree = repo.get_git_tree(sha="HEAD", recursive=True)
@@ -79,23 +108,46 @@ def walk_repo_tree(gh: Github, repo_full_name: str) -> list[dict]:
         if e.status == 404:
             return []
         raise
+    # The tree API truncates at ~100k entries; surface it instead of silently
+    # losing files past the cutoff. (A full fix would page via the contents API.)
+    truncated = bool(getattr(tree, "truncated", False))
+    if truncated:
+        console.print(f"  [yellow]⚠ tree truncated for {repo_full_name} — "
+                      f"some SKILL.md/sibling files may be missing[/yellow]")
+
+    all_paths = [item.path for item in tree.tree if item.type == "blob"]
+
     results = []
     for item in tree.tree:
-        if item.type == "blob" and Path(item.path).name.upper() == "SKILL.MD":
+        if item.type == "blob" and is_skill_file(Path(item.path).name):
+            # REVIEW(assumption): Gemini detection keys only on the ".gemini/"
+            # prefix; other Gemini layouts are mislabelled "claude".
             is_gemini = item.path.startswith(".gemini/")
             results.append({
                 "repo_full_name": repo_full_name,
                 "file_path": item.path,
                 "file_sha": item.sha,
+                # REVIEW(fragile): /HEAD/ resolves at fetch time, not walk time —
+                # could drift from file_sha if the repo is pushed mid-crawl.
                 "file_raw_url": f"https://raw.githubusercontent.com/{repo_full_name}/HEAD/{item.path}",
                 "repo_url": f"https://github.com/{repo_full_name}",
                 "file_format": "gemini" if is_gemini else "claude",
+                # DATA-EXPANSION: siblings captured for free from the tree we
+                # already walked. fetch_siblings.py reads these instead of a
+                # second unauthenticated tree fetch per repo.
+                "sibling_files": _siblings_for(item.path, all_paths),
+                "tree_truncated": truncated,
             })
     return results
 
 
 def get_repo_meta(gh: Github, repo_full_name: str) -> dict:
     repo = gh.get_repo(repo_full_name)
+    # DATA-EXPANSION: capture default_branch from the get_repo() call we already
+    # make, so fetch_siblings/audit_repo stop re-calling the repos API for it and
+    # enrich_urls can stop hard-coding "main".
+    # REVIEW(still open): repo_topics is captured but nothing consumes it — wiring
+    # it into domain classification would shrink reclassify.py's manual MOVES map.
     return {
         "repo_description": repo.description or "",
         "repo_stars": repo.stargazers_count,
@@ -103,6 +155,7 @@ def get_repo_meta(gh: Github, repo_full_name: str) -> dict:
         "repo_topics": repo.get_topics(),
         "repo_last_pushed": repo.pushed_at.isoformat() if repo.pushed_at else "",
         "repo_owner_type": repo.owner.type,
+        "repo_default_branch": repo.default_branch or "",
     }
 
 
@@ -110,6 +163,11 @@ def get_repo_meta(gh: Github, repo_full_name: str) -> dict:
 # Raw file fetch — unauthenticated (auth causes 404 via proxy on raw.gh.com)
 # ---------------------------------------------------------------------------
 
+# REVIEW(fragile / environment assumption): the module docstring on this section
+# says auth must be omitted because "auth causes 404 via proxy on raw.gh.com" —
+# that is a property of THIS sandbox's egress proxy, not of GitHub. On a normal
+# network unauthenticated raw fetches are rate-limited/cached differently, and
+# this coupling to the proxy isn't guarded or documented at the call site.
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=1, max=8),
@@ -137,6 +195,11 @@ def next_crawl_n() -> int:
 
 
 def find_today_dir(crawl_date: str) -> Path | None:
+    # REVIEW(assumption): "one crawl per UTC day" — resumption keys purely on the
+    # date. Running two DIFFERENT crawl-lists on the same day silently appends both
+    # into one crawl dir, and the input_quality metrics / repo_outcomes written at
+    # the end reflect only the LAST list run (earlier list's outcomes are lost).
+    # If multiple lists per day is a real workflow, key the dir on list_id too.
     if not CRAWLS_DIR.exists():
         return None
     for d in CRAWLS_DIR.iterdir():
@@ -243,18 +306,33 @@ def upsert(results: list[dict], index: dict[str, int], result: dict) -> None:
 
 
 def git_commit_push(crawl_id: str) -> None:
+    # Pushes the new crawl snapshot. Resolves the current branch and pushes it
+    # explicitly with `-u origin <branch>` rather than a bare `git push` that
+    # depends on ambient upstream config (and silently fails on a detached HEAD).
+    # NOTE: intentionally commits only crawls/<id>/ — derived data/ + docs/ are
+    # rebuilt and committed separately by run_pipeline, so they don't ride along
+    # here. Run the pipeline after a crawl to keep published artifacts in sync.
     import subprocess
+
+    def git(*args):
+        return subprocess.run(["git", "-C", str(BASE_DIR), *args],
+                              capture_output=True, text=True)
+
+    branch = git("rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
+    if not branch or branch == "HEAD":
+        console.print("  [red]git: detached HEAD or no branch — skipping push[/red]")
+        return
     rel = f"crawls/{crawl_id}/"
     for cmd in [
-        ["git", "-C", str(BASE_DIR), "add", rel],
-        ["git", "-C", str(BASE_DIR), "commit", "-m", f"feat: {crawl_id} — SKILL.md sweep"],
-        ["git", "-C", str(BASE_DIR), "push"],
+        ["add", rel],
+        ["commit", "-m", f"feat: {crawl_id} — SKILL.md sweep"],
+        ["push", "-u", "origin", branch],
     ]:
-        r = subprocess.run(cmd, capture_output=True, text=True)
+        r = git(*cmd)
         if r.returncode != 0:
-            console.print(f"  [red]git: {r.stderr.strip()}[/red]")
+            console.print(f"  [red]git {cmd[0]}: {r.stderr.strip()}[/red]")
             return
-    console.print("  [green]Committed and pushed[/green]")
+    console.print(f"  [green]Committed and pushed to {branch}[/green]")
 
 
 # ---------------------------------------------------------------------------
@@ -465,6 +543,9 @@ def crawl(
 
     repo_outcomes: dict[str, str] = {}
     list_meta: dict = {}
+    # Side-channel for the crawl-captured siblings (keyed repo::path) so we don't
+    # have to widen the positional raw_items tuple. Looked up in the fetch phase.
+    siblings_by_key: dict[str, list[str]] = {}
 
     if crawl_list:
         entries, list_meta = load_crawl_list(crawl_list)
@@ -499,6 +580,7 @@ def crawl(
                     key = f"{f['repo_full_name']}::{f['file_path']}"
                     if key not in seen_keys:
                         seen_keys.add(key)
+                        siblings_by_key[key] = f.get("sibling_files", [])
                         raw_items.append((
                             f["repo_full_name"], f["file_path"], f["file_sha"],
                             f["file_raw_url"], f["repo_url"], repo_type,
@@ -535,8 +617,13 @@ def crawl(
                         if key not in seen_keys:
                             seen_keys.add(key)
                             raw_url = f"https://raw.githubusercontent.com/{repo_full_name}/HEAD/{file_path}"
+                            # Capture the blob SHA so global-search mode is also
+                            # incremental (the fetch-phase SHA-diff skip needs a
+                            # truthy file_sha). `.sha` is exposed on search items;
+                            # guard in case the attribute is ever absent.
+                            file_sha = getattr(item, "sha", "") or ""
                             raw_items.append((
-                                repo_full_name, file_path, "",
+                                repo_full_name, file_path, file_sha,
                                 raw_url, item.repository.html_url, "search", "claude",
                             ))
                             new += 1
@@ -624,6 +711,11 @@ def crawl(
                 "file_sha": file_sha,
                 "file_raw_url": raw_url,
                 "skill_md_content": None if is_gemini else "",
+                # DATA-EXPANSION: folder siblings captured during the tree walk.
+                # None for global-search results (no tree walked) so fetch_siblings.py
+                # backfills them via API; a real [] (repo-scoped, genuinely no
+                # siblings) is trusted as-is.
+                "sibling_files": siblings_by_key.get(key),
                 "fetch_error": None,
             }
 

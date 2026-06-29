@@ -1,6 +1,26 @@
 """
 tag_skills.py — Classify skill nodes along 4 ontology dimensions using Claude CLI.
 
+REVIEW(LLM → deterministic): this is the strongest candidate in the repo for
+replacing an LLM call with deterministic code. It spends one `claude -p`
+invocation PER skill (~1,121 calls) on a closed-vocabulary classification, yet:
+  • `action` (generate|extract|transform|automate|analyze|configure|integrate)
+    is already produced deterministically by gen_types.py's regex map AND overlaps
+    skill_quality.WHAT_PATTERNS — the keyword table exists twice already.
+  • `output_type` (text|code|structured-data|media|action|report) is largely
+    readable from the body: fenced code → code; JSON/YAML/table → structured-data;
+    "report"/"summary" → report; image/audio verbs → media.
+  • `integration` (standalone|connector|orchestrator|modifier) keys on signals the
+    crawl already has: allowed-tools / mcp / api / sdk → connector; "orchestrat"/
+    pipeline/agent → orchestrator.
+  • `complexity` is the only genuinely fuzzy axis, and even it proxies well from
+    body length + numbered steps + reference-file count.
+The code already FALLS BACK to a deterministic default on any invalid LLM output
+(see call_claude), so a deterministic classifier would be more reproducible, free,
+and runnable inside run_pipeline.py — where this script currently is NOT wired,
+so tags drift out of sync on every re-crawl. Keep an optional LLM pass only for
+the residual ambiguous cases, not as the default for all 1,121.
+
 Dimensions:
   action        : what the skill does (generate|extract|transform|automate|analyze|configure|integrate)
   complexity    : barrier to entry (foundational|intermediate|advanced)
@@ -19,8 +39,10 @@ Usage:
 import json, re, os, subprocess, argparse, sys, time
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from graphio import load_graph, save_graph, skill_nodes
+
 BASE = Path(__file__).parent.parent
-HTML_PATH  = BASE / 'index.html'
 CACHE_PATH = BASE / 'data' / 'skill_tags.json'
 
 DIMENSIONS = {
@@ -44,14 +66,6 @@ Dimensions and allowed values:
   integration : {integration}
 
 Reply format: {{"action":"...","complexity":"...","output_type":"...","integration":"..."}}"""
-
-
-def load_graph():
-    content = HTML_PATH.read_text()
-    m = re.search(r'const GRAPH = (\{.*?\});\n', content)
-    if not m:
-        sys.exit("Could not find GRAPH in index.html")
-    return json.loads(m.group(1)), content, m
 
 
 def load_cache():
@@ -85,6 +99,11 @@ def call_claude(prompt, dry_run=False):
     )
     raw = result.stdout.strip()
     # Extract JSON from response (claude might add surrounding text)
+    # REVIEW(fragile): `\{[^{}]+\}` only matches a FLAT brace group — any nested
+    # object in the reply makes this grab a truncated fragment or miss entirely.
+    # Also: classification is non-deterministic across runs, so the cached tags are
+    # not reproducible from the inputs (a re-run with --force can yield different
+    # labels for unchanged skills). A deterministic classifier removes both issues.
     m = re.search(r'\{[^{}]+\}', raw)
     if not m:
         raise ValueError(f"No JSON in response: {raw!r}")
@@ -97,14 +116,10 @@ def call_claude(prompt, dry_run=False):
 
 
 def patch_html(graph, content, match, cache):
-    for node in graph['nodes']:
-        if node['type'] not in ('skill', 'dhk'):
-            continue
+    for node in skill_nodes(graph):
         if node['id'] in cache:
             node.update(cache[node['id']])
-    out = json.dumps(graph, separators=(',', ':'))
-    new_content = content[:match.start(1)] + out + content[match.end(1):]
-    HTML_PATH.write_text(new_content)
+    save_graph(graph, content, match)
     print(f"Patched index.html with tags from {len(cache)} cached skills.")
 
 
@@ -118,7 +133,7 @@ def main():
     graph, content, match = load_graph()
     cache = load_cache()
 
-    skills = [n for n in graph['nodes'] if n['type'] in ('skill', 'dhk')]
+    skills = skill_nodes(graph)
     print(f"Skills: {len(skills)} total, {len(cache)} cached")
 
     if args.patch:

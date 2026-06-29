@@ -7,16 +7,27 @@ Usage (from repo root):
 Edit NEW_DOMAINS, MOVES, and RENAME to adjust the taxonomy, then re-run.
 The script reads the GRAPH JSON embedded in index.html, rebuilds nodes/links,
 and writes the result back in-place.
+
+Resolved on this branch:
+  • counts are now DERIVED from actual node membership (no more hard-coded,
+    drift-prone `count` per domain);
+  • a deterministic `classify_domain()` keyword classifier auto-places any skill
+    not in the explicit MOVES override (and any node whose old domain has no
+    RENAME), so MOVES shrinks to genuine edge-cases instead of carrying every
+    skill;
+  • graph I/O goes through graphio.
+
+Still open: this isn't in run_pipeline.py, and a topic-aware classifier (joining
+to crawl repo_topics) would beat keywords — see docs/CODE-REVIEW.md.
 """
-import json, re, os
+import json, re, sys
+from collections import Counter
+from pathlib import Path
 
-HTML_PATH = os.path.join(os.path.dirname(__file__), '..', 'index.html')
+sys.path.insert(0, str(Path(__file__).parent))
+from graphio import load_graph, save_graph
 
-with open(HTML_PATH, 'r') as f:
-    content = f.read()
-
-match = re.search(r'const GRAPH = ({.*?});\n', content)
-graph = json.loads(match.group(1))
+graph, content, match = load_graph()
 
 # ── NEW DOMAINS ─────────────────────────────────────────────────
 NEW_DOMAINS = {
@@ -149,19 +160,71 @@ RENAME = {
     'Frontend & Design':    'Frontend & UI',
 }
 
+# ── KEYWORD DOMAIN CLASSIFIER ───────────────────────────────────
+# Ordered (specific → general); first hit wins. Auto-places skills that aren't in
+# the explicit MOVES override, so MOVES is for genuine exceptions only. Keys on
+# the node's label + description (topics aren't on graph nodes; a topic-aware
+# version would join to the crawl corpus — see CODE-REVIEW.md).
+DOMAIN_RULES = [
+    ('Finance & Payments',      r'payment|stripe|billing|invoice|crypto|token|wallet|payout|refund|trading'),
+    ('Security',                r'security|secure|\bauth\b|oauth|vulnerab|cve|exploit|secret|keyvault|encrypt|threat|contentsafety|constant-time'),
+    ('Testing & Quality',       r'\btest|\bqa\b|coverage|e2e|playwright|cypress|lint|eval|web-vitals|monitor'),
+    ('Infrastructure & DevOps', r'deploy|terraform|kubernetes|docker|cicd|ci/cd|infra|cloudflare|durable-object|netlify|provision'),
+    ('Data & Analytics',        r'\bdata\b|\bsql\b|database|analytics|etl|dashboard|warehouse|query|tinybird'),
+    ('Frontend & UI',           r'frontend|react|\bnext\b|flutter|expo|\bui\b|component|\bcss\b'),
+    ('Agent & Orchestration',   r'orchestrat|pipeline|multi-step|\bagent\b|voltagent|swarm|workflow'),
+    ('Creative & Media',        r'image|video|audio|podcast|art\b|design|canvas|gif|render|restore|theme|visual'),
+    ('Document & Writing',      r'document|docx|\bdoc\b|writing|co-author|markdown|\bpdf\b|report|comms'),
+    ('Marketing & Growth',      r'marketing|\bseo\b|cold-email|launch|campaign|growth|ad-angle|offer'),
+    ('Product & Strategy',      r'product|roadmap|epic|hypothesis|pestel|strategy|prioriti'),
+    ('Research & Learning',     r'research|learning|resume|dwarf|continual|expert-parallel'),
+    ('Platform & APIs',         r'\bapi\b|\bsdk\b|client|webhook|integrat|connect|google|gemini|azure|huggingface|replicate|firecrawl|resend|courier'),
+    ('Developer Experience',    r'\bcli\b|github|\bgit\b|template|plugin|wordpress|sentry|best-practice|guideline|sdk-setup'),
+]
+
+
+def classify_domain(label, description=''):
+    text = f'{label} {description}'.lower()
+    for domain, pat in DOMAIN_RULES:
+        if re.search(pat, text):
+            return domain
+    return 'Developer Experience'   # broad catch-all
+
+
 def get_new_domain(node):
     if node['type'] in ('dhk', 'dhk_hub', 'dhk_negative_space'):
         return 'Session Layer'
-    if node['id'] in MOVES:
+    if node['id'] in MOVES:                       # explicit override wins
         return MOVES[node['id']]
-    old = node.get('domain','')
-    return RENAME.get(old, old)
+    old = node.get('domain', '')
+    if old in RENAME:                             # known old taxonomy → rename
+        return RENAME[old]
+    if old in NEW_DOMAINS:                         # already a current domain
+        return old
+    # Unknown/blank domain: classify deterministically instead of leaving it
+    # stranded in a retired bucket.
+    return classify_domain(node.get('label', ''), node.get('description', ''))
 
 # ── REBUILD NODES ───────────────────────────────────────────────
 old_domain_ids = {n['id'] for n in graph['nodes'] if n['type']=='domain'}
-new_nodes = []
 
-# Add new domain nodes
+# First pass: assign every skill/dhk node its new domain and TALLY membership so
+# the domain-node `count` is derived, not hand-typed (no more drift).
+domain_count = Counter()
+non_domain = []
+for n in graph['nodes']:
+    if n['type'] == 'domain':
+        continue  # replaced below
+    new_n = dict(n)
+    if n['type'] in ('skill', 'dhk'):
+        nd = get_new_domain(n)
+        new_n['domain'] = nd
+        new_n['color'] = NEW_DOMAINS[nd]['color']
+        domain_count[nd] += 1
+    non_domain.append(new_n)
+
+# Second pass: build domain nodes with the derived counts.
+new_nodes = []
 for dname, dmeta in NEW_DOMAINS.items():
     new_nodes.append({
         'id': f'domain:{dname}',
@@ -169,19 +232,9 @@ for dname, dmeta in NEW_DOMAINS.items():
         'type': 'domain',
         'color': dmeta['color'],
         'size': dmeta['size'],
-        'count': dmeta['count'],
+        'count': domain_count.get(dname, 0),
     })
-
-# Add all non-domain nodes, updating domain field
-for n in graph['nodes']:
-    if n['type'] == 'domain':
-        continue  # replaced above
-    new_n = dict(n)
-    if n['type'] in ('skill','dhk'):
-        nd = get_new_domain(n)
-        new_n['domain'] = nd
-        new_n['color'] = NEW_DOMAINS[nd]['color']
-    new_nodes.append(new_n)
+new_nodes.extend(non_domain)
 
 # ── REBUILD LINKS ───────────────────────────────────────────────
 new_links = []
@@ -204,11 +257,10 @@ for n in new_nodes:
 # org links are already in new_links from the non-domain original links
 
 new_graph = {'nodes': new_nodes, 'links': new_links}
-out = json.dumps(new_graph, separators=(',',':'))
 print(f"Nodes: {len(new_nodes)}, Links: {len(new_links)}")
+print("Derived domain counts: " +
+      ", ".join(f"{d}={domain_count[d]}" for d in sorted(domain_count, key=lambda d: -domain_count[d])))
 
 # ── PATCH HTML ──────────────────────────────────────────────────
-new_content = content[:match.start(1)] + out + content[match.end(1):]
-with open(HTML_PATH, 'w') as f:
-    f.write(new_content)
+save_graph(new_graph, content, match)
 print("Done.")

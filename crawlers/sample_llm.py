@@ -1,14 +1,18 @@
 """
-sample_llm.py — LLM deep-read on a stratified sample of the corpus.
+sample_llm.py — [RETIRED] v1 LLM judge. Superseded by judge_llm.py.
 
-The heuristic scorer (score_corpus.py) measures structure; it can't judge
-whether a description *actually* helps Claude decide when to invoke a skill,
-or whether the body is genuinely useful. This pass samples skills across
-signatures (and across the quality range within each) and asks `claude -p`
-to compare each against the Anthropic gold standard.
+RETIRED: judge_llm.py (v2) replaces this. The post-mortem in
+docs/llm-judge-tuning.md found v1 scored even canonical skills as "weak" for
+three reasons — two of them harness bugs still present here: it clips every skill
+to 6000 chars (penalising long/best skills as "truncated") and gives the judge no
+reference-file visibility or per-axis calibration. NOT part of the study pipeline.
+Use judge_llm.py instead. Kept only for historical comparison of the two prompts.
 
-Uses `claude -p` (existing OAuth session, no API key). Results cached in
-data/llm_sample.json so re-runs are incremental.
+Original docstring:
+  LLM deep-read on a stratified sample of the corpus. The heuristic scorer
+  (score_corpus.py) measures structure; this asks `claude -p` whether a
+  description actually helps Claude decide when to invoke a skill. Results cached
+  in data/llm_sample.json.
 
 Usage:
     python crawlers/sample_llm.py            # run sample
@@ -19,10 +23,16 @@ import json
 import subprocess
 import argparse
 import random
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from score_corpus import latest_content_by_key   # canonical merged-corpus loader
+
 BASE = Path(__file__).parent.parent
-CRAWL = BASE / 'crawls' / 'crawl-1-2026-06-24' / 'data.json'
+# Reads the merged corpus (latest content per skill) rather than a pinned first
+# snapshot. REVIEW(still open): this is the v1 judge that judge_llm.py says it
+# REPLACES — retire it (like maturity_crawl.py) so two judges don't both linger.
 SCORES = BASE / 'data' / 'skill_quality.json'
 OUT = BASE / 'data' / 'llm_sample.json'
 
@@ -66,9 +76,7 @@ def main():
     random.seed(7)
 
     scores = json.load(open(SCORES))
-    crawl = {(r['repo_full_name'], r['file_path']): r
-             for r in json.load(open(CRAWL))['results']
-             if r.get('skill_md_content')}
+    crawl = latest_content_by_key()
     repo_sig = {rn: r['signature'] for rn, r in scores['repos'].items()}
 
     # bucket skills by (signature, tier) where tier splits the quality range
@@ -94,6 +102,9 @@ def main():
         key = (s['repo'], s['file_path'])
         if key in seen:
             continue
+        # REVIEW(known bug, kept here): judge_llm.py's docstring identifies this
+        # 6000-char clip as cause #1 of v1's pessimism (it penalised long, often
+        # best, skills as "truncated mid-sentence"). Another reason to retire v1.
         md = crawl[key]['skill_md_content'][:6000]
         prompt = PROMPT.format(repo=s['repo'], signature=sig, md=md)
         if args.dry_run:

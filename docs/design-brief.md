@@ -8,7 +8,7 @@
 
 ## What This Is
 
-A single-page web app that maps the public Claude agent skills corpus — ~4,900 SKILL.md files across 39+ GitHub repos — onto an interactive force-directed graph. Think of it as a **navigator for the skills ecosystem**: who published what, how skills cluster by domain, and how to find what you need.
+A single-page web app that maps the public Claude agent skills corpus — ~4,975 SKILL.md files across 39+ GitHub repos — onto an interactive force-directed graph. Think of it as a **navigator for the skills ecosystem**: who published what, how skills cluster by domain, and how to find what you need.
 
 Live at: `https://dhk.github.io/skill-map` (GitHub Pages, single `index.html`)  
 Stack: D3 v7 force graph, vanilla JS/HTML/CSS, no framework, no build step.

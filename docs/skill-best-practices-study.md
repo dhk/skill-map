@@ -1,7 +1,7 @@
 # The Skill Best-Practices Study
 
 A measured answer to: *how should an Agent Skill be defined?* Built by scoring
-every `SKILL.md` in the crawl corpus (4,953 skills across 41 repos) against the
+every `SKILL.md` in the crawl corpus (4,975 skills across 43 repos) against the
 Anthropic gold standard, three ways:
 
 1. **By classifying all crawled skills** and grading each one.

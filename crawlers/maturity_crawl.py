@@ -35,6 +35,11 @@ import statistics as st
 from pathlib import Path
 
 BASE = Path(__file__).parent.parent
+# REVIEW(fragile): hard-pinned first crawl (same as judge_llm/lineage). Less urgent
+# since this script is RETIRED from the pipeline, but if it's ever revived for the
+# private-repo use case the docstring describes, route it through load_all_crawls()
+# too. It does correctly thread $GITHUB_TOKEN (unlike lineage_trace.py) — copy that
+# pattern there.
 CRAWL = BASE / 'crawls' / 'crawl-1-2026-06-24' / 'data.json'
 SCORES = BASE / 'data' / 'skill_quality.json'
 OUT = BASE / 'data' / 'skill_maturity.json'

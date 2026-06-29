@@ -13,6 +13,7 @@ Usage:
     python crawlers/score_corpus.py
 """
 import json
+import re
 import statistics as st
 from pathlib import Path
 from collections import defaultdict
@@ -25,14 +26,32 @@ CRAWLS_DIR = BASE / 'crawls'
 OUT = BASE / 'data' / 'skill_quality.json'
 
 
+def _crawl_n(data_path):
+    """Numeric crawl index from a crawls/crawl-<n>-<date>/data.json path.
+    Sorting on this (not the raw string) keeps crawl-10 *after* crawl-2."""
+    m = re.search(r'crawl-(\d+)-', data_path.parent.name)
+    return int(m.group(1)) if m else -1
+
+
 def load_all_crawls():
     """Merge results across every crawls/*/data.json. On duplicate
-    (repo, file_path), the most recent crawl (by dir name) wins."""
+    (repo, file_path), the most recent crawl (by numeric crawl index) wins.
+
+    This is THE canonical "latest content per skill" loader — every consumer
+    (LLM judges, lineage) should route through it rather than pinning one crawl.
+    """
     merged = {}
-    for data_path in sorted(CRAWLS_DIR.glob('*/data.json')):
+    for data_path in sorted(CRAWLS_DIR.glob('*/data.json'), key=_crawl_n):
         for r in json.load(open(data_path)).get('results', []):
             merged[(r['repo_full_name'], r['file_path'])] = r
     return list(merged.values())
+
+
+def latest_content_by_key():
+    """(repo, file_path) -> crawl record, for records that have SKILL.md content.
+    Convenience wrapper so judge_llm/sample_llm/lineage stop re-implementing it."""
+    return {(r['repo_full_name'], r['file_path']): r
+            for r in load_all_crawls() if r.get('skill_md_content')}
 
 
 def main():
