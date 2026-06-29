@@ -12,13 +12,22 @@ skills ship with no safeguard).
 
 ## Install
 
+In **Claude Code** (the CLI or VS Code / JetBrains extension — *not* the Claude
+Desktop app or claude.ai, which don't support plugins). Run these as **two
+separate commands, one at a time**:
+
 ```
 /plugin marketplace add dhk/skill-map
+```
+```
 /plugin install skill-doctor@skill-map
 ```
 
-Then invoke it in Claude Code with `/skill-doctor`, or just ask:
+Then invoke it with `/skill-doctor`, or just ask:
 "use skill-doctor on `.claude/skills/foo/SKILL.md`".
+
+Not in Claude Code? See [INSTALL.md](../../INSTALL.md) for the one-line shell
+install and troubleshooting.
 
 ## Update / remove
 
