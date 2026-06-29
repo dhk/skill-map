@@ -1,0 +1,29 @@
+name: Skill Audit
+
+# Grades any Claude Agent Skills in this repo on every PR that touches a
+# SKILL.md, and posts the report as a PR comment. This doubles as the
+# copy-paste example for other repos — see .github/actions/skill-audit/README.md.
+
+on:
+  pull_request:
+    paths:
+      - '**/SKILL.md'
+      - '.claude/skills/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo being audited
+        uses: actions/checkout@v4
+
+      - name: Audit skills
+        uses: dhk/skill-map/.github/actions/skill-audit@main
+        with:
+          path: '.'
+          # fail-under: 70   # uncomment to turn the audit into a hard gate
