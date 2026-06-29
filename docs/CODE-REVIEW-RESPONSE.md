@@ -28,49 +28,43 @@ Priorities: **P0** = before merge · **P1** = should · **backlog** = optional.
 
 ---
 
-## P1 — recommended polish
+## P1 — recommended polish — ✅ DONE
 
-- [x] **`patch_map_badges.py` — badge join refreshed only 26/39; 13 kept stale
-  grades.** *Symptom fixed on this branch:* unmatched nodes now have their badge
-  **cleared** (no stale/wrong grade lingers) and the script logs `matched/cleared`.
-  Marker: `RECOMMEND(review2, P1)` in `patch_map_badges.py`.
-  **Root cause (still open, backlog):** it's upstream in `enrich_urls.py`. The
-  `(org,dir)` rewrite dropped the deep-link on ~16 map nodes (42→26) — skills the
-  map attributes to org X (openai, angular, supabase…) but whose crawled
-  `SKILL.md` actually lives in a mega-collection *copy* (davila7, affaan-m…). The
-  new code links to the attributed org, can't find the skill there, and falls
-  back to a bare org root — losing the deep-link. **Real fix:** link to the
-  skill's *actual crawled location* (repo+path from the corpus); keep the
-  attributed org as a label only.
-
-- [ ] **Honest framing for the deterministic tagger.** Marker:
-  `RECOMMEND(review2, P1)` in `classify_tags.py`. Per-axis agreement is decent
-  (48–66%) but **all-4-axes exact agreement is ~12% — not parity.** It is a free
-  *default / gap-filler* (`--fill` keeps existing LLM tags, never downgrades) plus
-  an *optional LLM pass for the ambiguous tail*. Keep that framing everywhere
-  (`docs/CODE-REVIEW.md` §B, PR body); never describe it as replacing the LLM.
+- [x] **`patch_map_badges.py` badge drop — FULLY RESOLVED.** Symptom: unmatched
+  nodes now have their badge **cleared** (no stale grade) and the script logs
+  `matched/cleared`. Root cause: fixed in `enrich_urls.py` (see backlog #3) — it
+  now deep-links to each skill's *actual crawled location* (canonical > most-
+  starred) when the `(org,dir)` attribution isn't in the corpus. Live map: 44
+  deep-links (28 exact + 16 located), **41 badges, 0 stale**.
+- [x] **Honest tagger framing.** `docs/CODE-REVIEW.md` §B and the
+  `RECOMMEND(review2)` marker in `classify_tags.py` now state plainly: all-4-axes
+  agreement ~12% — a default/gap-filler (`--fill` never overwrites LLM tags), not
+  a replacement.
 
 ---
 
-## Backlog — still-open `REVIEW(...)` notes, ranked
+## Backlog — ✅ ALL DONE (one commit each)
 
-1. **Thread `$GITHUB_TOKEN` into the unauth API calls** *(highest risk)* —
-   `lineage_trace.py`, legacy `fetch_siblings` backfill, `judge_llm.fetch_siblings`:
-   60 req/hr + bare `except` turns rate-limit exhaustion into silently-dropped
-   data. `maturity_crawl.py` already threads it — copy the pattern.
-2. **Check the tree-API `truncated` flag** — `crawl.py` warns but doesn't handle;
-   `fetch_siblings` legacy path ignores it. >100k-entry monorepos lose files past
-   the cutoff. Add a paginated/contents fallback.
-3. **`enrich_urls` deep-link coverage** (the P1 #2 root cause) — link to the
-   actual crawled repo+path so mega-collection copies keep their deep-link/badge.
-4. **One-crawl-per-day resumption** (`crawl.py:find_today_dir`) — two lists on the
-   same UTC day merge into one dir; metrics reflect only the last. Key on `list_id`.
-5. **Finish `default_branch` upstream** — captured now, but existing snapshots
-   predate it, so `enrich_urls` still emits `/tree/HEAD/`. Resolves on next crawl.
-6. **Frozen thresholds** (`skill_quality.py`) — rubric constants pinned from one
-   snapshot; derive canonical percentiles at runtime, keep constants as fallback.
-7. **`reclassify.py` keyword map** *(lowest)* — `classify_domain()` is keyword-only;
-   a topic-aware version (join to crawl `repo_topics`, now captured) would beat it.
+1. [x] **`$GITHUB_TOKEN` threaded** into all unauth API calls via new
+   `crawlers/ghapi.py` (lineage_trace, fetch_siblings, judge_llm — which now also
+   prefers the sibling sidecar). 5,000 req/hr vs 60; raises instead of silently
+   dropping data.
+2. [x] **Tree-API `truncated` handled** — `crawl.py._all_blobs_bfs` and
+   `fetch_siblings._blobs_bfs` walk per-directory (no flat 100k cap) when the
+   recursive tree is truncated.
+3. [x] **`enrich_urls` deep-link coverage** — falls back from `(org,dir)` to the
+   skill's actual crawled location (canonical > stars); restored 16 deep-links /
+   the badge join (see P1 above).
+4. [x] **Per-list crawl dir** — `crawl-<n>-<date>-<slug>`; `find_today_dir(date,
+   slug)` exact-suffix match, so same-day lists no longer merge.
+5. [x] **`default_branch` finished** — `enrich_urls.resolve_branches()` (cached
+   `data/repo_branches.json`, token-resolved) replaces `/tree/HEAD/` with the real
+   branch for all 44 deep-links; HEAD is the offline fallback.
+6. [x] **Thresholds derivable** — `skill_quality.calibrate()` re-derives the soft
+   cutoffs from the canonical set (`score_corpus --calibrate`); constants are the
+   fallback. Opt-in so committed scores don't shift.
+7. [x] **`reclassify` topic-aware** — `ORG_TOPICS` joins crawl `repo_topics` by
+   org into `classify_domain`.
 
 ---
 

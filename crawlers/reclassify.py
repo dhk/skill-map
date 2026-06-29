@@ -160,11 +160,29 @@ RENAME = {
     'Frontend & Design':    'Frontend & UI',
 }
 
+# ── ORG → TOPICS (from the crawl corpus) ────────────────────────
+# Graph nodes carry no topics, but the crawl captured repo_topics per repo. Join
+# them by org so the classifier gets team-curated signal (a repo tagged
+# "payments"/"security"/"react" is a strong, intentional domain hint).
+def _org_topics():
+    try:
+        from score_corpus import load_all_crawls
+    except Exception:
+        return {}
+    out = {}
+    for r in load_all_crawls():
+        org = r['repo_full_name'].split('/')[0].lower()
+        for t in (r.get('repo_topics') or []):
+            out.setdefault(org, set()).add(t.lower())
+    return out
+
+
+ORG_TOPICS = _org_topics()
+
 # ── KEYWORD DOMAIN CLASSIFIER ───────────────────────────────────
 # Ordered (specific → general); first hit wins. Auto-places skills that aren't in
 # the explicit MOVES override, so MOVES is for genuine exceptions only. Keys on
-# the node's label + description (topics aren't on graph nodes; a topic-aware
-# version would join to the crawl corpus — see CODE-REVIEW.md).
+# the node's label + description + its org's crawled topics.
 DOMAIN_RULES = [
     ('Finance & Payments',      r'payment|stripe|billing|invoice|crypto|token|wallet|payout|refund|trading'),
     ('Security',                r'security|secure|\bauth\b|oauth|vulnerab|cve|exploit|secret|keyvault|encrypt|threat|contentsafety|constant-time'),
@@ -183,8 +201,8 @@ DOMAIN_RULES = [
 ]
 
 
-def classify_domain(label, description=''):
-    text = f'{label} {description}'.lower()
+def classify_domain(label, description='', topics=()):
+    text = f"{label} {description} {' '.join(topics)}".lower()
     for domain, pat in DOMAIN_RULES:
         if re.search(pat, text):
             return domain
@@ -201,9 +219,11 @@ def get_new_domain(node):
         return RENAME[old]
     if old in NEW_DOMAINS:                         # already a current domain
         return old
-    # Unknown/blank domain: classify deterministically instead of leaving it
-    # stranded in a retired bucket.
-    return classify_domain(node.get('label', ''), node.get('description', ''))
+    # Unknown/blank domain: classify deterministically (topic-aware) instead of
+    # leaving it stranded in a retired bucket.
+    org = node['id'].split('/')[0].lower()
+    return classify_domain(node.get('label', ''), node.get('description', ''),
+                           ORG_TOPICS.get(org, ()))
 
 # ── REBUILD NODES ───────────────────────────────────────────────
 old_domain_ids = {n['id'] for n in graph['nodes'] if n['type']=='domain'}

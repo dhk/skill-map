@@ -94,13 +94,34 @@ def _siblings_for(file_path: str, all_paths: list[str]) -> list[str]:
     return sibs[:SIBLING_CAP]
 
 
+def _all_blobs_bfs(repo, root_sha: str) -> list[dict]:
+    """Full blob list via per-directory non-recursive tree calls — used when the
+    recursive tree is truncated (~100k-entry cap), so files past the cutoff aren't
+    silently lost. Returns [{'path','sha'}]. Bounded for safety."""
+    out: list[dict] = []
+    stack = [("", root_sha)]
+    dirs_walked = 0
+    while stack and dirs_walked < 20000:
+        prefix, sha = stack.pop()
+        try:
+            sub = repo.get_git_tree(sha=sha, recursive=False)
+        except GithubException:
+            continue
+        dirs_walked += 1
+        for el in sub.tree:
+            full = f"{prefix}{el.path}"
+            if el.type == "tree":
+                stack.append((full + "/", el.sha))
+            elif el.type == "blob":
+                out.append({"path": full, "sha": el.sha})
+    return out
+
+
 def walk_repo_tree(gh: Github, repo_full_name: str) -> list[dict]:
     """Return all SKILL.md blobs with their git SHA via the trees API, each
     annotated with its sibling files (captured here so downstream stages don't
     re-fetch the tree). REVIEW(remaining): sha="HEAD" still assumes the default
-    branch tip; the raw URL still pins /HEAD/ rather than the walked commit; and
-    SKILL.md matching differs from GLOBAL_QUERIES (skill.md/SKILLS.md). See notes
-    below — those are unchanged by this data-capture fix."""
+    branch tip; the raw URL still pins /HEAD/ rather than the walked commit."""
     try:
         repo = gh.get_repo(repo_full_name)
         tree = repo.get_git_tree(sha="HEAD", recursive=True)
@@ -108,34 +129,40 @@ def walk_repo_tree(gh: Github, repo_full_name: str) -> list[dict]:
         if e.status == 404:
             return []
         raise
-    # The tree API truncates at ~100k entries; surface it instead of silently
-    # losing files past the cutoff. (A full fix would page via the contents API.)
+    # The recursive tree API truncates at ~100k entries. When it does, fall back
+    # to a per-directory walk (each call is one level, so no flat cap) instead of
+    # silently dropping every file past the cutoff.
     truncated = bool(getattr(tree, "truncated", False))
     if truncated:
         console.print(f"  [yellow]⚠ tree truncated for {repo_full_name} — "
-                      f"some SKILL.md/sibling files may be missing[/yellow]")
+                      f"walking per-directory to recover all files[/yellow]")
+        blobs = _all_blobs_bfs(repo, tree.sha)
+    else:
+        blobs = [{"path": item.path, "sha": item.sha}
+                 for item in tree.tree if item.type == "blob"]
 
-    all_paths = [item.path for item in tree.tree if item.type == "blob"]
+    all_paths = [b["path"] for b in blobs]
 
     results = []
-    for item in tree.tree:
-        if item.type == "blob" and is_skill_file(Path(item.path).name):
+    for b in blobs:
+        item_path, item_sha = b["path"], b["sha"]
+        if is_skill_file(Path(item_path).name):
             # REVIEW(assumption): Gemini detection keys only on the ".gemini/"
             # prefix; other Gemini layouts are mislabelled "claude".
-            is_gemini = item.path.startswith(".gemini/")
+            is_gemini = item_path.startswith(".gemini/")
             results.append({
                 "repo_full_name": repo_full_name,
-                "file_path": item.path,
-                "file_sha": item.sha,
+                "file_path": item_path,
+                "file_sha": item_sha,
                 # REVIEW(fragile): /HEAD/ resolves at fetch time, not walk time —
                 # could drift from file_sha if the repo is pushed mid-crawl.
-                "file_raw_url": f"https://raw.githubusercontent.com/{repo_full_name}/HEAD/{item.path}",
+                "file_raw_url": f"https://raw.githubusercontent.com/{repo_full_name}/HEAD/{item_path}",
                 "repo_url": f"https://github.com/{repo_full_name}",
                 "file_format": "gemini" if is_gemini else "claude",
                 # DATA-EXPANSION: siblings captured for free from the tree we
                 # already walked. fetch_siblings.py reads these instead of a
                 # second unauthenticated tree fetch per repo.
-                "sibling_files": _siblings_for(item.path, all_paths),
+                "sibling_files": _siblings_for(item_path, all_paths),
                 "tree_truncated": truncated,
             })
     return results
@@ -194,16 +221,25 @@ def next_crawl_n() -> int:
     return max(int(re.match(r"crawl-(\d+)-", n).group(1)) for n in existing) + 1
 
 
-def find_today_dir(crawl_date: str) -> Path | None:
-    # REVIEW(assumption): "one crawl per UTC day" — resumption keys purely on the
-    # date. Running two DIFFERENT crawl-lists on the same day silently appends both
-    # into one crawl dir, and the input_quality metrics / repo_outcomes written at
-    # the end reflect only the LAST list run (earlier list's outcomes are lost).
-    # If multiple lists per day is a real workflow, key the dir on list_id too.
+def list_slug(crawl_list: Optional[Path]) -> str:
+    """Stable slug for a crawl-list (its filename stem), or '' for global search.
+    Used to key the crawl dir so two different lists on the same day don't merge."""
+    if not crawl_list:
+        return ""
+    return re.sub(r"[^a-z0-9]+", "-", Path(crawl_list).stem.lower()).strip("-")
+
+
+def find_today_dir(crawl_date: str, slug: str = "") -> Path | None:
+    # Resume only the SAME input on the same UTC day: a per-list slug keeps two
+    # different crawl-lists (or a list vs global) from appending into one dir and
+    # clobbering each other's input_quality metrics. Exact-suffix match so a
+    # global (no-slug) run never resumes a slugged dir, and vice-versa.
     if not CRAWLS_DIR.exists():
         return None
+    suffix = f"-{slug}" if slug else ""
+    pat = re.compile(rf"^crawl-\d+-{re.escape(crawl_date)}{re.escape(suffix)}$")
     for d in CRAWLS_DIR.iterdir():
-        if d.is_dir() and re.match(rf"crawl-\d+-{re.escape(crawl_date)}", d.name):
+        if d.is_dir() and pat.match(d.name):
             return d
     return None
 
@@ -515,15 +551,16 @@ def crawl(
 
     gh = make_gh(token)
     crawl_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    slug = list_slug(crawl_list)        # '' for global search
 
-    existing_dir = find_today_dir(crawl_date)
+    existing_dir = find_today_dir(crawl_date, slug)
     if existing_dir:
         crawl_id = existing_dir.name
         crawl_dir = existing_dir
         console.print(f"[yellow]Resuming[/yellow] existing crawl: [bold]{crawl_id}[/bold]")
     else:
         n = next_crawl_n()
-        crawl_id = f"crawl-{n}-{crawl_date}"
+        crawl_id = f"crawl-{n}-{crawl_date}" + (f"-{slug}" if slug else "")
         crawl_dir = CRAWLS_DIR / crawl_id
         crawl_dir.mkdir(parents=True, exist_ok=True)
         console.print(f"[green]Starting[/green] new crawl: [bold]{crawl_id}[/bold]")
