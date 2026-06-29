@@ -23,11 +23,11 @@ Usage:
     python crawlers/audit_repo.py /path/to/repo --json
 """
 import argparse
+import base64
 import json
 import os
 import re
 import sys
-import urllib.request
 import statistics as st
 from pathlib import Path
 from collections import defaultdict
@@ -35,6 +35,7 @@ from collections import defaultdict
 sys.path.insert(0, str(Path(__file__).parent))
 from skill_quality import score_skill
 from repo_signature import classify_repo, SIGNATURE_GUIDANCE
+from ghapi import gh_json
 
 BASE = Path(__file__).parent.parent
 CORPUS = BASE / 'data' / 'skill_quality.json'
@@ -66,13 +67,13 @@ def collect_local(root):
     return out
 
 
-def _gh(url, token):
-    req = urllib.request.Request(url, headers={
-        'Accept': 'application/vnd.github+json',
-        'User-Agent': 'skill-map-auditor',
-        **({'Authorization': f'Bearer {token}'} if token else {})})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read())
+def _gh(url, token=None):
+    # All GitHub REST calls go through the shared authenticated helper (threads
+    # $GITHUB_TOKEN → 5,000 req/hr, raises on non-2xx). A --token arg overrides
+    # the env for this process so private-repo audits work without exporting it.
+    if token:
+        os.environ['GITHUB_TOKEN'] = token
+    return gh_json(url, timeout=60)
 
 
 def collect_github(slug, token, branch=None):
@@ -85,13 +86,14 @@ def collect_github(slug, token, branch=None):
     out = []
     for node in tree.get('tree', []):
         if node['type'] == 'blob' and node['path'].split('/')[-1] == 'SKILL.md':
-            raw = (f'https://raw.githubusercontent.com/{owner}/{repo}/'
-                   f'{branch}/{node["path"]}')
-            req = urllib.request.Request(raw, headers={
-                'User-Agent': 'skill-map-auditor',
-                **({'Authorization': f'Bearer {token}'} if token else {})})
-            with urllib.request.urlopen(req, timeout=60) as r:
-                out.append((node['path'], r.read().decode('utf-8', 'replace')))
+            # Fetch blob content via the authenticated git blobs API (base64)
+            # rather than raw.githubusercontent.com — works for private repos and
+            # avoids the unauthenticated raw host (which the codebase moved off of).
+            blob = _gh(f'https://api.github.com/repos/{owner}/{repo}/git/blobs/'
+                       f'{node["sha"]}', token)
+            content = base64.b64decode(blob.get('content', '')).decode(
+                'utf-8', 'replace')
+            out.append((node['path'], content))
     return out, branch
 
 

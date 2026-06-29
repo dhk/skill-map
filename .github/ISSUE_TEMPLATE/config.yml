@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Audit your skills first
+    url: https://github.com/dhk/skill-map/tree/main/.github/actions/skill-audit
+    about: Grade your skills against the gold standard with one command or a GitHub Action.

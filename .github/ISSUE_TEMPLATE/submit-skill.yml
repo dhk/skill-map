@@ -1,0 +1,55 @@
+name: Submit a skill repo
+description: Add your Claude Agent Skills repo to the skill map (we store a reference — your skills stay in your repo).
+title: "[skill] owner/repo"
+labels: ["skill-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing to the [skill map](https://dhk.github.io/skill-map/)!
+
+        We index your repo **by reference** — the crawler reads your public
+        `SKILL.md` files where they live. Nothing is copied here; you keep
+        ownership and can update or remove it anytime.
+
+        Want to see how yours scores first? Run the auditor:
+        ```bash
+        python crawlers/audit_repo.py --github owner/repo
+        ```
+  - type: input
+    id: repo
+    attributes:
+      label: Repository (owner/repo)
+      description: The GitHub repo that contains your SKILL.md file(s). Must be public.
+      placeholder: your-org/your-skills
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: What kind of repo is it?
+      options:
+        - single-skill (one skill)
+        - domain-pack (a few related skills)
+        - mega-collection (many skills)
+        - marketplace / template repo
+        - other / not sure
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: One-line description
+      description: What do these skills do? Helps us place them on the map.
+      placeholder: "React/Next.js performance rule sheets."
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirm
+      options:
+        - label: This repo is public and contains at least one `SKILL.md`.
+          required: true
+        - label: I'm OK with the map linking to (referencing) this repo.
+          required: true
