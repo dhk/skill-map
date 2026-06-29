@@ -46,6 +46,11 @@ python crawlers/audit_repo.py --github owner/repo --token "$GITHUB_TOKEN"  # pri
 - uses: dhk/skill-map/.github/actions/skill-audit@main
 ```
 
+**Improve one skill interactively:** use the
+[`skill-doctor`](.claude/skills/skill-doctor/SKILL.md) skill — it interviews you
+about allowed-tools scoping, data sensitivity (PHI/PII), high-stakes actions,
+triggering, and install scope, then recommends and applies fixes.
+
 The auditor reports your repo's signature, a benchmark vs. same-type peers, your
 worst offenders, overlapping skills to consolidate, and the top general-purpose
 skills you're missing. The most common gap across the whole ecosystem is the
