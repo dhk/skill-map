@@ -2,6 +2,7 @@
   "name": "skill-map",
   "owner": {
     "name": "dhk",
+    "email": "dhkonskills@dhk.io",
     "url": "https://github.com/dhk"
   },
   "metadata": {
@@ -14,7 +15,7 @@
       "source": "./plugins/skill-doctor",
       "description": "Interactive best-practice reviewer for a single Agent Skill: interviews about allowed-tools scoping, data sensitivity (PHI/PII), high-stakes actions, triggering, and install scope, then recommends and applies fixes.",
       "version": "1.0.0",
-      "author": { "name": "dhk" },
+      "author": { "name": "dhk", "email": "dhkonskills@dhk.io" },
       "category": "development",
       "tags": ["skills", "quality", "best-practices", "review"]
     }
