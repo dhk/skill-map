@@ -34,6 +34,30 @@ Either way, then invoke it with `/skill-doctor`.
 
 ---
 
+## claude.ai / the Claude Desktop chat app
+
+The **chat apps** (claude.ai in a browser, and the Claude **Desktop** app) don't
+use Claude Code's plugin marketplace. They take custom Skills as a **zip upload**:
+
+1. **Requirements:** a **Pro, Max, Team, or Enterprise** plan with **code
+   execution enabled** in settings.
+2. **Get the zip:** download [`dist/skill-doctor.zip`](dist/skill-doctor.zip)
+   from this repo (or rebuild it with `bash plugins/skill-doctor/build-zip.sh`).
+3. **Upload it:** in claude.ai or the Desktop app, go to
+   **Settings → Features → Skills** and upload `skill-doctor.zip`.
+4. Claude uses it automatically when relevant.
+
+Notes:
+- **No auto-update.** Re-upload the zip to get a new version; the chat apps don't
+  track this repo or pin a marketplace version.
+- **Per-user, per-surface.** A claude.ai upload is separate from Claude Code and
+  the API, and each teammate uploads their own copy.
+- **No local files.** On claude.ai the skill runs in Claude's VM, so the
+  "apply edits in place" step doesn't apply — paste or upload the `SKILL.md` you
+  want reviewed, and Claude returns the improved version for you to download.
+
+---
+
 ## Step by step (for the conservative)
 
 Verify before you run anything.
