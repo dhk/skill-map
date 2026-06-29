@@ -50,12 +50,17 @@ python crawlers/audit_repo.py --github owner/repo --token "$GITHUB_TOKEN"  # pri
 [`skill-doctor`](plugins/skill-doctor/skills/skill-doctor/SKILL.md) skill — it
 interviews you about allowed-tools scoping, data sensitivity (PHI/PII),
 high-stakes actions, triggering, and install scope, then recommends and applies
-fixes. Install it from this repo's marketplace:
+fixes. Install it from this repo's marketplace in **Claude Code** (two separate
+commands, one at a time):
 
 ```
 /plugin marketplace add dhk/skill-map
+```
+```
 /plugin install skill-doctor@skill-map
 ```
+
+(Not in Claude Code? See [INSTALL.md](INSTALL.md) for the shell install.)
 
 The auditor reports your repo's signature, a benchmark vs. same-type peers, your
 worst offenders, overlapping skills to consolidate, and the top general-purpose

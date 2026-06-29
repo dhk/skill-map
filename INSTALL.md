@@ -3,18 +3,28 @@
 By **dhk** — <https://github.com/dhk/skill-map>. Pick the path that matches how
 much you want to inspect before running.
 
+> **Requires Claude Code** (the CLI, or the VS Code / JetBrains extension).
+> Plugins are not available in the **Claude Desktop** app or **claude.ai** — if
+> you see `/plugin isn't available in this environment`, you're not in Claude
+> Code. On Desktop/web, use the **Shell install** below instead.
+
 ---
 
 ## One-shot (if you trust the source)
 
-**Plugin (recommended)** — inside Claude Code:
+**Plugin (recommended)** — inside Claude Code. Run these as **two separate
+commands, one at a time** (don't paste both lines at once):
 
 ```
 /plugin marketplace add dhk/skill-map
+```
+
+```
 /plugin install skill-doctor@skill-map
 ```
 
-**Shell** — clones the repo and symlinks the skill into `~/.claude/skills`:
+**Shell** — works anywhere (incl. Desktop/web users who have the CLI installed).
+Clones the repo and symlinks the skill into `~/.claude/skills`:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/dhk/skill-map/main/install.sh | bash
@@ -63,6 +73,33 @@ The plugin is published with an explicit `version` (currently `1.0.0`), so you
 only receive updates when that string is bumped — nothing changes under you. To
 pin to an exact commit instead, add the marketplace from a specific `ref`/`sha`
 (see the [marketplace docs](https://code.claude.com/docs/en/plugin-marketplaces)).
+
+---
+
+## Troubleshooting
+
+**`/plugin isn't available in this environment.`**
+You're in the **Claude Desktop** app or on **claude.ai**, which don't support
+plugins. Use Claude Code (the CLI or the VS Code / JetBrains extension), or use
+the **Shell install** above — it works anywhere the CLI is installed.
+
+**`fatal: unable to access 'https://github.com/dhk/skill-map /plugin install …'`**
+(or any error showing the repo URL with extra text after it). The two commands
+got run as **one** — `marketplace add` treated the second line as part of the
+repo path. Run them **separately, one at a time**:
+
+```
+/plugin marketplace add dhk/skill-map
+```
+
+then, after it succeeds:
+
+```
+/plugin install skill-doctor@skill-map
+```
+
+If you'd rather avoid the two-step flow entirely, use the one-line **Shell
+install** above.
 
 ---
 

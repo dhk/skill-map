@@ -9,15 +9,23 @@ An interactive force-directed graph of the Claude / agent skills ecosystem, back
 [**Open the map →**](https://dhk.github.io/skill-map)
 
 **Install `skill-doctor`** (by [dhk](https://github.com/dhk)) — an interactive
-best-practice reviewer for a single skill:
+best-practice reviewer for a single skill. In **Claude Code**, run these as two
+separate commands (not in Claude Desktop — see [INSTALL.md](INSTALL.md)):
 
 ```
 /plugin marketplace add dhk/skill-map
+```
+```
 /plugin install skill-doctor@skill-map
 ```
 
-See [INSTALL.md](INSTALL.md) for the one-shot `curl` install and a
-verify-first walkthrough.
+Not in Claude Code? One-line shell install:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/dhk/skill-map/main/install.sh | bash
+```
+
+See [INSTALL.md](INSTALL.md) for a verify-first walkthrough and troubleshooting.
 
 ---
 
