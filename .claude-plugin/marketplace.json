@@ -1,0 +1,22 @@
+{
+  "name": "skill-map",
+  "owner": {
+    "name": "dhk",
+    "url": "https://github.com/dhk"
+  },
+  "metadata": {
+    "description": "Tools for auditing and improving Claude Agent Skills, from the skill-map study of the ecosystem.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "skill-doctor",
+      "source": "./plugins/skill-doctor",
+      "description": "Interactive best-practice reviewer for a single Agent Skill: interviews about allowed-tools scoping, data sensitivity (PHI/PII), high-stakes actions, triggering, and install scope, then recommends and applies fixes.",
+      "version": "1.0.0",
+      "author": { "name": "dhk" },
+      "category": "development",
+      "tags": ["skills", "quality", "best-practices", "review"]
+    }
+  ]
+}
