@@ -1,0 +1,12 @@
+{
+  "name": "skill-doctor",
+  "description": "Examine a Claude Agent Skill and bring it up to best-practice standard. Interviews about allowed-tools scoping, data sensitivity (PHI/PII/HIPAA), high-stakes actions, triggering, and install scope, then recommends fixes and applies them on confirmation.",
+  "version": "1.0.0",
+  "author": {
+    "name": "dhk",
+    "url": "https://github.com/dhk"
+  },
+  "homepage": "https://github.com/dhk/skill-map",
+  "license": "MIT",
+  "keywords": ["skills", "quality", "best-practices", "review", "audit"]
+}
