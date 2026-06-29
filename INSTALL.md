@@ -68,8 +68,8 @@ pin to an exact commit instead, add the marketplace from a specific `ref`/`sha`
 
 ## Who made this?
 
-skill-doctor is by **dhk** (<https://github.com/dhk>). Authorship is verifiable
-in several places:
+skill-doctor is by **dhk** (<https://github.com/dhk>, <dhkonskills@dhk.io>).
+Authorship is verifiable in several places:
 
 - The **GitHub repo path** `dhk/skill-map` — only the owner of that account can
   publish under it. The plugin namespace `@skill-map` derives from this repo.
