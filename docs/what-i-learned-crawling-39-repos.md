@@ -1,165 +1,242 @@
-# What I Learned From Crawling 41 Skill Repos (4,953 SKILL.md files)
+# Vulnerabilities, Anti-Patterns, and Best Practices in Published Claude Agent Skills
 
-A heuristic quality pass over every `SKILL.md` in the corpus, scored against the
-Anthropic gold standard (see [best-practices.md](best-practices.md)). One crawl,
-41 repos, 4,953 skills with full content (crawl-1 + crawl-2). Here is what the data says.
+*A corpus analysis of 4,953 SKILL.md files across 41 public repositories.*
 
-## The headline numbers
+---
 
-- **Corpus median quality: 82.5 / 100** — a solid B+ ecosystem, better than first
-  reported (see the two correction notes below).
-- **Grade distribution:** A 2,033 · B 2,100 · C 690 · D 76 · F 54.
-- **Only 2.5% of skills state when *not* to use them** (the anti-trigger note) —
-  the rarest practice in the ecosystem and the #1 defect (4,758 skills). Even the
-  canonical repos almost all miss it. This is the one genuinely universal gap.
-- **68% tell Claude *when* to use them** — 1,521 skills still have no
-  WHEN-trigger, but most do.
-- **Only 27% use progressive disclosure** (link to reference files instead of
-  inlining everything).
+## Overview
 
-> **Correction (parser fix).** An earlier pass reported median 73.5 and "only
-> 43% have a WHEN-trigger." That was a bug: the scorer didn't parse YAML
-> block-scalar descriptions (`description: |-`), which **27.5% of the corpus
-> uses** — so a quarter of all skills had their descriptions read as empty. After
-> fixing it, the median rose to 79.8 and WHEN-triggers to 68%. The lesson cuts
-> both ways: measure your measurement. The anti-trigger finding survived; the
-> "ecosystem writes bad metadata" narrative softened to "the ecosystem is fine
-> except for one near-universal omission."
+This document reports findings from a systematic quality assessment of the Claude
+Agent Skills ecosystem. Every `SKILL.md` in the crawl corpus was scored against
+the Anthropic canonical standard using a five-axis rubric (frontmatter, triggering,
+disclosure, structure, safety — see
+[rubric.md](../plugins/skill-doctor/skills/skill-doctor/reference/rubric.md)).
+A stratified sample was additionally reviewed by a calibrated LLM judge. Corpus
+coverage: 41 repositories, 4,953 skills with full content, crawled June 2026.
 
-> **Update (crawl-2, 2026-06-27).** Added rohitg00/awesome-claude-code-toolkit
-> (2.2k★, 40 skills) and mksglu/context-mode (18k★, 11 skills). Both are
-> **original** — zero exact duplicates with the existing corpus. They sharpen the
-> stars≠quality point: rohitg00 has 2.2k stars but only **1/40** skills carry a
-> WHEN-trigger (its descriptions are capability blurbs, not invocation cues),
-> dragging domain-pack's trigger rate from 81%→73%; mksglu (18k★) has 11/11.
-> Lineage figures below remain crawl-1-scoped (the new repos add no copy edges).
+The headline finding is a system that is structurally competent but has a single
+near-universal vulnerability — the missing anti-trigger — and a smaller but more
+serious cluster of safety defects in tool scoping and data handling.
 
-> **Correction 2 (sibling files).** The crawl captured only `SKILL.md`, so the
-> progressive-disclosure axis was blind to `reference/`/`scripts/` folders —
-> which **50% of the corpus has**. Backfilling folder contents
-> (`fetch_siblings.py`) and crediting them moved the median 79.5→82.5 and the
-> canonical repos to 90. Disclosure is now scored on real folder contents, not
-> inferred from inline links. (Same lesson, again: measure your measurement.)
+---
 
-## Lesson 1 — The ecosystem's quality problem is concentrated, not spread
+## Corpus composition
 
-Quality does **not** degrade evenly. It collapses in one place: **mega-collections**.
+| Repository type | Repos | Skills | Share |
+|---|---|---|---|
+| Mega-collection | 5 | 3,775 | 77% |
+| Marketplace | 6 | 594 | 12% |
+| Domain-pack | 12 | 410 | 8% |
+| Canonical-reference | 5 | 118 | 2% |
+| Boutique | 6 | 49 | 1% |
+| Single-skill | 7 | 7 | <1% |
 
-| Signature | Repos | Skills | Median quality | % with WHEN-trigger |
-|---|---|---|---|---|
-| canonical-reference | 5 | 118 | **90.0** | 87% |
-| domain-pack | 12 | 410 | **85.0** | 73% |
-| marketplace | 6 | 594 | **90.0** | 87% |
-| single-skill | 7 | 7 | 85.0 | 100% |
-| boutique | 6 | 49 | 82.5 | 90% |
-| **mega-collection** | 5 | **3,775** | **80.0** | **64%** |
+Mega-collections — large aggregations of skills from multiple contributors — dominate
+the corpus numerically. This has direct implications for where defects concentrate.
 
-Mega-collections are **77% of all skills in the corpus** and have the lowest
-median (78) and the lowest WHEN-trigger rate (64%). Everything that *isn't* a
-mega-collection clusters at 82–90 median. The gap is real but **modest** — these
-are big aggregations with uneven contributions, not junk. Curated work is a notch
-better across the board.
+---
 
-## Lesson 2 — The WHEN-trigger still divides curated from bulk
+## Quality distribution
 
-The cheapest, highest-leverage gap is descriptions that say *what* a skill does
-but never *when* to invoke it. Two-thirds of the corpus gets this right; the
-shortfall is concentrated in mega-collections. This is
-the text Claude reads to decide whether to use the skill at all — omitting the
-trigger directly hurts retrieval.
+| Grade | Score range | Skills | % |
+|---|---|---|---|
+| A | ≥ 85 | 2,033 | 41% |
+| B | 70–84 | 2,100 | 42% |
+| C | 55–69 | 690 | 14% |
+| D | 40–54 | 76 | 2% |
+| F | < 40 | 54 | 1% |
 
-- Canonical / domain / marketplace repos: **81–87%** have it.
-- Mega-collections: **64%** have it.
+**Corpus median: 82.5 / 100.** The distribution is left-skewed: the majority of
+skills are structurally sound. The long tail — ~17% graded C or below — is
+concentrated almost entirely in mega-collections and is driven by a small number
+of recurring defects rather than broad-based quality failure.
 
-Adding "Use this when…" to a description is a one-line change that moves a skill
-up a full grade. It is the first thing to fix anywhere.
+---
 
-## Lesson 3 — Frontmatter drift is everywhere
+## Defect inventory
 
-`nonstandard-frontmatter` is the **third most common flag (1,119 skills)**. The
-gold standard is disciplined: `name`, `description`, and at most `license` /
-`metadata`. Out in the wild, repos sprout bespoke keys, inconsistent casing, and
-`non-slug-name` values (368 skills). It rarely breaks anything, but it signals an
-absent house style — and house style is exactly what separates the
-canonical-reference repos from same-sized domain-packs.
-
-## Lesson 4 — Thin descriptions are rare (once you parse them right)
-
-Only **388 skills (8%)** have a description under 8 words. An earlier pass put
-this at 35% — almost all of that was the block-scalar parser bug reading real
-multi-line descriptions as empty. Genuinely thin descriptions are the exception.
-
-## Lesson 5 — Structure is the corpus's *strength*
-
-Bodies are mostly fine. `stub-body` (54), `missing-description` (21), and
-`missing-name` (14) are rare. People write decent skill *bodies*; what they skip
-is the **frontmatter discipline and the trigger** — the parts that make a skill
-*discoverable*, not just *readable*.
-
-## Top defects across the whole corpus
+The table below ranks every flagged defect by prevalence across the full corpus.
 
 | Defect | Skills affected | % of corpus |
 |---|---|---|
-| no anti-trigger ("when NOT to use") | 4,758 | 97% |
-| no WHEN-trigger | 1,521 | 31% |
-| thin description (<8 words) | 388 | 8% |
-| nonstandard frontmatter | 1,119 | 23% |
-| non-slug name | 368 | 8% |
-| no progressive disclosure | 248 | 5% |
-| stub body | 54 | 1% |
-| missing description | 21 | <1% |
-| missing name | 14 | <1% |
+| No anti-trigger ("Do NOT use when…") | 4,758 | **97%** |
+| No WHEN-trigger ("Use this when…") | 1,521 | 31% |
+| Nonstandard frontmatter keys | 1,119 | 23% |
+| Thin description (< 8 words) | 388 | 8% |
+| Non-slug `name` field | 368 | 8% |
+| No progressive disclosure (reference files) | 248 | 5% |
+| Stub body | 54 | 1% |
+| Missing description | 21 | < 1% |
+| Missing name | 14 | < 1% |
 
-## Lesson 6 — what the LLM cross-read caught that heuristics can't
+### The dominant defect: missing anti-trigger (97%)
 
-A stratified sample was deep-read by Claude and compared to the Anthropic house
-style. The first judge (`sample_llm.py`) was miscalibrated and called even
-Anthropic "weak"; the **tuned v2 judge** (`judge_llm.py`, see
-[llm-judge-tuning.md](llm-judge-tuning.md)) agrees with the heuristic cleanly and
-monotonically:
+The anti-trigger — a clause stating *when not to invoke* a skill — is the rarest
+practice in the ecosystem and the highest-leverage fix. Without it, the model has
+no signal to suppress the skill in adjacent contexts: a code-review skill fires on
+refactoring requests; a deployment skill activates on read-only queries.
 
-| Heuristic band | v2 verdicts |
+The defect is near-universal across all repository types, including canonical
+references. It is also the cheapest fix: one clause added to the `description`
+field.
+
+### Secondary defect: missing WHEN-trigger (31%)
+
+The WHEN-trigger — a clause stating *when to invoke* — is the mechanism by which
+the model routes to a skill at all. It is absent in 31% of the corpus. The rate
+splits sharply by repository type: 87% of canonical and marketplace repos include
+it; 64% of mega-collections do. The shortfall is concentrated in bulk-aggregated
+content where descriptions function as capability blurbs rather than invocation
+cues.
+
+### Structural defects: frontmatter drift
+
+Nonstandard frontmatter (23%) and non-slug names (8%) are prevalent but low-impact
+in isolation. Their significance is diagnostic: they indicate an absent authoring
+standard. Canonical repositories that enforce house style score 87–90 on the
+rubric; those that do not cluster around 80. The correlation is reliable.
+
+---
+
+## Safety vulnerabilities
+
+The defects above affect *discoverability and routing*. The following affect
+*safety*. They are less prevalent but higher severity.
+
+### Unscoped tool grants
+
+16% of the corpus declares `allowed-tools`. Of those, **more than 50% grant bare
+`Bash`** — unrestricted shell access — rather than a scoped pattern (e.g.
+`Bash(git log*)`, `Bash(npm run*)`). The scoped and unscoped variants differ
+significantly in blast radius: a bare `Bash` grant permits arbitrary command
+execution; a scoped pattern restricts it to the intended operation.
+
+Skills that take agentic actions — file edits, deployments, database operations —
+should declare `allowed-tools` at the narrowest scope that still works. Skills that
+only produce content (documentation, analysis) generally do not need tool
+declarations.
+
+### Sensitive data without safeguards
+
+376 skills in the corpus reference regulated or sensitive data: HIPAA, PHI, PII,
+GDPR, patient records, SSNs, financial data. **Only 48% of those include any data
+handling guidance.** The remaining 52% instruct the model to process sensitive
+data with no stated safeguards: no redaction, no retention policy, no handling of
+credentials or secrets.
+
+The absence of a data handling section is not a soft quality issue. In regulated
+domains it is a compliance gap. The required content is straightforward: what data
+the skill reads or writes, any de-identification before processing, explicit
+prohibition on logging or echoing sensitive values, and applicable locale
+constraints (HIPAA, GDPR).
+
+### High-stakes actions without confirmation guards
+
+Approximately 50% of the corpus references irreversible or costly operations:
+deploy, delete, drop, migrate, payments, production. Of those, a significant share
+have no explicit guard — no dry-run step, no explicit confirmation prompt, no
+validation before execution. Irreversible actions that proceed without a
+confirmation step expose users to data loss or unintended side effects with no
+recovery path.
+
+---
+
+## LLM cross-validation
+
+A stratified sample was reviewed by a calibrated LLM judge (see
+[llm-judge-tuning.md](llm-judge-tuning.md)). The judge agreed with the heuristic
+scorer monotonically across score bands:
+
+| Heuristic band | LLM verdicts |
 |---|---|
 | < 50 | broken ×3, weak ×1 |
 | 50–75 | solid ×9, exemplary ×1, weak ×2 |
 | 75–90 | solid ×9, exemplary ×1, weak ×2 |
 | 90+ | exemplary ×2, solid ×2 |
 
-The two graders now track each other — the LLM adds *substance* judgment on top of
-the heuristic's *structure* check. Its weakest axes across the sample are
-**triggering (6.2/10)** and **disclosure (6.2)**, exactly the dimensions the
-corpus numbers flag.
+The LLM review surfaced qualitative defects the heuristic cannot detect:
 
-Where it earned its keep was the **qualitative divergences** structure can't see:
+- **Unbounded triggers** — "use in any conversation" passes the presence check but
+  provides no routing signal.
+- **Coercive tone** — adversarial framing ("you do not have a choice," "red flags"
+  tables treating the model as a threat) that conflicts with Anthropic's
+  collaborative authoring voice and degrades model compliance.
+- **Scope creep** — personality configuration, tone policing, and meta-governance
+  smuggled into skill content.
+- **Non-standard markup** — proprietary XML-ish tags (`<extremely-important>`,
+  `<subagent-stop>`) with no canonical precedent and undefined behavior.
+- **Truncated artifacts** — at least one published skill in the corpus is
+  truncated mid-sentence.
+- **Concrete examples absent** — passes the structural heading check but provides
+  no worked example, making the skill harder to invoke correctly.
 
-- **No progressive disclosure / no reference links** (most common) — rulebooks
-  dumped inline instead of linked out.
-- **No concrete examples** — passes the heading check, still unhelpful.
-- **Unbounded triggers** — "use in any conversation" is technically a trigger
-  but a meaningless one.
-- **Coercive tone** — "absolutely must," "you do not have a choice," "not
-  negotiable," adversarial "red flags" tables that frame the model as a threat to
-  be guarded against. This clashes hard with Anthropic's measured, collaborative
-  voice.
-- **Non-standard XML-ish tags** (`<extremely-important>`, `<subagent-stop>`) with
-  no canonical precedent.
-- **Scope creep** — "personality configuration" (gratitude bans, tone policing)
-  smuggled in as skill content; meta-governance conflated with task guidance.
-- **Unshippable artifacts** — at least one file truncated mid-sentence.
-
-The lesson: a high structural score is necessary, not sufficient. Use the
-heuristic as a fast gate; use a qualitative read to catch tone, scope, and
-substance.
-
-## The one-paragraph takeaway
-
-The Claude skills ecosystem is in better shape than headlines suggest: median
-~80, two-thirds of skills carry a WHEN-trigger, bodies are structured and useful.
-The one near-universal omission is the **anti-trigger note** — 97% of skills
-never say when *not* to fire. That, plus some frontmatter drift in the
-mega-collections, is the whole to-do list. The fix is cheap and mechanical.
+A high structural score is necessary but not sufficient. The heuristic functions
+as a fast gate; qualitative review catches tone, scope, and substance failures.
 
 ---
 
-*Generated by `crawlers/score_corpus.py` over all `crawls/` (crawl-1 + crawl-2).
-Reproduce: `python crawlers/score_corpus.py`.*
+## What the data implies for the ecosystem
+
+**The core problem is not quality — it is the absence of a shared standard.**
+
+The ecosystem median (82.5) is respectable. Bodies are well-written. Most skills
+have a purpose and execute it. The defects that exist are not evidence of
+careless authorship; they are evidence that authors have no canonical checklist to
+work from. The anti-trigger is absent from 97% of skills not because authors
+disagree with the practice but because the practice has not been articulated as a
+norm.
+
+The safety vulnerabilities — unscoped tools, unguarded sensitive data, missing
+confirmation steps — follow the same pattern. They appear most often in domain
+areas (infrastructure, healthcare, finance) where the stakes are highest and the
+existing guidance is thinnest.
+
+---
+
+## What we are going to do about it
+
+Three interventions, in order of leverage:
+
+**1. Individual skill review: skill-doctor**
+
+An interactive reviewer that audits a single `SKILL.md` against the rubric, runs
+a structured interview for context the file cannot provide (tool scoping rationale,
+data sensitivity, intended trigger scope), and recommends concrete edits. It
+applies fixes on explicit confirmation. Addresses the full defect set including
+safety.
+
+Install in Claude Code:
+```
+/plugin marketplace add dhk/skill-map
+/plugin install skill-doctor@skill-map
+```
+
+**2. Repository-level audit: audit_repo.py / skill-audit Action**
+
+A programmatic auditor that scores an entire repo, benchmarks it against same-type
+peers in the corpus, surfaces the worst offenders, and identifies overlapping
+skills to consolidate. Runs locally or as a GitHub Action that comments on every
+PR touching a `SKILL.md`.
+
+```bash
+python crawlers/audit_repo.py --github owner/repo
+```
+
+```yaml
+- uses: dhk/skill-map/.github/actions/skill-audit@main
+```
+
+**3. Ecosystem visibility: the skill map**
+
+A continuously updated index of the public skills ecosystem, graded and searchable,
+that makes quality and provenance visible at the repository level. Authors can
+submit their repos for inclusion; the crawler re-scores on each crawl.
+
+[dhk.github.io/skill-map](https://dhk.github.io/skill-map)
+
+---
+
+*Source data: `crawlers/score_corpus.py` over `crawls/` (crawl-1 + crawl-2).
+Reproduce with `python crawlers/score_corpus.py`. Rubric:
+[reference/rubric.md](../plugins/skill-doctor/skills/skill-doctor/reference/rubric.md).
+LLM judge methodology: [llm-judge-tuning.md](llm-judge-tuning.md).*
