@@ -18,6 +18,12 @@ The headline finding is a system that is structurally competent but has a single
 near-universal vulnerability — the missing anti-trigger — and a smaller but more
 serious cluster of safety defects in tool scoping and data handling.
 
+This is the full narrative report, with the corpus-wide data (defect prevalence,
+safety findings) behind every claim. For condensed, task-oriented versions of the
+same material, see [best-practices.md](best-practices.md) (the scoring rubric on
+its own) and [skill-author-checklist.md](skill-author-checklist.md) (the same
+findings as a one-page authoring checklist).
+
 ---
 
 ## Corpus composition
