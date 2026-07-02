@@ -1,9 +1,10 @@
 # Quality by Skill Type
 
 The same rubric, sliced by what a skill *is* (classified heuristically from its
-name). After the parser fix (see the [correction note](what-i-learned-crawling-39-repos.md)),
-the by-type spread is **much flatter than first reported** — the dramatic
-"data/analytics is the worst type" finding was mostly the block-scalar artifact.
+name). After a parser fix (a YAML block-scalar description was being truncated,
+undercounting some skills' actual length), the by-type spread is **much flatter
+than first reported** — the dramatic "data/analytics is the worst type" finding
+was mostly that artifact.
 
 | Skill type | N skills | Median quality | % with WHEN-trigger |
 |---|---|---|---|
