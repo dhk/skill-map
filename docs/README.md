@@ -18,10 +18,10 @@ find out which kind it is.
 | File | What it answers |
 |---|---|
 | [skill-best-practices-study.md](skill-best-practices-study.md) | Hub doc for the whole study — links everything below in reading order. |
-| [best-practices.md](best-practices.md) | The scoring rubric, derived empirically from `anthropics/skills` and `openai/skills`. |
+| [best-practices.md](best-practices.md) | The scoring rubric, derived empirically from `anthropics/skills` and `openai/skills`. Condensed extract of `skill-ecosystem-vulnerabilities.md`. |
+| [skill-ecosystem-vulnerabilities.md](skill-ecosystem-vulnerabilities.md) | The full narrative report — corpus composition, quality distribution, defect inventory, safety vulnerabilities. `best-practices.md` and `skill-author-checklist.md` are condensed, task-oriented extracts of this. |
 | [skill-types.md](skill-types.md) | Quality sliced by skill type (generator, reviewer, reference, etc). |
-| [skill-author-checklist.md](skill-author-checklist.md) | Authoring checklist tagged by what's machine-checkable vs. needs judgment. |
-| [skill-ecosystem-vulnerabilities.md](skill-ecosystem-vulnerabilities.md) | Full standalone report covering corpus composition, quality distribution, and safety defects — overlaps significantly with `best-practices.md` + `skill-author-checklist.md`. Possibly an earlier draft that predates the split into focused docs; not yet reconciled. |
+| [skill-author-checklist.md](skill-author-checklist.md) | Authoring checklist tagged by what's machine-checkable vs. needs judgment. Condensed extract of `skill-ecosystem-vulnerabilities.md`. |
 | [llm-judge-tuning.md](llm-judge-tuning.md) | Post-mortem on why the LLM judge scored Anthropic "weak," and the fix. |
 | [repo-signature-playbook.md](repo-signature-playbook.md) | "If your repo looks like X, do Y" — per-archetype recommendations. |
 | [just-add-these-skills.md](just-add-these-skills.md) | The general-purpose skill set adopted across ≥4 independent repos. |
@@ -35,11 +35,3 @@ find out which kind it is.
 | [design-brief.md](design-brief.md) | UX review brief for the next map iteration (dated 2026-06-25). |
 | [internal-skill-map.md](internal-skill-map.md) | Design doc for pointing the crawler at a corporate GitHub org. |
 | [article-series.md](article-series.md) | Five-part article series outline built on this study. |
-
-## Known issues
-
-- `skill-types.md` and `skill-best-practices-study.md` both link to
-  `what-i-learned-crawling-39-repos.md`, which doesn't exist in this directory.
-  Broken link — either restore the file or drop the references.
-- See the `skill-ecosystem-vulnerabilities.md` row above — content overlap with
-  two other docs, not yet reconciled.
