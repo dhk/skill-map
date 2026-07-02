@@ -14,7 +14,7 @@ Anthropic gold standard, three ways:
 | Doc | What it answers |
 |---|---|
 | [best-practices.md](best-practices.md) | The rubric. What "good" means, derived from `anthropics/skills`. |
-| [what-i-learned-crawling-39-repos.md](what-i-learned-crawling-39-repos.md) | The headline findings across the whole corpus. |
+| [skill-ecosystem-vulnerabilities.md](skill-ecosystem-vulnerabilities.md) | The headline findings across the whole corpus — full report: composition, quality distribution, defect inventory, safety vulnerabilities. |
 | [repo-signature-playbook.md](repo-signature-playbook.md) | "If your repo looks like X, do Y" + top-N skills to add, per signature. |
 | [just-add-these-skills.md](just-add-these-skills.md) | The general-purpose set + practice-level changes for skills you already have. |
 | [skill-types.md](skill-types.md) | Quality sliced by skill type — which kinds are written well vs badly. |
