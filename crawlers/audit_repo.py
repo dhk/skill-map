@@ -29,6 +29,7 @@ import os
 import re
 import sys
 import statistics as st
+import urllib.error
 from pathlib import Path
 from collections import defaultdict
 
@@ -284,7 +285,27 @@ def main():
     args = ap.parse_args()
 
     if args.github:
-        files, branch = collect_github(args.github, args.token, args.branch)
+        try:
+            files, branch = collect_github(args.github, args.token, args.branch)
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                msg = (f"repo '{args.github}' not found (or private with no "
+                       f"access). Check the name, or pass --token / set "
+                       f"$GITHUB_TOKEN if it's private.")
+            elif e.code == 401:
+                msg = "the token was rejected (invalid or expired). Check --token / $GITHUB_TOKEN."
+            elif e.code == 403:
+                msg = ("GitHub returned 403 — most likely rate-limited (60 "
+                       "req/hr without a token) or blocked by a network policy. "
+                       "Pass --token / set $GITHUB_TOKEN and retry.")
+            else:
+                msg = f"GitHub API error {e.code}: {e.reason}"
+            print(f'audit_repo.py: {msg}', file=sys.stderr)
+            sys.exit(1)
+        except urllib.error.URLError as e:
+            print(f'audit_repo.py: could not reach the GitHub API ({e.reason}). '
+                  f'Check your network connection and retry.', file=sys.stderr)
+            sys.exit(1)
         target = f'{args.github}@{branch}'
         owner_type = 'Organization' if '/' in args.github else 'User'
     elif args.path:
