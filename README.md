@@ -16,7 +16,7 @@ for install options (Claude Code plugin, shell, or claude.ai zip upload).
 
 ## The Session Layer Gap
 
-Every published skill in this corpus does one thing: it makes Claude better at a task. Write better Terraform. Review smarter contracts. Generate cleaner dbt models. The task layer is well-covered: 4,902 skills and counting.
+Every published skill in this corpus does one thing: it makes Claude better at a task. Write better Terraform. Review smarter contracts. Generate cleaner dbt models. The task layer is well-covered: 4,975 skills and counting.
 
 Nobody has published a skill for how to run a day.
 
@@ -59,7 +59,7 @@ The map is built from two layers of data:
 
 **Interactive graph** (what you see at the link above): 1,121 skills across 53 organizations, sourced from [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) — a curated index of published agent skills. 229 nodes, 306 links, 13 domains.
 
-**Raw corpus** (powering future analysis): a GitHub crawler has swept 39 repositories and collected 4,902 Claude-format SKILL.md files in full — plus 418 Gemini-format files catalogued by metadata. That's the actual content of the skills, not just the index entries.
+**Raw corpus** (powering future analysis): a GitHub crawler has swept 43 repositories and collected 4,975 Claude-format SKILL.md files in full — plus 418 Gemini-format files catalogued by metadata. That's the actual content of the skills, not just the index entries.
 
 ### Largest repositories in the corpus
 

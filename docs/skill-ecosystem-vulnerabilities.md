@@ -1,6 +1,6 @@
 # Vulnerabilities, Anti-Patterns, and Best Practices in Published Claude Agent Skills
 
-*A corpus analysis of 4,953 SKILL.md files across 41 public repositories.*
+*A corpus analysis of 4,975 SKILL.md files across 43 public repositories.*
 
 ---
 
@@ -12,7 +12,7 @@ the Anthropic canonical standard using a five-axis rubric (frontmatter, triggeri
 disclosure, structure, safety — see
 [rubric.md](../plugins/skill-doctor/skills/skill-doctor/reference/rubric.md)).
 A stratified sample was additionally reviewed by a calibrated LLM judge. Corpus
-coverage: 41 repositories, 4,953 skills with full content, crawled June 2026.
+coverage: 43 repositories, 4,975 skills with full content, crawled June 2026.
 
 The headline finding is a system that is structurally competent but has a single
 near-universal vulnerability — the missing anti-trigger — and a smaller but more
