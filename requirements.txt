@@ -1,0 +1,11 @@
+# Only needed for the full crawl pipeline (crawl.py, render_*.py, validate_wiring.py).
+# skill_quality.py / audit_repo.py / repo_signature.py need nothing beyond the
+# standard library (PyYAML is optional there — falls back to a hand parser).
+httpx
+typer
+PyGithub
+rich
+tenacity
+matplotlib
+PyYAML
+jsonschema

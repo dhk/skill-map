@@ -1,7 +1,8 @@
 # Contributing
 
-Two ways to take part: **submit your skills repo** to the map, and **audit your
-skills** against the ecosystem.
+Three ways to take part: **submit your skills repo** to the map, **audit your
+skills** against the ecosystem, or **develop this repo** itself (the crawler,
+scorer, and map).
 
 ## Submit your skills repo
 
@@ -67,6 +68,37 @@ worst offenders, overlapping skills to consolidate, and the top general-purpose
 skills you're missing. The most common gap across the whole ecosystem is the
 **anti-trigger** (`Do NOT use when…`) — ~97% of skills omit it, and it's the
 cheapest win.
+
+## Develop this repo
+
+Working on the crawler, scorer, or map itself (not just running the auditor
+as a consumer)?
+
+**Setup:**
+```bash
+git clone https://github.com/dhk/skill-map
+cd skill-map
+python3 --version   # 3.9+ assumed, nothing pins an exact version yet
+```
+
+**Smoke test — no dependencies needed for this one:**
+```bash
+python crawlers/skill_quality.py plugins/skill-doctor/skills/skill-doctor/SKILL.md
+```
+If that prints a JSON score, your checkout is fine. `skill_quality.py`,
+`audit_repo.py`, and `repo_signature.py` need nothing beyond the standard
+library (PyYAML is optional there — falls back to a hand parser if absent).
+
+**Full pipeline** (crawling, rendering figures, validating `WIRING.md`) needs
+the rest of `requirements.txt`:
+```bash
+pip install -r requirements.txt
+python crawlers/run_pipeline.py --fast   # rebuild derived data from existing crawl snapshots
+```
+
+**No automated tests exist yet.** Before opening a PR that touches `crawlers/`,
+at minimum re-run `run_pipeline.py` and confirm `check_docs.py`'s output is
+clean (it flags narrative docs whose cited numbers drifted from `STATS.md`).
 
 ## How the data flows
 
