@@ -293,12 +293,17 @@ def write_study(edges: list[dict], clusters: list[list[str]], out_path: str):
         "## Intra-repo wiring clusters",
         "",
         f"Top {min(20, len(clusters))} clusters of mutually referencing skills within a single repo.",
+        "Full membership for every cluster is in [`data/skill_clusters.json`](../data/skill_clusters.json) —",
+        "large clusters are truncated below so one repo's skill list doesn't dominate the page.",
         "",
         "| Size | Skills |",
         "|---|---|",
     ]
+    CLUSTER_PREVIEW_N = 15
     for cluster in clusters[:20]:
-        lines.append(f"| {len(cluster)} | {', '.join(f'`{s}`' for s in cluster)} |")
+        shown = cluster[:CLUSTER_PREVIEW_N]
+        more = f", *+{len(cluster) - CLUSTER_PREVIEW_N} more*" if len(cluster) > CLUSTER_PREVIEW_N else ""
+        lines.append(f"| {len(cluster)} | {', '.join(f'`{s}`' for s in shown)}{more} |")
 
     lines += [
         "",
