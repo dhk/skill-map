@@ -1,0 +1,43 @@
+name: Publish PyPI package (reusable)
+
+# Reusable workflow: builds and publishes one PyPI package from this monorepo
+# using PyPI Trusted Publishing (OIDC — no stored API token, nothing to
+# rotate or leak). Called by a thin per-package trigger workflow; see
+# publish-skill-doctor.yml for the copy-paste example, and README.md in this
+# directory for how to wire up a new package end to end.
+
+on:
+  workflow_call:
+    inputs:
+      package-dir:
+        description: Directory containing the package's pyproject.toml
+        required: true
+        type: string
+      environment:
+        description: GitHub environment configured as the PyPI trusted publisher
+        required: false
+        type: string
+        default: pypi
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write # required for PyPI Trusted Publishing — do not add a token secret instead
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
+
+      - name: Build sdist and wheel
+        run: uv build --out-dir dist
+        working-directory: ${{ inputs.package-dir }}
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ${{ inputs.package-dir }}/dist
