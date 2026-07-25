@@ -32,9 +32,17 @@ static pass flagged as relevant, and **batch** related questions into one call
 - **Q (if yes): Which guard fits?** dry-run/preview first · explicit
   confirmation prompt · validation/checks before acting · all of these.
 
-## D. Triggering (almost always ask)
-- **Q: When should this skill fire — and when should it explicitly NOT?**
-  Capture both; the anti-trigger goes into the description as `Do NOT use when…`.
+## D. Triggering
+- **Q: When should this skill fire?** Always ask — the positive trigger is
+  universal.
+- **Q (only if there's a plausible neighbor): Is there another skill in this
+  install scope that could compete for similar trigger phrases?** Ask this
+  one only when the static pass actually spotted a plausible overlap (a
+  similarly-named or adjacent-domain skill). If yes, capture what this skill
+  is NOT for — the anti-trigger goes into the description as `Do NOT use
+  when…`. If there's no plausible neighbor, don't manufacture an
+  anti-trigger just to check a box; it adds words without adding signal (see
+  rubric §2 — this exact check has drawn real noise complaints).
 
 ## E. Scope & install (always ask)
 - **Q: Where should this skill live?** Options:

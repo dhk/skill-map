@@ -1,0 +1,30 @@
+name: Publish skill-doctor to PyPI
+
+# Trigger only — the build/publish logic lives in publish-pypi-package.yml (a
+# reusable workflow) so every pip-published plugin in this repo shares one
+# implementation. Tag format is prefixed (skill-doctor-vX.Y.Z, not vX.Y.Z) so
+# multiple packages in this monorepo can each cut releases without colliding
+# on tag names.
+#
+# One-time setup on PyPI before the first tag push:
+#   1. Claim the `dhk-skill-doctor` project name (plain `skill-doctor` was
+#      already taken by an unrelated package) via a pending publisher at
+#      pypi.org/manage/account/publishing/, or an authenticated local
+#      `uv publish` / `twine upload` if you'd rather claim it manually first.
+#      The `dhk-` prefix is the standard for every future PyPI package too —
+#      see .github/workflows/README.md.
+#   2. On the project's PyPI settings, add a trusted publisher: this repo
+#      (dhk/skill-map), this workflow filename, environment `pypi`.
+# After that, every `skill-doctor-vX.Y.Z` tag pushed here ships a release —
+# see README.md in this directory.
+
+on:
+  push:
+    tags:
+      - 'skill-doctor-v*'
+
+jobs:
+  publish:
+    uses: ./.github/workflows/publish-pypi-package.yml
+    with:
+      package-dir: plugins/skill-doctor

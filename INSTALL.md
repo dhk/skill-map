@@ -1,19 +1,49 @@
 # Installing skill-doctor
 
-By **dhk** — <https://github.com/dhk/skill-map>. Pick the path that matches how
-much you want to inspect before running.
-
-> **Requires Claude Code** (the CLI, or the VS Code / JetBrains extension).
-> Plugins are not available in the **Claude Desktop** app or **claude.ai** — if
-> you see `/plugin isn't available in this environment`, you're not in Claude
-> Code. On Desktop/web, use the **Shell install** below instead.
+By **dhk** — <https://github.com/dhk/skill-map>.
 
 ---
 
-## One-shot (if you trust the source)
+## 1. One-shot install (recommended)
 
-**Plugin (recommended)** — inside Claude Code. Run these as **two separate
-commands, one at a time** (don't paste both lines at once):
+```bash
+pipx run dhk-skill-doctor
+```
+
+Repo-free: the skill content ships as data inside the `dhk-skill-doctor` PyPI
+wheel, so this fetches it, runs the installer once in a throwaway venv, and
+leaves nothing behind but `~/.claude/skills/skill-doctor`. No git required.
+Then invoke it with `/skill-doctor` in Claude Code.
+
+Re-run the same command to update. Add `--force` if you've hand-edited the
+installed copy and want to reset it; `--target <dir>` to install somewhere
+other than the default.
+
+## 2. Fallback: curl one-liner (if you don't have `pipx`)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/dhk/skill-map/main/install.sh | bash
+```
+
+Clones this repo with git and symlinks the skill into `~/.claude/skills`
+(so `git pull` in the checkout updates it). Use this when `pipx`/Python isn't
+available but git is. Get `pipx` instead with `pip install pipx && pipx
+ensurepath` — see the [pipx docs](https://pipx.pypa.io/stable/installation/).
+
+## 3. Detailed guide
+
+Everything below — the Claude Code plugin marketplace path, the claude.ai/
+Desktop zip upload, a verify-before-you-run walkthrough, version pinning, and
+troubleshooting — for when you want more control than the one-liners above.
+
+> **Plugin marketplace requires Claude Code** (the CLI, or the VS Code /
+> JetBrains extension). Plugins aren't available in the Claude Desktop app or
+> claude.ai — use the zip upload section below on those surfaces.
+
+### Claude Code plugin marketplace
+
+Inside Claude Code. Run these as **two separate commands, one at a time**
+(don't paste both lines at once):
 
 ```
 /plugin marketplace add dhk/skill-map
@@ -23,14 +53,9 @@ commands, one at a time** (don't paste both lines at once):
 /plugin install skill-doctor@skill-map
 ```
 
-**Shell** — works anywhere (incl. Desktop/web users who have the CLI installed).
-Clones the repo and symlinks the skill into `~/.claude/skills`:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/dhk/skill-map/main/install.sh | bash
-```
-
-Either way, then invoke it with `/skill-doctor`.
+Then invoke it with `/skill-doctor`. Note this fetches the *full* skill-map
+repo under the hood (crawler, data, docs — everything) — prefer options 1 or 2
+above if you want to avoid that.
 
 ---
 
@@ -68,10 +93,17 @@ Verify before you run anything.
    - [`reference/rubric.md`](plugins/skill-doctor/skills/skill-doctor/reference/rubric.md)
    - [`reference/interview-bank.md`](plugins/skill-doctor/skills/skill-doctor/reference/interview-bank.md)
 
-2. **Read the installer** before piping it to a shell:
-   <https://github.com/dhk/skill-map/blob/main/install.sh>
+2. **For the `pipx` path**, read the installer it runs — it's ~50 lines, no
+   third-party dependencies, and only ever writes under `~/.claude/skills/`:
+   [`src/skill_doctor_installer/cli.py`](plugins/skill-doctor/src/skill_doctor_installer/cli.py).
+   The PyPI package (`dhk-skill-doctor`) is built straight from this repo via CI —
+   [`pyproject.toml`](plugins/skill-doctor/pyproject.toml) bundles the same
+   `skills/skill-doctor/` tree linked above as package data, nothing more.
 
-3. **Add the marketplace and review it** — adding a marketplace does *not*
+3. **For the shell-install path**, read the installer before piping it to a
+   shell: <https://github.com/dhk/skill-map/blob/main/install.sh>
+
+4. **Add the marketplace and review it** — adding a marketplace does *not*
    install anything; it just registers the catalog so you can inspect it:
    ```
    /plugin marketplace add dhk/skill-map
@@ -79,12 +111,15 @@ Verify before you run anything.
    Then open the `/plugin` menu, find `skill-doctor@skill-map`, and check the
    author and contents.
 
-4. **Install when satisfied:**
+5. **Install when satisfied**, via whichever path you verified:
+   ```bash
+   pipx run dhk-skill-doctor
+   ```
    ```
    /plugin install skill-doctor@skill-map
    ```
 
-5. **Or install fully by hand** (no marketplace, no script):
+6. **Or install fully by hand** (no marketplace, no installer script):
    ```bash
    git clone https://github.com/dhk/skill-map ~/.local/share/skill-map
    ln -s ~/.local/share/skill-map/plugins/skill-doctor/skills/skill-doctor \
@@ -93,10 +128,14 @@ Verify before you run anything.
 
 ### Pin a version
 
-The plugin is published with an explicit `version` (currently `1.0.0`), so you
-only receive updates when that string is bumped — nothing changes under you. To
-pin to an exact commit instead, add the marketplace from a specific `ref`/`sha`
-(see the [marketplace docs](https://code.claude.com/docs/en/plugin-marketplaces)).
+Every distribution channel carries the same explicit `version` string
+(currently `1.0.0`) in lockstep — `plugin.json`, `pyproject.toml`, and
+`SKILL.md` — so you only receive updates when that string bumps; nothing
+changes under you between runs.
+
+- **pipx:** `pipx run "dhk-skill-doctor==1.0.0"` pins to an exact release.
+- **Plugin:** add the marketplace from a specific `ref`/`sha` instead of
+  `main` (see the [marketplace docs](https://code.claude.com/docs/en/plugin-marketplaces)).
 
 ---
 
