@@ -23,8 +23,41 @@ from pathlib import Path
 
 BASE = Path(__file__).parent.parent
 STATS = BASE / 'data' / 'corpus_stats.json'
+GRAPH = BASE / 'data' / 'graph_data_v2.json'
 DOCS = BASE / 'docs'
 README = BASE / 'README.md'
+
+# The line in README.md that describes the *interactive graph* dataset (a
+# curated subset, deliberately different from n_skills/n_repos above — see
+# other_dataset_ctx). Nothing previously re-derived these four numbers from
+# the graph data itself, which is exactly the gap that let a spam PR (#1,
+# Xquik-dev, 2026-06-24) change them without anything noticing, and let
+# index.html's domain counter sit wrong (15 vs the actual 13) independent of
+# that incident. This regex is intentionally specific to that one sentence
+# rather than a generic scan, since "skills"/"organizations"/"nodes"/"links"
+# are common words elsewhere in the doc.
+IG_LINE = re.compile(
+    r'\*\*Interactive graph\*\*.*?:\s*([\d,]+)\s*skills across\s*([\d,]+)\s*organi[sz]ations.*?'
+    r'([\d,]+)\s*nodes,\s*([\d,]+)\s*links,\s*(\d+)\s*domains',
+    re.S,
+)
+
+
+def graph_truth():
+    """Recompute the interactive-graph headline figures directly from the
+    data, rather than trusting whatever prose last hand-typed them."""
+    if not GRAPH.exists():
+        return None
+    g = json.load(open(GRAPH))
+    domains = [n for n in g['nodes'] if n.get('type') == 'domain']
+    orgs = [n for n in g['nodes'] if n.get('type') == 'org']
+    return {
+        'skills': sum(n.get('count', 0) for n in domains),
+        'orgs': len(orgs),
+        'nodes': len(g['nodes']),
+        'links': len(g['links']),
+        'domains': len(domains),
+    }
 
 
 def main():
@@ -76,6 +109,31 @@ def main():
         if md.name in ('STATS.md',):
             continue
         for i, line in enumerate(md.read_text().splitlines(), 1):
+            # Checked unconditionally, before the other_dataset_ctx skip below
+            # — that skip exists to exempt this exact line's "organizations"/
+            # "VoltAgent"/"curated index" wording from the *other* checks, so
+            # it would otherwise skip this check too, right when it matters.
+            if md.name == 'README.md':
+                m = IG_LINE.search(line)
+                if m:
+                    truth = graph_truth()
+                    if truth is None:
+                        issues.append((md.name, i, 'graph_data_v2.json missing — cannot verify',
+                                       line.strip()[:90]))
+                    else:
+                        claimed = {
+                            'skills': _num(m.group(1)), 'orgs': _num(m.group(2)),
+                            'nodes': _num(m.group(3)), 'links': _num(m.group(4)),
+                            'domains': _num(m.group(5)),
+                        }
+                        mismatches = [f'{k} {claimed[k]} (live: {truth[k]})'
+                                      for k in claimed if claimed[k] != truth[k]]
+                        if mismatches:
+                            issues.append((md.name, i,
+                                           'interactive-graph line vs data/graph_data_v2.json: '
+                                           + ', '.join(mismatches),
+                                           line.strip()[:90]))
+
             if hist_ctx.search(line) or other_dataset_ctx.search(line):
                 continue
             for pat, label in stale_patterns:

@@ -1,0 +1,109 @@
+name: Corpus Guard
+
+# Runs on every PR that touches the interactive-graph data or its embedded
+# copy in index.html — exactly the files PR #1 (Xquik-dev, 2026-06-24)
+# touched, and exactly the files that had zero CI coverage at the time
+# (skill-audit.yml only triggers on SKILL.md paths). Two checks:
+#
+#   1. check_docs.py — do README.md's/index.html's headline numbers still
+#      match data/graph_data_v2.json? (doc-drift, not authenticity)
+#   2. vet_corpus_contributors.py --strict — does any newly-added org show
+#      spam/backlink signals (repo-creation bursts, repeated disclaimer
+#      boilerplate, an anomalous submitter repo count)? (authenticity)
+#
+# Both results get posted as a PR comment either way, so the evidence is in
+# front of a reviewer before the merge button gets clicked — not just a
+# green check that's easy to not think about.
+
+on:
+  pull_request:
+    paths:
+      - 'data/graph_data_v2.json'
+      - 'index.html'
+      - 'README.md'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run doc-drift check
+        id: docs
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python crawlers/check_docs.py 2>&1 | tee docs_output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Run contributor-vetting check
+        id: vet
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE_REF: ${{ github.event.pull_request.base.ref || 'main' }}
+          AUTHOR: ${{ github.event.pull_request.user.login || '' }}
+        run: |
+          author_arg=()
+          if [ -n "$AUTHOR" ]; then author_arg=(--author "$AUTHOR"); fi
+          python crawlers/vet_corpus_contributors.py \
+            --base "origin/$BASE_REF" \
+            "${author_arg[@]}" \
+            --strict 2>&1 | tee vet_output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Post findings as a PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const docs = fs.existsSync('docs_output.txt') ? fs.readFileSync('docs_output.txt', 'utf8') : '(no output)';
+            const vet = fs.existsSync('vet_output.txt') ? fs.readFileSync('vet_output.txt', 'utf8') : '(no output)';
+            const body = [
+              '### Corpus Guard',
+              '',
+              '<details><summary>Doc-drift check (README/index.html vs data/graph_data_v2.json)</summary>',
+              '',
+              '```', docs.trim(), '```',
+              '</details>',
+              '',
+              '<details><summary>Contributor-vetting check (new orgs + PR author)</summary>',
+              '',
+              '```', vet.trim(), '```',
+              '</details>',
+            ].join('\n');
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.startsWith('### Corpus Guard'));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                comment_id: existing.id, body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: context.issue.number, body,
+              });
+            }
+
+      - name: Fail if either check failed
+        if: steps.docs.outputs.exit_code != '0' || steps.vet.outputs.exit_code != '0'
+        run: |
+          echo "See the PR comment above for details."
+          exit 1
