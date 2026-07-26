@@ -16,11 +16,13 @@ name: Corpus Guard
 # green check that's easy to not think about.
 
 on:
-  pull_request:
-    paths:
-      - 'data/graph_data_v2.json'
-      - 'index.html'
-      - 'README.md'
+  # Deliberately NOT path-filtered at the trigger level, even though this
+  # check only cares about a few files: a required status check that never
+  # reports (because a path filter skipped it) permanently blocks merging
+  # any PR that doesn't touch those paths. Path-relevance is checked inside
+  # the job instead (see "Check if relevant paths changed" below), so this
+  # workflow always reports a status and is safe to mark as required.
+  pull_request: {}
   workflow_dispatch: {}
 
 permissions:
@@ -39,8 +41,22 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Check if relevant paths changed
+        id: relevant
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          changed=$(git diff --name-only "$BASE_SHA" HEAD -- data/graph_data_v2.json index.html README.md)
+          if [ -n "$changed" ]; then
+            echo "hit=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "hit=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Run doc-drift check
         id: docs
+        if: github.event_name != 'pull_request' || steps.relevant.outputs.hit == 'true'
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -103,7 +119,10 @@ jobs:
             }
 
       - name: Fail if either check failed
-        if: steps.docs.outputs.exit_code != '0' || steps.vet.outputs.exit_code != '0'
+        # Compared against the literal '1' (our scripts' only failure code),
+        # not "!= '0'" — a skipped step (irrelevant paths) leaves this output
+        # empty, which must count as passing, not failing.
+        if: steps.docs.outputs.exit_code == '1' || steps.vet.outputs.exit_code == '1'
         run: |
           echo "See the PR comment above for details."
           exit 1
