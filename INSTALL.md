@@ -129,11 +129,13 @@ Verify before you run anything.
 ### Pin a version
 
 Every distribution channel carries the same explicit `version` string
-(currently `1.0.0`) in lockstep — `plugin.json`, `pyproject.toml`, and
-`SKILL.md` — so you only receive updates when that string bumps; nothing
-changes under you between runs.
+(currently `1.0.1`) in lockstep — `plugin.json` and `pyproject.toml` — so you
+only receive updates when that string bumps; nothing changes under you
+between runs. (`SKILL.md` itself doesn't carry a version field — `version`
+isn't one of the frontmatter keys Anthropic's own validator allows there;
+see rubric.md §0.)
 
-- **pipx:** `pipx run "dhk-skill-doctor==1.0.0"` pins to an exact release.
+- **pipx:** `pipx run "dhk-skill-doctor==1.0.1"` pins to an exact release.
 - **Plugin:** add the marketplace from a specific `ref`/`sha` instead of
   `main` (see the [marketplace docs](https://code.claude.com/docs/en/plugin-marketplaces)).
 
