@@ -25,6 +25,16 @@ on:
 
 jobs:
   publish:
+    # Permissions must be granted explicitly here, not just inside the
+    # called reusable workflow -- a calling job with no permissions block
+    # doesn't propagate id-token access to what it calls, and the request
+    # for it fails validation before any job runs (this is what caused the
+    # skill-doctor-v1.0.0 and v1.0.1 tag pushes to fail with startup_failure
+    # before a single job started -- a direct workflow_dispatch on the
+    # reusable workflow worked fine, isolating the bug to this missing block).
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/publish-pypi-package.yml
     with:
       package-dir: plugins/skill-doctor
