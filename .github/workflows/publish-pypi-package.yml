@@ -18,6 +18,18 @@ on:
         required: false
         type: string
         default: pypi
+  workflow_dispatch:
+    inputs:
+      package-dir:
+        description: Directory containing the package's pyproject.toml
+        required: true
+        type: string
+        default: plugins/skill-doctor
+      environment:
+        description: GitHub environment configured as the PyPI trusted publisher
+        required: false
+        type: string
+        default: pypi
 
 permissions:
   contents: read
