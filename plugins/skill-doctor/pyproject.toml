@@ -1,6 +1,6 @@
 [project]
 name = "dhk-skill-doctor"
-version = "1.0.0"
+version = "1.0.1"
 description = "Repo-free, one-shot installer for the skill-doctor Claude Agent Skill"
 readme = "README.md"
 license = { text = "MIT" }

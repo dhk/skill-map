@@ -130,7 +130,7 @@ The `pyproject.toml` package exists only to get that Markdown onto your disk
 without needing git; it has no runtime dependency on skill-map beyond install
 time.
 
-Version: `1.0.0` — pinned explicitly; you only receive updates when that string
+Version: `1.0.1` — pinned explicitly; you only receive updates when that string
 bumps (in both `plugin.json` and `pyproject.toml`).
 
 Releases to PyPI are automated: pushing a `skill-doctor-vX.Y.Z` tag runs
