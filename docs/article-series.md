@@ -54,8 +54,8 @@ real figure, a dataset, and a reproducible command — not just opinion.
   all skills, median 80) vs curated/canonical repos at 85–90. Stars (r=0.16),
   recency (0.10), and commit count (−0.002) **all fail to predict quality**.
 - **The reveal:** the repo *signature* predicts quality; nothing else does.
-- **Backed by:** the signature study (`what-i-learned-crawling-39-repos.md`),
-  `score_corpus.py`, the maturity null result.
+- **Backed by:** the signature study (`repo-signature-playbook.md`,
+  `llm-judge-tuning.md`), `score_corpus.py`, the maturity null result.
 - **Figure:** median quality by signature; quality-vs-stars scatter.
 
 ## 4. "What Makes a Skill 'Good'? The Gold Standard, Measured"
