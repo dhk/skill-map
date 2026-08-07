@@ -1,122 +1,116 @@
 # skill-doctor
 
-Interactive best-practice reviewer for a single Claude Agent Skill. Give it a
-`SKILL.md` — it interviews you about the things the file alone can't reveal
-(allowed-tools scoping, data sensitivity, high-stakes actions, triggering, install
-scope), then recommends fixes and applies them on your confirmation.
+**An interactive, evidence-based reviewer for a single Claude Agent Skill.**
 
-Grounded in the [skill-map](https://github.com/dhk/skill-map) study of ~5,000
-crawled skills — corpus findings like ">50% of `Bash` grants are unscoped" and
-"~97% of skills omit the anti-trigger" are baked into the rubric.
+Give skill-doctor a `SKILL.md`. It asks about the context the file cannot reveal
+on its own—tool scope, sensitive data, consequential actions, triggering, and
+installation scope—then recommends changes and applies only those you approve.
 
-By [dhk](https://github.com/dhk) — [dhkonskills@dhk.io](mailto:dhkonskills@dhk.io).
-
----
+The rubric comes from the [Skill Map](README.md) study of approximately 5,000
+crawled skills. Corpus findings such as unscoped Bash access and missing
+anti-triggers are converted into checks an author can act on.
 
 ## Install
 
-### One-shot, repo-free (recommended)
+### Published package
 
 ```bash
 pipx run dhk-skill-doctor
 ```
 
-No git, no clone of this repo — the skill content ships as data inside the
-PyPI wheel, so `pipx` fetches it, runs the installer once in a throwaway venv,
-and leaves nothing behind but the skill itself at `~/.claude/skills/skill-doctor`.
-Then invoke it with `/skill-doctor`.
+This downloads the published `dhk-skill-doctor` wheel, installs the bundled
+skill at `~/.claude/skills/skill-doctor`, and leaves no repository checkout or
+persistent virtual environment. Then invoke `/skill-doctor` in Claude Code.
 
-Re-run the same command any time to update (or add `--force` if you've since
-edited the installed copy by hand and want to reset it).
+Re-run the command to update. Add `--force` to replace a locally edited copy.
 
-> No `pipx`? `pip install pipx && pipx ensurepath`, or see the
-> [pipx docs](https://pipx.pypa.io/stable/installation/).
+### Shell installer
 
-### Claude Code plugin marketplace
-
-In **Claude Code** (the CLI, or the VS Code / JetBrains extension). Run these as
-**two separate commands, one at a time**:
-
-```
-/plugin marketplace add dhk/skill-map
-```
-
-```
-/plugin install skill-doctor@skill-map
-```
-
-Then invoke it with `/skill-doctor`. This does fetch the full skill-map repo
-under the hood — prefer the pipx install above if you want to avoid that.
-
-### Shell install
+Review [`install.sh`](install.sh), then run:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/dhk/skill-map/main/install.sh | bash
 ```
 
-Clones the whole repo and symlinks the skill into `~/.claude/skills`. Then
-invoke with `/skill-doctor`. Prefer the pipx install above unless you
-specifically want a live-updating symlink to a full checkout.
+This route clones the repository and symlinks the skill into
+`~/.claude/skills`. Use it when you want an inspectable checkout that updates
+with `git pull`.
 
-### claude.ai / Claude Desktop (zip upload)
+### Careful step-by-step installation
 
-The chat apps take custom Skills as a zip upload (requires a **Pro, Max, Team, or
-Enterprise** plan with **code execution** enabled):
+[INSTALL.md](INSTALL.md) covers:
 
-1. Download [`dist/skill-doctor.zip`](dist/skill-doctor.zip) (or rebuild with
-   `bash plugins/skill-doctor/build-zip.sh`).
-2. Go to **Settings → Features → Skills** and upload `skill-doctor.zip`.
+- verifying the source before execution;
+- Claude Code marketplace installation;
+- claude.ai and Claude Desktop zip upload;
+- fully manual installation;
+- version pinning and removal; and
+- troubleshooting.
 
-No auto-update — re-upload to get a new version. On claude.ai the "apply edits in
-place" step doesn't apply; paste or upload the `SKILL.md` you want reviewed and
-Claude returns the improved version.
-
-See [INSTALL.md](INSTALL.md) for a verify-first walkthrough, step-by-step
-instructions, and troubleshooting.
-
----
+The detailed guide is the source of truth for installation variants. Commands
+are not repeated here.
 
 ## What it checks
 
-Five axes, weighted by impact:
-
 | Axis | Weight | Key checks |
-|---|---|---|
-| Frontmatter | 20% | `name`, `description`, `license`; anti-trigger in description |
-| Triggering | 25% | Positive trigger + anti-trigger (`Do NOT use when…`) |
-| Progressive disclosure | 15% | Workflow in SKILL.md; details deferred to `reference/` |
-| Structure | 15% | `## When to use`, `## When NOT to use`, numbered workflow |
-| Safety | 25% | Tool scoping, PHI/PII handling, confirmation before high-stakes actions |
+|---|---:|---|
+| Frontmatter | 20% | `name`, `description`, `license`, and an anti-trigger |
+| Triggering | 25% | Positive trigger and explicit “do not use” boundary |
+| Progressive disclosure | 15% | Workflow in `SKILL.md`; detail deferred to references |
+| Structure | 15% | Clear use cases, exclusions, and numbered workflow |
+| Safety | 25% | Tool scope, sensitive data, and confirmation before consequential actions |
 
-The most common gap across the whole ecosystem: **no anti-trigger** (~97% of
-skills omit it). The second most common: **unscoped `Bash` grant** (>50%).
+The most common corpus gap is a missing anti-trigger. The second is an unscoped
+`Bash` grant. skill-doctor treats both as practical design defects rather than
+style preferences.
 
----
+## How it works
 
-## Update / remove
+```mermaid
+flowchart LR
+    Skill["SKILL.md"] --> Static["Read structure and declared scope"]
+    Static --> Interview["Ask for missing operational context"]
+    Interview --> Rubric["Score against corpus-derived rubric"]
+    Rubric --> Findings["Explain findings and evidence"]
+    Findings --> Approval{"Author approves changes?"}
+    Approval -->|Yes| Edit["Apply selected edits"]
+    Approval -->|No| Report["Return recommendations only"]
+```
 
-**pipx install:**
+The interview is necessary because important constraints—such as whether a tool
+touches production data or performs an irreversible action—cannot be inferred
+safely from prose alone.
+
+## Runtime and privacy
+
+The installed skill is self-contained Markdown. It requires no Python package or
+network access at runtime. The PyPI package exists only to place that Markdown
+on disk without requiring Git.
+
+The review runs in the AI surface where you invoke it. Treat any uploaded
+`SKILL.md` and answers about sensitive workflows according to that surface’s
+data-handling policy.
+
+## Update and remove
+
+For the `pipx run` route:
+
 ```bash
-pipx run dhk-skill-doctor --force   # update
-rm -rf ~/.claude/skills/skill-doctor   # remove
+pipx run dhk-skill-doctor --force
+rm -rf ~/.claude/skills/skill-doctor
 ```
 
-**Plugin install:**
-```
-/plugin marketplace update skill-map
-/plugin uninstall skill-doctor@skill-map
-```
+Marketplace and manual-install update paths are documented in
+[INSTALL.md](INSTALL.md).
 
----
+## Repository layout
 
-## What's inside
-
-```
+```text
 plugins/skill-doctor/
-├── .claude-plugin/plugin.json      # Claude Code plugin manifest
-├── pyproject.toml                  # PyPI package (`dhk-skill-doctor`) — installer only
-├── src/skill_doctor_installer/     # installer CLI; bundles skills/skill-doctor/ as data
-└── skills/skill-doctor/            # the actual skill — single source of truth
+├── .claude-plugin/plugin.json
+├── pyproject.toml
+├── src/skill_doctor_installer/
+└── skills/skill-doctor/
     ├── SKILL.md
     ├── WIRING.md
     └── reference/
@@ -124,17 +118,18 @@ plugins/skill-doctor/
         └── interview-bank.md
 ```
 
-The skill itself is self-contained Markdown — the rubric is carried as prose in
-`reference/`, so it runs anywhere with no Python or network access at runtime.
-The `pyproject.toml` package exists only to get that Markdown onto your disk
-without needing git; it has no runtime dependency on skill-map beyond install
-time.
+The skill tree is the single source of truth. The installer bundles that same
+tree as package data.
 
-Version: `1.0.1` — pinned explicitly; you only receive updates when that string
-bumps (in both `plugin.json` and `pyproject.toml`).
+## Status
 
-Releases to PyPI are automated: pushing a `skill-doctor-vX.Y.Z` tag runs
-[`.github/workflows/publish-skill-doctor.yml`](.github/workflows/publish-skill-doctor.yml),
-which builds and publishes via PyPI Trusted Publishing (no stored token). See
-[`.github/workflows/README.md`](.github/workflows/README.md) for the one-time
-PyPI setup and how to wire up the same flow for future plugins.
+Version 1.0.1 is distributed through PyPI, the Claude Code plugin marketplace,
+and a zip for claude.ai or Claude Desktop. Release tags trigger PyPI Trusted
+Publishing through
+[`.github/workflows/publish-skill-doctor.yml`](.github/workflows/publish-skill-doctor.yml).
+
+## Authorship
+
+skill-doctor is built by [DHK](https://www.dhk.io). The repository path,
+package metadata, plugin manifest, release tags, and Git history provide the
+authorship and version trail.
