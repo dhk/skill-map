@@ -1,47 +1,66 @@
-# docs/ index
+# Documentation index
 
-14 files plus two subfolders, four kinds. This page exists so you don't have
-to open each one to find out which kind it is.
+The repository documentation falls into four groups. Generated documents name
+their generator and should not be edited by hand.
 
-## Architecture & decisions — structure and why it's shaped this way
+## Architecture and decisions
 
-| Path | What it shows |
+| Path | What it explains |
 |---|---|
-| [architecture/overview.md](architecture/overview.md) | C4-style context/container diagrams: the two products in this repo (the map site, skill-doctor/skill-audit) and how they relate. |
-| [adr/](adr/) | Architecture Decision Records — immutable, one per real decision. Currently: why skill-doctor ships as a separate distributable product (0001), why Corpus Guard + `check_docs.py` exist (0002). |
+| [`architecture/overview.md`](architecture/overview.md) | System context and containers for the Skill Map, skill-doctor, pipeline, and CI guards |
+| [`adr/`](adr/) | Immutable architecture decision records |
+| [`../ROADMAP.md`](../ROADMAP.md) | Current product and engineering themes |
 
-See also [`../ROADMAP.md`](../ROADMAP.md) at repo root (themes, not this
-index's scope, but the natural next stop after architecture).
+Start with the architecture overview when changing boundaries between the site,
+crawler, corpus, and distributed tool.
 
-## Auto-generated — regenerate with `python crawlers/run_pipeline.py`, don't hand-edit
+## Generated evidence
 
-| File | Generator | What it shows |
+Regenerate these documents with `python crawlers/run_pipeline.py`. Do not edit
+them directly.
+
+| Path | Generator | Output |
 |---|---|---|
-| [STATS.md](STATS.md) | `crawlers/gen_stats.py` | Live corpus snapshot — skill/repo counts, quality median. The source of truth other docs cite. |
-| [adopted-conventions.md](adopted-conventions.md) | `crawlers/gen_conventions.py` | Convention-adoption rates: best practitioners vs. everyone else. |
-| [originators.md](originators.md) | `crawlers/originator_leaderboard.py` | Leaderboard of who originates skills vs. who copies. |
-| [curiosities.md](curiosities.md) | `crawlers/curiosities.py` | Per-crawl anomaly detectors — popular-but-undiscoverable, viral copies, coercive tone, etc. |
-| [skill-wiring-study.md](skill-wiring-study.md) | `crawlers/discover_wiring.py` | Implicit cross-skill references mined from the corpus (8,249 edges). |
+| [`STATS.md`](STATS.md) | `crawlers/gen_stats.py` | Current corpus counts and quality summary |
+| [`adopted-conventions.md`](adopted-conventions.md) | `crawlers/gen_conventions.py` | Convention adoption rates |
+| [`originators.md`](originators.md) | `crawlers/originator_leaderboard.py` | Skill originators and copies |
+| [`curiosities.md`](curiosities.md) | `crawlers/curiosities.py` | Per-crawl anomalies and outliers |
+| [`skill-wiring-study.md`](skill-wiring-study.md) | `crawlers/discover_wiring.py` | Implicit cross-skill references |
 
-## Study — hand-written analysis, built on the auto-generated data above
+Generated findings derive from immutable snapshots under [`../crawls/`](../crawls/)
+and intermediate data under [`../data/`](../data/).
 
-| File | What it answers |
+## Research and guidance
+
+Read [`skill-best-practices-study.md`](skill-best-practices-study.md) first for
+the study’s evidence trail and recommended reading order.
+
+| Path | Question answered |
 |---|---|
-| [skill-best-practices-study.md](skill-best-practices-study.md) | Hub doc for the whole study — links everything below in reading order. |
-| [best-practices.md](best-practices.md) | **Reference**: the scoring rubric itself — dimensions, weights, grades — derived empirically from `anthropics/skills` and `openai/skills`. Look here to know what "good" means. |
-| [skill-ecosystem-vulnerabilities.md](skill-ecosystem-vulnerabilities.md) | **Explanation**: the full narrative research report the rubric and checklist are drawn from — corpus composition, quality distribution, defect inventory, safety vulnerabilities, methodology, what's next. Look here for the *why* and the full data; `best-practices.md` and `skill-author-checklist.md` don't repeat it, they each pull one actionable angle out of it (rubric vs. checklist). |
-| [skill-types.md](skill-types.md) | Quality sliced by skill type (generator, reviewer, reference, etc). |
-| [skill-author-checklist.md](skill-author-checklist.md) | **How-to**: the authoring checklist, tagged by what's machine-checkable vs. needs judgment. Look here when writing a skill, not when researching the ecosystem. |
-| [llm-judge-tuning.md](llm-judge-tuning.md) | Post-mortem on why the LLM judge scored Anthropic "weak," and the fix. |
-| [repo-signature-playbook.md](repo-signature-playbook.md) | "If your repo looks like X, do Y" — per-archetype recommendations. |
-| [just-add-these-skills.md](just-add-these-skills.md) | The general-purpose skill set adopted across ≥4 independent repos. |
-| [update-from-anthropic.md](update-from-anthropic.md) | Specific Anthropic skills that miss Anthropic's own rubric, with fixes. |
-| [incremental-crawl-system.md](incremental-crawl-system.md) | How the pipeline stays current across re-crawls without hand-editing. |
+| [`best-practices.md`](best-practices.md) | What does the empirical scoring rubric consider good? |
+| [`skill-ecosystem-vulnerabilities.md`](skill-ecosystem-vulnerabilities.md) | What defects and safety gaps appear across the corpus, and why do they matter? |
+| [`skill-author-checklist.md`](skill-author-checklist.md) | What should an author check before publishing? |
+| [`skill-types.md`](skill-types.md) | How does quality differ by skill type? |
+| [`llm-judge-tuning.md`](llm-judge-tuning.md) | Why did the first LLM judge mis-score strong skills, and how was it corrected? |
+| [`repo-signature-playbook.md`](repo-signature-playbook.md) | What should a repository do given its current skill pattern? |
+| [`just-add-these-skills.md`](just-add-these-skills.md) | Which general-purpose skills recur across independent repositories? |
+| [`update-from-anthropic.md`](update-from-anthropic.md) | Which Anthropic skills miss parts of the derived rubric? |
+| [`incremental-crawl-system.md`](incremental-crawl-system.md) | How does the corpus update without rewriting historical evidence? |
 
-## Planning & outreach — not part of the corpus study
+The rubric, checklist, and narrative report are complementary. They do not need
+to repeat one another: the rubric defines scoring, the checklist supports
+authors, and the report preserves the analysis.
 
-| File | What it's for |
+## Planning and outreach
+
+These documents describe proposed or communicative work rather than current
+corpus evidence.
+
+| Path | Purpose |
 |---|---|
-| [design-brief.md](design-brief.md) | UX review brief for the next map iteration (dated 2026-06-25). |
-| [internal-skill-map.md](internal-skill-map.md) | Design doc for pointing the crawler at a corporate GitHub org. |
-| [article-series.md](article-series.md) | Five-part article series outline built on this study. |
+| [`design-brief.md`](design-brief.md) | Dated UX brief for a future map iteration |
+| [`internal-skill-map.md`](internal-skill-map.md) | Design for applying the crawler to a private organization |
+| [`article-series.md`](article-series.md) | Article-series outline derived from the research |
+
+Treat dated planning documents as historical context unless the roadmap or an
+open issue confirms that the work is active.
