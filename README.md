@@ -1,91 +1,160 @@
 # The Skill Map
 
-![Last Updated](https://img.shields.io/badge/updated-June%202026-9aabb8) ![Skills](https://img.shields.io/badge/skills-4%2C975-16a34a) ![Repos](https://img.shields.io/badge/repos-43-3b82f6) ![Stars](https://img.shields.io/github/stars/dhk/skill-map?style=flat&color=9aabb8)
+**A living reference for the Agent Skills ecosystem: 4,975 skills across 43
+repositories, 13 domains, and five uncharted territories.**
 
-**A living reference for the Agent Skills ecosystem: 4,975 skills across 43 repositories, 13 domains, 5 uncharted territories**
+The Skill Map combines an interactive ecosystem map with a crawled research
+corpus. It shows what skill authors are building, how practices spread between
+repositories, and where important categories remain absent.
 
-An interactive force-directed graph of the Claude / agent skills ecosystem, backed by a crawler that has swept 43 public repositories and collected 4,975 SKILL.md files in full. Thirteen domains. Hundreds of organizations. And five territories with zero published skills: the negative space that tells you where the ecosystem is missing something.
+[**Explore the live map →**](https://dhk.github.io/skill-map/)
 
-[**Open the map →**](https://dhk.github.io/skill-map)
+## Start here
 
-**[skill-doctor](SKILL-DOCTOR.md)** — an interactive best-practice reviewer for a
-single skill, by [dhk](https://github.com/dhk). One-shot install:
-`pipx run dhk-skill-doctor`. See [SKILL-DOCTOR.md](SKILL-DOCTOR.md) for that and
-other install options (Claude Code plugin, shell, or claude.ai zip upload).
+This repository contains two related products:
 
----
+| If you want to… | Start with |
+|---|---|
+| Explore the published Agent Skills ecosystem | [Open the map](https://dhk.github.io/skill-map/) |
+| Review and improve one `SKILL.md` | [Install skill-doctor](SKILL-DOCTOR.md) |
+| Understand the evidence and methodology | [Read the research index](docs/README.md) |
+| Submit a public skills repository | [Follow the contribution guide](CONTRIBUTING.md#submit-your-skills-repo) |
+| Develop the crawler, scorer, or site | [Set up a development checkout](CONTRIBUTING.md#develop-this-repo) |
 
-## The Session Layer Gap
+The map is a browser-based research artifact; it requires no installation.
+skill-doctor is the installable tool derived from the same evidence base.
 
-Every published skill in this corpus does one thing: it makes Claude better at a task. Write better Terraform. Review smarter contracts. Generate cleaner dbt models. The task layer is well-covered: 4,975 skills and counting.
+## Why it matters
 
-Nobody has published a skill for how to run a day.
+Published skills cover the task layer well: writing Terraform, reviewing
+contracts, generating dbt models, and thousands of other bounded jobs. The
+corpus also makes the missing infrastructure visible.
 
-That's the session layer: the skills that manage continuity across a working session. Captain's log. Day planning. Context snapshots. Weekly resets. Reading list ingestion. These aren't task-layer utilities: they're the infrastructure that makes Claude a persistent collaborator rather than a stateless tool. Stateless tools get abandoned. Persistent collaborators become habits.
+Five territories had no published skills in the June 2026 crawl:
 
-DHK has been building and running session-layer skills in production for over a year, before Anthropic formalized the Skills format in October 2025. None of that work appears in the public corpus, because nobody had a category for it. This map makes the gap visible.
+1. **The session layer** — continuity, planning, context handoff, and reset
+   practices across working sessions.
+2. **AI as a personal operating system** — coordinated workflows that make an
+   assistant persistent rather than stateless.
+3. **Skill discovery** — canonical registries, versioning, and dependency
+   management.
+4. **Skill evaluation** — shared benchmarks and evidence that a skill improves
+   its intended outcome.
+5. **Healthcare and life sciences** — clinical workflows, regulated data, and
+   domain-specific safety.
 
----
+The absence is useful evidence. It shows where the ecosystem has mature task
+coverage and where it still lacks shared infrastructure.
 
-## The Negative Space
+## Architecture
 
-Five territories with zero published skills as of June 2026:
+The repository keeps the public research artifact and its derived authoring
+tool together while distributing them independently.
 
-**1. The Session Layer**: Skills for continuity: captain's log, day planning, context handoff, weekly resets. The stickiest use case in the ecosystem, and the most underbuilt.
+```mermaid
+flowchart LR
+    Sources["Public skill repositories"] --> Crawl["Crawler and immutable snapshots"]
+    Crawl --> Pipeline["Scoring and analysis pipeline"]
+    Pipeline --> Corpus["Research corpus and generated studies"]
+    Pipeline --> Map["Interactive Skill Map"]
+    Corpus --> Doctor["skill-doctor rubric"]
+    Map --> Pages["GitHub Pages"]
+    Doctor --> PyPI["PyPI / pipx"]
+    Doctor --> Plugin["Claude Code plugin"]
+    Doctor --> Zip["claude.ai / Desktop zip"]
+```
 
-**2. Claude as Personal OS**: Orchestrated workflow systems that embed Claude into daily rhythm. Not individual automations: a coordinated layer that runs your day.
+- **Skill Map** uses the crawl and derived JSON to publish an interactive view
+  of the ecosystem.
+- **skill-doctor** turns corpus-measured practices into an interactive review
+  for one skill.
+- **CI guards** check corpus integrity and prevent headline figures in the
+  documentation from drifting silently.
 
-**3. Skill Discovery**: No canonical registry. No versioning standard. No dependency management. The npm problem, unsolved.
+See [the architecture overview](docs/architecture/overview.md) for the system
+context, containers, and design boundaries.
 
-**4. Skill Evaluation**: No benchmark. No eval harness. Skills ship on vibes. The ecosystem has no way to measure whether a skill is good.
+## Use the map
 
-**5. Healthcare & Life Sciences**: The largest enterprise vertical in software. Zero published skills. HIPAA compliance, clinical workflow, EHR integration: all dark matter.
+The [live map](https://dhk.github.io/skill-map/) supports several views into the
+ecosystem:
 
----
+- select a domain to focus the graph;
+- select an organization to see its published skills;
+- select a skill to inspect its domain and source;
+- use **DHK** to isolate the session-layer cluster;
+- use **Uncharted** to expose the five missing territories.
 
-## How to Use the Map
+The interactive graph is a curated view of 1,119 skills from 52 organizations.
+The broader research corpus contains the full contents of 4,975 Claude-format
+skills across 43 repositories, plus 418 Gemini-format files catalogued by
+metadata. These layers serve different purposes and their counts should not be
+treated as interchangeable.
 
-- **Click a domain node** to filter to that domain and surface the persona who lives there
-- **Click an org node** to see all skills from that organization
-- **Click a skill node** to see the skill's name, domain, and org
-- **Click "DHK" in the filter bar** to isolate the session-layer cluster in the negative space
-- **Click "Uncharted"** to highlight the five red clouds: the territories with no published skills
-- **Click any red cloud** to open the territory description
+## Review a skill with skill-doctor
 
----
+The shortest published installation is:
 
-## Data Sources
+```bash
+pipx run dhk-skill-doctor
+```
 
-The map is built from two layers of data:
+Then invoke `/skill-doctor` in Claude Code.
 
-**Interactive graph** (what you see at the link above): 1,119 skills across 52 organizations, sourced from [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) — a curated index of published agent skills. 226 nodes, 302 links, 13 domains.
+Other supported routes include a reviewed `curl` installer, the Claude Code
+plugin marketplace, and a zip upload for claude.ai or Claude Desktop. See
+[skill-doctor](SKILL-DOCTOR.md) for the product overview and [the detailed
+installation guide](INSTALL.md) for verification, version pinning, manual
+installation, and troubleshooting.
 
-**Raw corpus** (powering future analysis): a GitHub crawler has swept 43 repositories and collected 4,975 Claude-format SKILL.md files in full — plus 418 Gemini-format files catalogued by metadata. That's the actual content of the skills, not just the index entries.
+## Research outputs
 
-### Largest repositories in the corpus
+The repository publishes evidence at three levels:
 
-| Repository | Skills | Stars | Focus |
-|---|---|---|---|
-| [BbgnsurfTech/claude-skills-collection](https://github.com/BbgnsurfTech/claude-skills-collection) | 1,337 | 20 | Comprehensive skills + plugins collection |
-| [affaan-m/ECC](https://github.com/affaan-m/ECC) | 881 | 221k | Agent harness + skills, multi-framework |
-| [davila7/claude-code-templates](https://github.com/davila7/claude-code-templates) | 872 | 28k | Claude Code configuration and templates |
-| [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) | 345 | 19k | 337 skills across 30+ agent types |
-| [borghei/claude-skills](https://github.com/borghei/claude-skills) | 340 | 300 | 338 skills across 16 domains |
-| [wshobson/agents](https://github.com/wshobson/agents) | 156 | 37k | Multi-harness plugin marketplace |
+- **Generated snapshots** — current counts, conventions, originators, wiring,
+  and curiosities rebuilt from crawl data.
+- **Reference material** — the empirical rubric, author checklist, and
+  repository-signature recommendations.
+- **Narrative studies** — ecosystem vulnerabilities, skill types, evaluation
+  findings, and the implications of the negative space.
 
-- **Crawler:** [`crawlers/crawl.py`](crawlers/crawl.py) — repo-scoped git tree walks, SHA-diff incrementality, source quality metrics
-- **Seed lists:** [`crawlers/crawl-lists/`](crawlers/crawl-lists/) — curated and research-sourced repo lists
-- **Last crawled:** June 2026
-- **Domains:** 13 (Developer Tools, Security & Auth, Frontend & Design, Agent Orchestration, Data & Databases, DevOps & Infrastructure, Testing & Debugging, Document Creation, Marketing & Content, Product Management, Finance & Payments, Communication, Media & Creative)
-- **Negative space:** 5 uncharted territories identified by DHK
+[The research index](docs/README.md) separates generated material from
+hand-written analysis and planning documents.
 
----
+## Data and reproducibility
+
+- **Crawler:** [`crawlers/crawl.py`](crawlers/crawl.py) performs repo-scoped
+  Git tree walks with incremental SHA tracking.
+- **Seed lists:** [`crawlers/crawl-lists/`](crawlers/crawl-lists/) records the
+  repositories included in a crawl.
+- **Immutable snapshots:** [`crawls/`](crawls/) preserves individual crawl
+  outputs.
+- **Derived data:** [`data/`](data/) is regenerated from those snapshots.
+- **Pipeline:** [`crawlers/run_pipeline.py`](crawlers/run_pipeline.py)
+  rebuilds scores, studies, and site data.
+- **Current documented crawl:** June 2026.
+
+Derived artifacts should be regenerated, not hand-edited. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for the supported validation path.
+
+## Status
+
+The map and corpus are published and usable. skill-doctor is distributed as
+version 1.0.1. The repository is active and the data is point-in-time: displayed
+counts describe the documented crawl rather than a live index of every public
+skill.
+
+## License and contributing
+
+The project is available under the [MIT License](LICENSE).
+
+To submit a repository, audit skills, or work on the crawler and map, see
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## About
 
-Built by [DHK](https://dhkondata.substack.com): practitioner writing on data, AI, and working systems.
+Built by [DHK](https://www.dhk.io), working on data, AI, and systems that make
+their own evidence visible.
 
-- Substack: [dhkondata.substack.com](https://dhkondata.substack.com)
-- GitHub: [github.com/dhk](https://github.com/dhk)
-
-The argument behind the map: [The Session Layer](https://dhkondata.substack.com): published June 2026.
+- [DHK website](https://www.dhk.io)
+- [GitHub](https://github.com/dhk)
