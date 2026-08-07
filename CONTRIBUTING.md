@@ -1,111 +1,146 @@
 # Contributing
 
-Three ways to take part: **submit your skills repo** to the map, **audit your
-skills** against the ecosystem, or **develop this repo** itself (the crawler,
-scorer, and map).
+There are three useful ways to contribute: submit a public skills repository,
+audit and improve skills, or develop the crawler, scorer, and map.
 
 ## Submit your skills repo
 
-The [skill map](https://dhk.github.io/skill-map/) indexes repos **by reference** —
-the crawler reads your public `SKILL.md` files where they live. We don't copy your
-skills here; they stay in your repo and you keep ownership.
+The [Skill Map](https://dhk.github.io/skill-map/) indexes repositories by
+reference. The crawler reads public `SKILL.md` files where they live; it does
+not move ownership of those skills into this repository.
 
-Pick whichever is easier:
+Choose either route.
 
-### Option A — issue form (no git needed)
-Open a [**Submit a skill repo**](https://github.com/dhk/skill-map/issues/new?template=submit-skill.yml)
-issue and fill in your `owner/repo`. We'll add it to the community list and it'll
-appear after the next crawl.
+### Issue form
 
-### Option B — pull request
-Add a row to [`crawlers/crawl-lists/community.md`](crawlers/crawl-lists/community.md):
+Open the [Submit a skill repo
+form](https://github.com/dhk/skill-map/issues/new?template=submit-skill.yml) and
+provide the `owner/repo`.
+
+### Pull request
+
+Add a row to
+[`crawlers/crawl-lists/community.md`](crawlers/crawl-lists/community.md):
 
 ```markdown
 | owner/repo | single-skill | One-line description of what it does. |
 ```
 
-Only the `repo` column is required by the crawler; the rest is human context.
-
-**Requirements:** the repo is public and has at least one `SKILL.md`.
+The repository must be public and contain at least one `SKILL.md`. The crawler
+requires only the repository column; the remaining fields provide human context.
 
 ## Audit your skills
 
-Before (or instead of) submitting, grade your skills against the Anthropic gold
-standard and the crawled corpus.
+Use the repository-level auditor to compare a skills collection with the
+corpus-derived rubric:
 
-**Locally:**
 ```bash
 pip install pyyaml
-python crawlers/audit_repo.py /path/to/your/skills          # local
-python crawlers/audit_repo.py --github owner/repo            # any public repo
-python crawlers/audit_repo.py --github owner/repo --token "$GITHUB_TOKEN"  # private
+python crawlers/audit_repo.py /path/to/your/skills
+python crawlers/audit_repo.py --github owner/repo
+python crawlers/audit_repo.py --github owner/repo --token "$GITHUB_TOKEN"
 ```
 
-**As a GitHub Action** (auto-comments the report on every PR that touches a
-`SKILL.md`) — see [`.github/actions/skill-audit`](.github/actions/skill-audit/README.md):
+The auditor reports repository signature, peer benchmarks, weak skills,
+potential consolidation, and common capabilities that may be missing.
+
+To review one skill interactively, install
+[skill-doctor](SKILL-DOCTOR.md). The shortest route is:
+
+```bash
+pipx run dhk-skill-doctor
+```
+
+The [installation guide](INSTALL.md) contains the plugin, shell, zip, manual,
+and verify-first alternatives.
+
+To run the audit in GitHub Actions when a pull request changes a `SKILL.md`,
+use the [bundled action](.github/actions/skill-audit/README.md):
+
 ```yaml
 - uses: dhk/skill-map/.github/actions/skill-audit@main
 ```
 
-**Improve one skill interactively:** use the
-[`skill-doctor`](plugins/skill-doctor/skills/skill-doctor/SKILL.md) skill — it
-interviews you about allowed-tools scoping, data sensitivity (PHI/PII),
-high-stakes actions, triggering, and install scope, then recommends and applies
-fixes. Install it from this repo's marketplace in **Claude Code** (two separate
-commands, one at a time):
-
-```
-/plugin marketplace add dhk/skill-map
-```
-```
-/plugin install skill-doctor@skill-map
-```
-
-(Not in Claude Code? See [INSTALL.md](INSTALL.md) for the shell install.)
-
-The auditor reports your repo's signature, a benchmark vs. same-type peers, your
-worst offenders, overlapping skills to consolidate, and the top general-purpose
-skills you're missing. The most common gap across the whole ecosystem is the
-**anti-trigger** (`Do NOT use when…`) — ~97% of skills omit it, and it's the
-cheapest win.
-
 ## Develop this repo
 
-Working on the crawler, scorer, or map itself (not just running the auditor
-as a consumer)?
+### Requirements
 
-**Setup:**
+- Git
+- Python 3.9 or later
+- a browser for the static map
+
+Clone the repository:
+
 ```bash
 git clone https://github.com/dhk/skill-map
 cd skill-map
-python3 --version   # 3.9+ assumed, nothing pins an exact version yet
 ```
 
-**Smoke test — no dependencies needed for this one:**
+### Fast smoke test
+
+This path uses only the Python standard library:
+
 ```bash
 python crawlers/skill_quality.py plugins/skill-doctor/skills/skill-doctor/SKILL.md
 ```
-If that prints a JSON score, your checkout is fine. `skill_quality.py`,
-`audit_repo.py`, and `repo_signature.py` need nothing beyond the standard
-library (PyYAML is optional there — falls back to a hand parser if absent).
 
-**Full pipeline** (crawling, rendering figures, validating `WIRING.md`) needs
-the rest of `requirements.txt`:
+A JSON score confirms that the checkout and core scorer are usable.
+`skill_quality.py`, `audit_repo.py`, and `repo_signature.py` can run without
+PyYAML, although installing it provides the preferred parser.
+
+### Full pipeline
+
+Install the development dependencies and rebuild derived artifacts from the
+existing crawl snapshots:
+
 ```bash
 pip install -r requirements.txt
-python crawlers/run_pipeline.py --fast   # rebuild derived data from existing crawl snapshots
+python crawlers/run_pipeline.py --fast
 ```
 
-**No automated tests exist yet.** Before opening a PR that touches `crawlers/`,
-at minimum re-run `run_pipeline.py` and confirm `check_docs.py`'s output is
-clean (it flags narrative docs whose cited numbers drifted from `STATS.md`).
+The data flow is:
 
-## How the data flows
-
+```text
+public repository
+    → seed-list reference
+    → crawler
+    → immutable snapshot in crawls/
+    → scoring and analysis pipeline
+    → data/, studies, and interactive map
 ```
-your repo (SKILL.md)  →  community.md (a reference)  →  crawler  →  scorer  →  map + studies
-```
 
-The crawl stores immutable snapshots under `crawlers/crawls/`; `run_pipeline.py`
-recomputes every derived finding from them. See
-[docs/incremental-crawl-system.md](docs/incremental-crawl-system.md).
+The pipeline’s docstring is the source of truth for its current stage order.
+See [the architecture overview](docs/architecture/overview.md) and
+[incremental crawl design](docs/incremental-crawl-system.md) for the stable
+boundaries.
+
+## Validate a change
+
+No comprehensive automated test suite exists yet. Use the checks appropriate to
+the files you changed.
+
+| Change | Minimum validation |
+|---|---|
+| `crawlers/` or scoring logic | Run the full pipeline and inspect changed generated artifacts |
+| Narrative documentation or headline figures | Run `python crawlers/check_docs.py` |
+| Wiring metadata | Run the validation command documented in [WIRING.md](WIRING.md) |
+| Static map | Serve the repository locally and inspect the affected view |
+| skill-doctor package | Run the package and zip checks documented under `plugins/skill-doctor/` |
+
+Do not hand-edit generated files. The [documentation
+index](docs/README.md) identifies which documents are generated and the command
+that rebuilds them.
+
+## Pull requests
+
+Keep pull requests focused and explain:
+
+- the problem being addressed;
+- which source data or code changed;
+- which derived artifacts were regenerated;
+- the validation commands run; and
+- any known limitation left for later work.
+
+A corpus change should preserve the source repository and crawl provenance.
+A documentation change should not invent a live count: use the generated
+statistics or label the value with its crawl date.
