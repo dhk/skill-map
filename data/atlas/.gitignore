@@ -1,0 +1,5 @@
+# Bulk Atlas tables are published on Hugging Face and as release assets, not in
+# git (DATA-POLICY.md, ADR 0007). Manifests stay tracked.
+*.parquet
+*.csv
+*.jsonl

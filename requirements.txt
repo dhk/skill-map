@@ -9,3 +9,7 @@ tenacity
 matplotlib
 PyYAML
 jsonschema
+
+# Skill Concepts Atlas (crawlers/atlas/): Parquet I/O and the pinned GitSkills read.
+pyarrow
+huggingface_hub

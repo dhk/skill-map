@@ -59,6 +59,7 @@ over time. Its decisions are ADRs 0004 to 0007.
 | Path | What it covers |
 |---|---|
 | [`atlas/plan.md`](atlas/plan.md) | Question, corpus, dating, dimensions, data tables, phases and FAQ |
+| [`atlas/gitskills-import.md`](atlas/gitskills-import.md) | How GitSkills metadata becomes the base catalogue |
 
 ## Planning and outreach
 

@@ -1,0 +1,19 @@
+{
+  "gitskills": {
+    "title": "GitSkills: A Dataset of Agent Skills on GitHub",
+    "authors": ["Giuseppe Destefanis", "Daniel Graziotin", "Matteo Vaccargiu", "Marco Ortu"],
+    "paper": "https://arxiv.org/abs/2608.10906",
+    "hf_repo": "mvaccargiu/gitskills",
+    "hf_revision": "ebab174",
+    "hf_revision_note": "Short commit id shown on the Hugging Face file page on 2026-11-26. The importer resolves it to the full commit and refuses any other.",
+    "zenodo_doi": "10.5281/zenodo.21875637",
+    "zenodo_version": "1.0.0",
+    "zenodo_file": "agent_skills_release.db",
+    "zenodo_md5": "b058631fb1926efac6e82a4706646742",
+    "license": "CC-BY-4.0 for metadata and aggregation; file text stays under each origin repository's license",
+    "expected_rows": {
+      "artifacts": 3797117,
+      "repos": 282200
+    }
+  }
+}
