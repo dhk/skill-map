@@ -375,7 +375,20 @@ def test_case_duplicate_repos_are_merged_and_reported():
     assert dup["repos_merged"] == [{"kept": "other/app", "merged": ["Other/App"]}]
     assert dup["repo_rows_dropped"] == 1
     assert dup["occurrences_merged"] == 1
-    assert dup["occurrence_examples"][0]["path"] == ".codex/skills/deploy/SKILL.md"
+    ex = dup["occurrence_examples"][0]
+    assert ex["path"] == ".codex/skills/deploy/SKILL.md"
+    assert ex["dropped_row_spelling"] == "Other/App" and ex["kept_row_spelling"] == "other/app"
+    assert dup["texts_dropped"] == 0 and ex["dropped_text_kept_elsewhere"]
+
+
+def test_collision_reports_a_text_that_only_the_dropped_row_held():
+    arts, repos = _with_case_duplicate()
+    a = arts.to_pydict()
+    a["file_sha"][4] = "e" * 40  # the older spelling held a different version of the file
+    _, _, rep = g.reconcile_duplicates(pa.table(a, schema=arts.schema), repos)
+    assert rep["texts_dropped"] == 1
+    assert rep["occurrence_examples"][0]["dropped_sha"] == "e" * 40
+    assert not rep["occurrence_examples"][0]["dropped_text_kept_elsewhere"]
 
 
 def test_case_duplicate_keeps_latest_pushed_then_stars_then_spelling():

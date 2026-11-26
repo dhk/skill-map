@@ -47,7 +47,7 @@ import pyarrow.parquet as pq
 from crawlers import exclusions as removal
 from crawlers import licensing
 
-METHOD_VERSION = "gitskills-import/1.2.0"
+METHOD_VERSION = "gitskills-import/1.2.1"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SOURCES = Path(__file__).with_name("sources.json")
 DEFAULT_OUT = REPO_ROOT / "data" / "atlas" / "gitskills"
@@ -177,7 +177,7 @@ def reconcile_duplicates(artifacts: pa.Table, repos: pa.Table) -> tuple[pa.Table
                        "re-key occurrences; on repo+path collision keep the representative, "
                        "then latest discovered_at"),
               "repos_merged": [], "repo_rows_dropped": 0,
-              "occurrences_merged": 0, "occurrence_examples": [],
+              "occurrences_merged": 0, "texts_dropped": 0, "occurrence_examples": [],
               "representatives_reassigned": 0}
     if not dupes:
         return artifacts, repos, report
@@ -206,6 +206,7 @@ def reconcile_duplicates(artifacts: pa.Table, repos: pa.Table) -> tuple[pa.Table
     primary = artifacts.column("dedup_primary").to_pylist()
     found = artifacts.column("discovered_at").to_pylist()
     winner: dict[tuple, int] = {}
+    losers: list[tuple[int, int]] = []  # (dropped row, kept row)
     for i, (r, p) in enumerate(zip(rekeyed, paths)):
         k = (_norm_repo(r), p)
         if k not in winner:
@@ -217,11 +218,21 @@ def reconcile_duplicates(artifacts: pa.Table, repos: pa.Table) -> tuple[pa.Table
         loser = j if rank_i > rank_j else i
         if loser == j:
             winner[k] = i
-        report["occurrences_merged"] += 1
-        if len(report["occurrence_examples"]) < 50:
-            report["occurrence_examples"].append(
-                {"repo": rekeyed[i], "path": p, "merged_spelling": occ_repos[loser]})
+        losers.append((loser, i if loser == j else j))
     keep_occ = sorted(winner.values())
+    all_shas = artifacts.column("file_sha").to_pylist()
+    kept_shas = {all_shas[i] for i in keep_occ}
+    report["occurrences_merged"] = len(losers)
+    for loser, kept in losers:
+        lost = all_shas[loser] not in kept_shas
+        report["texts_dropped"] += int(lost)
+        if len(report["occurrence_examples"]) < 50:
+            report["occurrence_examples"].append({
+                "repo": rekeyed[kept], "path": paths[kept],
+                "dropped_row_spelling": occ_repos[loser], "kept_row_spelling": occ_repos[kept],
+                "dropped_sha": all_shas[loser], "kept_sha": all_shas[kept],
+                "dropped_text_kept_elsewhere": not lost,
+            })
     idx = artifacts.schema.get_field_index("repo_full_name")
     artifacts = artifacts.set_column(idx, "repo_full_name", pa.array(rekeyed, pa.string()))
     artifacts = artifacts.take(pa.array(keep_occ))

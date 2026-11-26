@@ -52,11 +52,20 @@ occurrence. Repo names and licenses are matched without regard to case.
 
 GitSkills is read from Hugging Face, which can serve single columns without the
 44 GB Zenodo database, and cited by its Zenodo DOI. The Hugging Face revision is
-pinned to commit `ebab174`, the short id shown on
-the dataset's file page on 26 Nov 2026. The importer resolves it to the full
-commit and stops if it resolves to anything else. The pin will be replaced with
-the full 40-character commit once the first run can reach Hugging Face. It also checks the expected row
-counts (3,797,117 artifacts and 282,200 repos, from the dataset card).
+pinned to the full commit `ebab17454a7c236f8f26b183567f1a126f42e3f8`, which the
+first run on 26 Nov 2026 resolved from the short id `ebab174` shown on the
+dataset's file page. The importer stops if the pin resolves to anything else.
+It also checks the expected row counts before any merging (3,797,117 artifacts
+and 282,200 repos, from the dataset card).
+
+## First run (26 Nov 2026)
+
+From the committed manifest: 3,797,113 occurrences, 1,877,980 distinct texts
+and 282,191 repositories after merging 9 repository names that differed only
+by case (4 occurrences shared a path across two spellings). Descriptions are
+published for 753,797 texts (40%), withheld for licence on 1,124,160 and for
+the removal list on 23. 4,468 of the 4,759 blob SHAs in this repo's own
+snapshots (94%) are also in GitSkills.
 
 After a run, `data/atlas/gitskills/manifest.json` is committed. It records the resolved revision, every input
 file with its size and hash, the columns read, output row counts and hashes,
