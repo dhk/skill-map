@@ -15,9 +15,11 @@ copied into this repository. The repository's MIT license could also be read as
 covering that third-party text, which it cannot.
 
 The Skill Concepts Atlas will publish much larger datasets, aimed at
-researchers and at automated reuse. Most source repositories carry no license
-or a license that does not clearly allow redistribution, and the largest prior
-dataset (GitSkills, about 3.8 million files) states no license at all.
+researchers and at automated reuse. Many source repositories carry no license
+or one that does not clearly allow redistribution. The largest prior dataset,
+GitSkills (about 3.8 million files), releases its metadata under CC BY 4.0 and
+leaves file text under each origin repository's license, the same split this
+policy adopts.
 
 ## Decision
 
