@@ -7,9 +7,10 @@ Reads only the metadata columns of the pinned GitSkills release (never the
 - content:    one row per distinct blob SHA, from the GitSkills representative
 - repo:       one row per repository
 
-Parquet outputs are kept out of git (see data/atlas/.gitignore); the small
+Parquet outputs are kept out of git (see data/atlas/.gitignore). The small
 manifest.json, with the resolved revision, input file hashes, row counts and
-output hashes, is committed so every later step can cite exactly what it used.
+output hashes, is meant to be committed after a run so every later step can
+cite exactly what it used.
 
 Usage:
     python -m crawlers.atlas.gitskills                  # remote, pinned revision
@@ -57,11 +58,25 @@ PLATFORM_FOLDERS = {
     ".windsurf": "windsurf", ".opencode": "opencode", ".kiro": "kiro",
 }
 
-# Licenses that allow redistribution of the text with attribution.
+# Licenses that allow redistribution of the text with attribution. Compared
+# case-insensitively, since repo metadata is not consistent about case.
 PERMISSIVE_LICENSES = {
     "MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "0BSD",
     "Unlicense", "CC0-1.0", "CC-BY-4.0", "MIT-0", "Zlib", "BSL-1.0",
 }
+_PERMISSIVE_LOWER = {l.lower() for l in PERMISSIVE_LICENSES}
+
+
+def license_permits_text(license_id: str | None) -> bool:
+    return bool(license_id) and license_id.strip().lower() in _PERMISSIVE_LOWER
+
+
+def _norm_repo(name: str | None) -> str:
+    return (name or "").strip().lower()
+
+
+def _non_empty(values) -> list:
+    return [v for v in values if v not in (None, "")]
 
 EXCERPT_LIMIT = 300  # characters, per DATA-POLICY.md
 
@@ -89,8 +104,34 @@ def _truncate(values: pa.ChunkedArray | pa.Array) -> tuple[pa.Array, pa.Array]:
     return pa.array(out, pa.string()), pa.array(flag, pa.bool_())
 
 
+def check_keys(artifacts: pa.Table, repos: pa.Table) -> None:
+    """Fail loudly if the keys the Atlas relies on are not unique or not joined."""
+    repo_names = repos.column("full_name").to_pylist()
+    norm_repos = [_norm_repo(r) for r in repo_names]
+    if len(set(norm_repos)) != len(norm_repos):
+        raise ValueError(f"repos: {len(norm_repos) - len(set(norm_repos))} duplicate repo names")
+
+    occ_repos = artifacts.column("repo_full_name").to_pylist()
+    ids = [f"{_norm_repo(r)}:{p}" for r, p in zip(occ_repos, artifacts.column("path").to_pylist())]
+    if len(set(ids)) != len(ids):
+        raise ValueError(f"artifacts: {len(ids) - len(set(ids))} duplicate repo+path ids")
+
+    known = set(norm_repos)
+    orphans = {_norm_repo(r) for r in occ_repos} - known
+    if orphans:
+        raise ValueError(f"artifacts: {len(orphans)} repos with no row in repos, e.g. {sorted(orphans)[:3]}")
+
+    primary = artifacts.filter(pc.equal(artifacts.column("dedup_primary"), 1))
+    shas = primary.column("file_sha").to_pylist()
+    if len(_non_empty(shas)) != len(shas):
+        raise ValueError(f"artifacts: {len(shas) - len(_non_empty(shas))} representative rows with an empty blob SHA")
+    if len(set(shas)) != len(shas):
+        raise ValueError(f"artifacts: {len(shas) - len(set(shas))} blob SHAs with more than one representative row")
+
+
 def build_tables(artifacts: pa.Table, repos: pa.Table, source: str) -> dict[str, pa.Table]:
     """Turn GitSkills artifacts and repos into occurrence, content and repo tables."""
+    check_keys(artifacts, repos)
     paths = artifacts.column("path").to_pylist()
     occurrence = pa.table({
         "occurrence_id": pa.array(
@@ -139,11 +180,12 @@ def build_tables(artifacts: pa.Table, repos: pa.Table, source: str) -> dict[str,
         "is_fork": repos.column("is_fork"),
         "language": repos.column("language"),
         "license": repos.column("license"),
-        "license_permits_text": pa.array([l in PERMISSIVE_LICENSES for l in licenses], pa.bool_()),
+        "license_permits_text": pa.array([license_permits_text(l) for l in licenses], pa.bool_()),
         "description": repos.column("description"),
         "created_at": repos.column("created_at"),
         "pushed_at": repos.column("pushed_at"),
         "source": pa.array([source] * repos.num_rows, pa.string()),
+        "method_version": pa.array([METHOD_VERSION] * repos.num_rows, pa.string()),
     })
     return {"occurrence": occurrence, "content": content, "repo": repo}
 
@@ -166,10 +208,10 @@ def skillmap_blob_shas(root: Path = REPO_ROOT) -> set[str]:
 
 def summarise(tables: dict[str, pa.Table], skillmap_shas: set[str]) -> dict:
     occ, content, repo = tables["occurrence"], tables["content"], tables["repo"]
-    distinct = set(occ.column("blob_sha").to_pylist())
-    permissive = {r for r, ok in zip(repo.column("repo_full_name").to_pylist(),
-                                     repo.column("license_permits_text").to_pylist()) if ok}
-    rep_repos = content.column("representative_repo").to_pylist()
+    distinct = set(_non_empty(occ.column("blob_sha").to_pylist()))
+    permissive = {_norm_repo(r) for r, ok in zip(repo.column("repo_full_name").to_pylist(),
+                                                 repo.column("license_permits_text").to_pylist()) if ok}
+    rep_repos = [_norm_repo(r) for r in content.column("representative_repo").to_pylist()]
     return {
         "occurrences": occ.num_rows,
         "distinct_blob_shas": len(distinct),
@@ -193,24 +235,35 @@ def _sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+def _concat(tables: list[pa.Table]) -> pa.Table:
+    """Concatenate shards whose types differ slightly (e.g. an all-null column)."""
+    return pa.concat_tables(tables, promote_options="permissive")
+
+
 def read_local(data_dir: Path, config: str, columns: list[str]) -> tuple[pa.Table, list[dict]]:
     files = sorted(Path(data_dir, config).glob("*.parquet"))
     if not files:
         raise SystemExit(f"no parquet files under {data_dir}/{config}")
     tables = [pq.read_table(f, columns=columns) for f in files]
     inputs = [{"path": f"data/{config}/{f.name}", "bytes": f.stat().st_size, "sha256": _sha256(f)} for f in files]
-    return pa.concat_tables(tables), inputs
+    return _concat(tables), inputs
 
 
-def read_remote(repo_id: str, revision: str, config: str, columns: list[str]) -> tuple[pa.Table, list[dict], str]:
-    """Read selected columns over HTTP range requests, without downloading `content`."""
-    from huggingface_hub import HfApi, HfFileSystem
+def resolve_revision(repo_id: str, revision: str):
+    """Resolve the pinned revision; refuse anything that is not that commit."""
+    from huggingface_hub import HfApi
 
-    api = HfApi()
-    info = api.dataset_info(repo_id, revision=revision, files_metadata=True)
+    info = HfApi().dataset_info(repo_id, revision=revision, files_metadata=True)
+    if not info.sha or not info.sha.startswith(revision):
+        raise SystemExit(f"revision {revision} resolved to {info.sha}; refusing to continue")
+    return info
+
+
+def read_remote(repo_id: str, info, config: str, columns: list[str]) -> tuple[pa.Table, list[dict]]:
+    """Read only the selected columns, using HTTP range requests per column chunk."""
+    from huggingface_hub import HfFileSystem
+
     full = info.sha
-    if not full.startswith(revision):
-        raise SystemExit(f"revision {revision} resolved to {full}; refusing to continue")
     prefix = f"data/{config}/"
     siblings = sorted((s for s in info.siblings if s.rfilename.startswith(prefix)
                        and s.rfilename.endswith(".parquet")), key=lambda s: s.rfilename)
@@ -221,18 +274,25 @@ def read_remote(repo_id: str, revision: str, config: str, columns: list[str]) ->
             tables.append(pq.ParquetFile(fh).read(columns=columns))
         inputs.append({"path": s.rfilename, "bytes": s.size,
                        "sha256": getattr(s.lfs, "sha256", None) if s.lfs else None})
-    return pa.concat_tables(tables), inputs, full
+    if not tables:
+        raise SystemExit(f"no parquet files under {prefix} at {full}")
+    return _concat(tables), inputs
 
 
-def run(out: Path, local: Path | None = None, check_counts: bool = True) -> dict:
+def run(out: Path, local: Path | None = None, check_counts: bool = True,
+        skillmap_root: Path = REPO_ROOT) -> dict:
     src = json.loads(SOURCES.read_text())["gitskills"]
     if local:
         artifacts, a_in = read_local(local, "artifacts", ARTIFACT_COLUMNS)
         repos, r_in = read_local(local, "repos", REPO_COLUMNS)
-        revision = f"local:{local}"
+        # Never record this machine's absolute path in a committed manifest;
+        # the input file hashes identify the data.
+        revision = "local"
     else:
-        artifacts, a_in, revision = read_remote(src["hf_repo"], src["hf_revision"], "artifacts", ARTIFACT_COLUMNS)
-        repos, r_in, _ = read_remote(src["hf_repo"], src["hf_revision"], "repos", REPO_COLUMNS)
+        info = resolve_revision(src["hf_repo"], src["hf_revision"])
+        artifacts, a_in = read_remote(src["hf_repo"], info, "artifacts", ARTIFACT_COLUMNS)
+        repos, r_in = read_remote(src["hf_repo"], info, "repos", REPO_COLUMNS)
+        revision = info.sha
 
     if check_counts:
         for name, table in (("artifacts", artifacts), ("repos", repos)):
@@ -259,7 +319,7 @@ def run(out: Path, local: Path | None = None, check_counts: bool = True) -> dict
         "columns_read": {"artifacts": ARTIFACT_COLUMNS, "repos": REPO_COLUMNS},
         "inputs": {"artifacts": a_in, "repos": r_in},
         "outputs": outputs,
-        "summary": summarise(tables, skillmap_blob_shas()),
+        "summary": summarise(tables, skillmap_blob_shas(skillmap_root)),
     }
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     return manifest
