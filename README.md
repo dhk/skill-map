@@ -151,8 +151,9 @@ skill.
 ## License and contributing
 
 The project's code and documents are available under the [MIT License](LICENSE).
-Third-party `SKILL.md` text in crawl snapshots is not covered by it; see
-[DATA-POLICY.md](DATA-POLICY.md).
+Its annotations (scores, labels, lineage and other derived data) are under
+[CC BY 4.0](LICENSE-DATA.md). Third-party `SKILL.md` text in crawl snapshots is
+covered by neither; see [DATA-POLICY.md](DATA-POLICY.md).
 
 To submit a repository, audit skills, or work on the crawler and map, see
 [CONTRIBUTING.md](CONTRIBUTING.md).

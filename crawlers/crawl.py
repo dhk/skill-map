@@ -22,6 +22,8 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, MofNCo
 from rich.table import Table
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
+from exclusions import git_blob_sha, load as load_exclusions
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
@@ -720,8 +722,16 @@ def crawl(
     ) as prog:
         task = prog.add_task("Fetching…", total=len(raw_items))
 
+        # DATA-POLICY.md: authors who asked to be left out are skipped, and texts
+        # on the removal list are never stored, whichever repo holds a copy.
+        removal_list = load_exclusions()
+
         for repo_full_name, file_path, file_sha, raw_url, repo_url, repo_type, file_format in raw_items:
             key = f"{repo_full_name}::{file_path}"
+            if removal_list.repo_excluded(repo_full_name):
+                skipped += 1
+                prog.advance(task)
+                continue
             is_canonical = repo_type == "canonical"
             is_gemini = file_format == "gemini"
 
@@ -780,6 +790,11 @@ def crawl(
                     if error:
                         result["fetch_error"] = f"file_content: {error}"
                         errors += 1
+                    elif removal_list.blob_excluded(git_blob_sha(content)) or \
+                            removal_list.blob_excluded(file_sha):
+                        result["skill_md_content"] = None
+                        result["content_removed"] = "blob-excluded"
+                        fetched += 1
                     else:
                         result["skill_md_content"] = content
                         fetched += 1
