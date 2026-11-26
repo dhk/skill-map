@@ -45,8 +45,8 @@ counts (3,797,117 artifacts and 282,200 repos, from the dataset card).
 After a run, `data/atlas/gitskills/manifest.json` is committed. It records the resolved revision, every input
 file with its size and hash, the columns read, output row counts and hashes,
 and a summary. A `--local` run records the revision as `local` rather than a
-path on the machine, and relies on the input file hashes. The Parquet outputs are not committed; they go to Hugging Face
-and release assets with each Atlas release.
+path on the machine, and relies on the input file hashes. The Parquet outputs are not committed; they go to GitHub release assets, with a copy on
+Hugging Face, with each Atlas release.
 
 ## Platform folder
 
