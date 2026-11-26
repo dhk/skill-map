@@ -67,6 +67,16 @@ published for 753,797 texts (40%), withheld for licence on 1,124,160 and for
 the removal list on 23. 4,468 of the 4,759 blob SHAs in this repo's own
 snapshots (94%) are also in GitSkills.
 
+The dataset card's 1,877,981 distinct texts is one more than ours. The
+missing text is the one merge that lost a text: `lzzmm/gpubk` and `lzzmm/GPUbk`
+both list `src/bk/data/codex-skill/gpubk/SKILL.md`, with different contents
+(`f5b619f2…` and `3d4d8455…`). They are one repository seen twice, so only one
+row can stand for that path; the importer kept `3d4d8455…`, and `f5b619f2…`
+appears nowhere else in the release. The other 3 merged occurrences had the
+same text under both spellings. A dropped text is an older version of a file
+that is still catalogued, so it is left out rather than kept without an
+occurrence.
+
 After a run, `data/atlas/gitskills/manifest.json` is committed. It records the resolved revision, every input
 file with its size and hash, the columns read, output row counts and hashes,
 and a summary. A `--local` run records the revision as `local` rather than a
