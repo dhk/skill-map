@@ -51,6 +51,15 @@ The rubric, checklist, and narrative report are complementary. They do not need
 to repeat one another: the rubric defines scoring, the checklist supports
 authors, and the report preserves the analysis.
 
+## Skill Concepts Atlas
+
+A study of how purposes and concepts in published skills spread and change
+over time. Its decisions are ADRs 0004 to 0007.
+
+| Path | What it covers |
+|---|---|
+| [`atlas/plan.md`](atlas/plan.md) | Question, corpus, dating, dimensions, data tables, phases and FAQ |
+
 ## Planning and outreach
 
 These documents describe proposed or communicative work rather than current
