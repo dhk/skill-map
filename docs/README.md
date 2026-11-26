@@ -9,6 +9,7 @@ their generator and should not be edited by hand.
 |---|---|
 | [`architecture/overview.md`](architecture/overview.md) | System context and containers for the Skill Map, skill-doctor, pipeline, and CI guards |
 | [`adr/`](adr/) | Immutable architecture decision records |
+| [`../DATA-POLICY.md`](../DATA-POLICY.md) | What third-party text the repo stores, licensing, and removal requests |
 | [`../ROADMAP.md`](../ROADMAP.md) | Current product and engineering themes |
 
 Start with the architecture overview when changing boundaries between the site,
