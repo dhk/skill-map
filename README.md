@@ -134,6 +134,10 @@ hand-written analysis and planning documents.
   rebuilds scores, studies, and site data.
 - **Current documented crawl:** June 2026.
 
+Crawl snapshots contain the text of public `SKILL.md` files, which stays under
+its authors' terms. [DATA-POLICY.md](DATA-POLICY.md) covers licensing, what new
+datasets publish, and how to ask for removal.
+
 Derived artifacts should be regenerated, not hand-edited. See
 [CONTRIBUTING.md](CONTRIBUTING.md) for the supported validation path.
 
@@ -146,7 +150,9 @@ skill.
 
 ## License and contributing
 
-The project is available under the [MIT License](LICENSE).
+The project's code and documents are available under the [MIT License](LICENSE).
+Third-party `SKILL.md` text in crawl snapshots is not covered by it; see
+[DATA-POLICY.md](DATA-POLICY.md).
 
 To submit a repository, audit skills, or work on the crawler and map, see
 [CONTRIBUTING.md](CONTRIBUTING.md).
