@@ -1,6 +1,6 @@
 {
   "method_version": "vendor-reference/1.0.0",
-  "built_at": "2026-11-26T19:45:09+00:00",
+  "built_at": "2026-11-26T19:55:18+00:00",
   "attribution": {
     "license": "CC-BY-4.0",
     "attribution": "Skill Map vendor reference set by Dave Holmes-Kinsella and contributors (https://github.com/dhk/skill-map). Pointers to files in each vendor's public repository; no file text is included."
@@ -221,17 +221,27 @@
       }
     }
   },
-  "mirror": null,
+  "mirror": {
+    "gitskills_revision": "ebab17454a7c236f8f26b183567f1a126f42e3f8",
+    "copies": 74596,
+    "copy_repos": 9699,
+    "vendor_blobs_copied": 2445
+  },
   "outputs": [
     {
       "path": "version.parquet",
       "rows": 8168,
-      "sha256": "3b2d6291a3c8eb2709ff2885b9398e25e62c1cf937428957af14f11bf6bef2c2"
+      "sha256": "a48bd4b2a55cd5bc5c70251923ce373bcfd860fac53abb82a4584f622f08aef6"
     },
     {
       "path": "skill.parquet",
       "rows": 2709,
-      "sha256": "8e0f93a6b5a4eaa60fbec21504dea4744751c25e8e6622c459223aa4296bd7b4"
+      "sha256": "a9e2df0ad4cc3cf2fde9f2b3548fb4d73bb11d47550464cb083344e92fa4ba8a"
+    },
+    {
+      "path": "mirror.parquet",
+      "rows": 74596,
+      "sha256": "0eecd042c9f757f71ceaa9d914c6a5c31d7c4ff95a81c39355f9f0c5b2b8804f"
     }
   ]
 }
