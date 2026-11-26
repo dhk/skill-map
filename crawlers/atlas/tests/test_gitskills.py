@@ -332,3 +332,86 @@ def test_remote_read_rejects_wrong_commit(monkeypatch, tmp_path):
     _fake_hub(monkeypatch, tmp_path, "deadbeef" + "0" * 32)
     with pytest.raises(SystemExit, match="refusing"):
         g.run(tmp_path / "out", check_counts=False, skillmap_root=_empty_skillmap(tmp_path))
+
+
+# --- repositories whose names differ only by case ------------------------------
+
+def _with_case_duplicate():
+    """other/app also appears as Other/App: an older spelling with its own
+    occurrence of the same path (a collision) and one unique path."""
+    a = _artifacts().to_pydict()
+    extra = {c: [None, None] for c in a}
+    extra["repo_full_name"] = ["Other/App", "Other/App"]
+    extra["path"] = [".codex/skills/deploy/SKILL.md", "old/SKILL.md"]
+    extra["filename"] = ["SKILL.md", "SKILL.md"]
+    extra["file_sha"] = ["b" * 40, "d" * 40]
+    extra["dedup_primary"] = [0, 1]
+    extra["discovered_at"] = ["2026-07-01T00:00:00Z", "2026-07-01T00:00:00Z"]
+    for c in a:
+        a[c] = a[c] + extra[c]
+    r = _repos().to_pydict()
+    old = {k: [v[2]] for k, v in r.items()}
+    old["full_name"] = ["Other/App"]
+    old["pushed_at"] = ["2026-01-01T00:00:00Z"]  # older than other/app
+    for k in r:
+        r[k] = r[k] + old[k]
+    return pa.table(a, schema=_artifacts().schema), pa.table(r, schema=_repos().schema)
+
+
+def test_case_duplicate_repos_are_merged_and_reported():
+    arts, repos = _with_case_duplicate()
+    with pytest.raises(ValueError, match="duplicate repo names"):
+        g.check_keys(arts, repos)
+    report = {}
+    t = g.build_tables(arts, repos, "t", report=report)
+    assert t["repo"].num_rows == 3
+    assert "Other/App" not in t["repo"].column("repo_full_name").to_pylist()
+    occ = t["occurrence"]
+    assert occ.num_rows == 5  # 4 originals + the unique old path; the collision merged
+    assert set(occ.column("repo_full_name").to_pylist()) == {"anthropics/skills", "someone/mirror", "other/app"}
+    assert "other/app:old/SKILL.md" in occ.column("occurrence_id").to_pylist()
+    assert t["content"].num_rows == 4  # a, b, c, d: one row each
+    dup = report["duplicates"]
+    assert dup["repos_merged"] == [{"kept": "other/app", "merged": ["Other/App"]}]
+    assert dup["repo_rows_dropped"] == 1
+    assert dup["occurrences_merged"] == 1
+    assert dup["occurrence_examples"][0]["path"] == ".codex/skills/deploy/SKILL.md"
+
+
+def test_case_duplicate_keeps_latest_pushed_then_stars_then_spelling():
+    arts, repos = _with_case_duplicate()
+    r = repos.to_pydict()
+    r["pushed_at"][3] = "2026-09-01T00:00:00Z"  # Other/App now the most recent
+    _, kept, rep = g.reconcile_duplicates(arts, pa.table(r, schema=repos.schema))
+    assert rep["repos_merged"][0]["kept"] == "Other/App"
+    r["pushed_at"][3] = r["pushed_at"][2]  # same date: most stars wins
+    r["stars"][3] = 99
+    _, _, rep = g.reconcile_duplicates(arts, pa.table(r, schema=repos.schema))
+    assert rep["repos_merged"][0]["kept"] == "Other/App"
+    r["stars"][3] = r["stars"][2]  # full tie: spelling that sorts first
+    _, _, rep = g.reconcile_duplicates(arts, pa.table(r, schema=repos.schema))
+    assert rep["repos_merged"][0]["kept"] == "Other/App"  # "O" < "o"
+
+
+def test_collision_keeps_the_representative_row():
+    arts, repos = _with_case_duplicate()
+    a = arts.to_pydict()
+    a["dedup_primary"][2] = 0  # other/app's copy is not the representative ...
+    a["dedup_primary"][4] = 1  # ... Other/App's copy of the same path is
+    t = g.build_tables(pa.table(a, schema=arts.schema), repos, "t")
+    c = t["content"]
+    shas = c.column("blob_sha").to_pylist()
+    assert shas.count("b" * 40) == 1
+    assert c.column("representative_repo").to_pylist()[shas.index("b" * 40)] == "other/app"
+
+
+def test_manifest_records_duplicate_repos(tmp_path: Path):
+    arts, repos = _with_case_duplicate()
+    data = tmp_path / "data"
+    (data / "artifacts").mkdir(parents=True)
+    (data / "repos").mkdir()
+    pq.write_table(arts, data / "artifacts" / "part-0.parquet")
+    pq.write_table(repos, data / "repos" / "part-0.parquet")
+    m = g.run(tmp_path / "out", local=data, check_counts=False, skillmap_root=_empty_skillmap(tmp_path))
+    assert m["duplicate_repo_names"]["repos_merged"][0]["merged"] == ["Other/App"]
+    assert m["outputs"]["repo"]["rows"] == 3

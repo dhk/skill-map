@@ -47,7 +47,7 @@ import pyarrow.parquet as pq
 from crawlers import exclusions as removal
 from crawlers import licensing
 
-METHOD_VERSION = "gitskills-import/1.1.0"
+METHOD_VERSION = "gitskills-import/1.2.0"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SOURCES = Path(__file__).with_name("sources.json")
 DEFAULT_OUT = REPO_ROOT / "data" / "atlas" / "gitskills"
@@ -134,6 +134,114 @@ def _sortable(v) -> str | None:
     return v.isoformat() if hasattr(v, "isoformat") else str(v)
 
 
+def _ensure_representatives(artifacts: pa.Table) -> tuple[pa.Table, int]:
+    """Give every blob SHA exactly one representative row, promoting the first
+    remaining occurrence where an earlier step removed the representative."""
+    shas = artifacts.column("file_sha").to_pylist()
+    primary = artifacts.column("dedup_primary").to_pylist()
+    has_primary = {s for s, p in zip(shas, primary) if p == 1}
+    reassigned = 0
+    for i, s in enumerate(shas):
+        if s and s not in has_primary:
+            primary[i] = 1
+            has_primary.add(s)
+            reassigned += 1
+    if reassigned:
+        idx = artifacts.schema.get_field_index("dedup_primary")
+        artifacts = artifacts.set_column(
+            idx, "dedup_primary", pa.array(primary, artifacts.schema.field("dedup_primary").type))
+    return artifacts, reassigned
+
+
+def reconcile_duplicates(artifacts: pa.Table, repos: pa.Table) -> tuple[pa.Table, pa.Table, dict]:
+    """Merge repositories whose names differ only by case, and their occurrences.
+
+    GitHub treats owner/name case-insensitively, so two GitSkills rows such as
+    `Foo/Bar` and `foo/bar` are one repository seen under two spellings (a
+    rename or a case change between crawls). One row is kept per name, chosen
+    deterministically: the latest `pushed_at` (the spelling GitHub reported
+    most recently), then the most stars, then the spelling that sorts first.
+    Occurrences under any spelling are re-keyed to the kept one. If that makes
+    two occurrences share a repo and path, the representative row is kept,
+    then the latest `discovered_at`, then the first in input order.
+
+    Nothing is dropped silently: the returned report lists every merged
+    repository and counts every merged occurrence, and goes in the manifest.
+    """
+    names = repos.column("full_name").to_pylist()
+    groups: dict[str, list[int]] = {}
+    for i, n in enumerate(names):
+        groups.setdefault(_norm_repo(n), []).append(i)
+    dupes = {k: v for k, v in groups.items() if len(v) > 1}
+    report = {"rule": ("keep latest pushed_at, then most stars, then first spelling; "
+                       "re-key occurrences; on repo+path collision keep the representative, "
+                       "then latest discovered_at"),
+              "repos_merged": [], "repo_rows_dropped": 0,
+              "occurrences_merged": 0, "occurrence_examples": [],
+              "representatives_reassigned": 0}
+    if not dupes:
+        return artifacts, repos, report
+
+    pushed = repos.column("pushed_at").to_pylist()
+    stars = repos.column("stars").to_pylist()
+    keep_rows = set(range(repos.num_rows))
+    canonical: dict[str, str] = {}
+    for key, rows in sorted(dupes.items()):
+        # max() keeps the first of equal candidates, so sorting by spelling
+        # first makes the final tie-break "spelling that sorts first".
+        by_name = sorted(rows, key=lambda i: names[i])
+        best = max(by_name, key=lambda i: (_sortable(pushed[i]) is not None,
+                                           _sortable(pushed[i]) or "",
+                                           stars[i] or 0))
+        canonical[key] = names[best]
+        dropped = [names[i] for i in rows if i != best]
+        keep_rows -= set(rows) - {best}
+        report["repos_merged"].append({"kept": names[best], "merged": dropped})
+        report["repo_rows_dropped"] += len(dropped)
+    repos = repos.take(pa.array(sorted(keep_rows)))
+
+    occ_repos = artifacts.column("repo_full_name").to_pylist()
+    rekeyed = [canonical.get(_norm_repo(r), r) for r in occ_repos]
+    paths = artifacts.column("path").to_pylist()
+    primary = artifacts.column("dedup_primary").to_pylist()
+    found = artifacts.column("discovered_at").to_pylist()
+    winner: dict[tuple, int] = {}
+    for i, (r, p) in enumerate(zip(rekeyed, paths)):
+        k = (_norm_repo(r), p)
+        if k not in winner:
+            winner[k] = i
+            continue
+        j = winner[k]
+        rank_i = (primary[i] == 1, _sortable(found[i]) or "")
+        rank_j = (primary[j] == 1, _sortable(found[j]) or "")
+        loser = j if rank_i > rank_j else i
+        if loser == j:
+            winner[k] = i
+        report["occurrences_merged"] += 1
+        if len(report["occurrence_examples"]) < 50:
+            report["occurrence_examples"].append(
+                {"repo": rekeyed[i], "path": p, "merged_spelling": occ_repos[loser]})
+    keep_occ = sorted(winner.values())
+    idx = artifacts.schema.get_field_index("repo_full_name")
+    artifacts = artifacts.set_column(idx, "repo_full_name", pa.array(rekeyed, pa.string()))
+    artifacts = artifacts.take(pa.array(keep_occ))
+    # A dropped duplicate may have been a text's representative, or a text may
+    # now have two; keep exactly one, preferring the earliest kept row.
+    shas = artifacts.column("file_sha").to_pylist()
+    prim = artifacts.column("dedup_primary").to_pylist()
+    seen: set = set()
+    for i, (sha, pr) in enumerate(zip(shas, prim)):
+        if pr == 1:
+            if sha in seen:
+                prim[i] = 0
+            seen.add(sha)
+    pidx = artifacts.schema.get_field_index("dedup_primary")
+    artifacts = artifacts.set_column(pidx, "dedup_primary",
+                                     pa.array(prim, artifacts.schema.field("dedup_primary").type))
+    artifacts, report["representatives_reassigned"] = _ensure_representatives(artifacts)
+    return artifacts, repos, report
+
+
 def apply_exclusions(artifacts: pa.Table, repos: pa.Table,
                      ex: removal.Exclusions) -> tuple[pa.Table, pa.Table, dict]:
     """Drop repositories on the removal list. Where that removes a text's
@@ -148,17 +256,7 @@ def apply_exclusions(artifacts: pa.Table, repos: pa.Table,
         "representatives_reassigned": 0,
     }
     if stats["occurrences_dropped"]:
-        shas = kept.column("file_sha").to_pylist()
-        primary = kept.column("dedup_primary").to_pylist()
-        has_primary = {s for s, p in zip(shas, primary) if p == 1}
-        for i, s in enumerate(shas):
-            if s and s not in has_primary:
-                primary[i] = 1
-                has_primary.add(s)
-                stats["representatives_reassigned"] += 1
-        idx = kept.schema.get_field_index("dedup_primary")
-        kept = kept.set_column(idx, "dedup_primary",
-                               pa.array(primary, kept.schema.field("dedup_primary").type))
+        kept, stats["representatives_reassigned"] = _ensure_representatives(kept)
     return kept, repos.filter(repo_keep), stats
 
 
@@ -217,10 +315,17 @@ def check_keys(artifacts: pa.Table, repos: pa.Table) -> None:
 
 
 def build_tables(artifacts: pa.Table, repos: pa.Table, source: str,
-                 ex: removal.Exclusions | None = None) -> dict[str, pa.Table]:
-    """Turn GitSkills artifacts and repos into occurrence, content and repo tables."""
+                 ex: removal.Exclusions | None = None,
+                 report: dict | None = None) -> dict[str, pa.Table]:
+    """Turn GitSkills artifacts and repos into occurrence, content and repo tables.
+
+    If `report` is given, it is filled with what was merged and removed."""
     ex = ex or removal.Exclusions(set(), set())
-    artifacts, repos, _ = apply_exclusions(artifacts, repos, ex)
+    artifacts, repos, dup_report = reconcile_duplicates(artifacts, repos)
+    artifacts, repos, removal_stats = apply_exclusions(artifacts, repos, ex)
+    if report is not None:
+        report["duplicates"] = dup_report
+        report["removal"] = removal_stats
     check_keys(artifacts, repos)
     paths = artifacts.column("path").to_pylist()
     occurrence = pa.table({
@@ -450,8 +555,9 @@ def run(out: Path, local: Path | None = None, check_counts: bool = True,
                 raise SystemExit(f"{name}: {table.num_rows} rows, expected {want}")
 
     source = f"gitskills@{revision}"
-    _, _, removal_stats = apply_exclusions(artifacts, repos, ex)
-    tables = build_tables(artifacts, repos, source, ex)
+    report: dict = {}
+    tables = build_tables(artifacts, repos, source, ex, report)
+    removal_stats = report["removal"]
     out.mkdir(parents=True, exist_ok=True)
     outputs = {}
     for name, table in tables.items():
@@ -472,6 +578,7 @@ def run(out: Path, local: Path | None = None, check_counts: bool = True,
             "sha256": _sha256(Path(exclusions_path)),
             **removal_stats,
         },
+        "duplicate_repo_names": report["duplicates"],
         "columns_read": {"artifacts": ARTIFACT_COLUMNS, "repos": REPO_COLUMNS},
         "inputs": {"artifacts": a_in, "repos": r_in},
         "outputs": outputs,

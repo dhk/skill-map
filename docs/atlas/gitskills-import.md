@@ -64,6 +64,18 @@ and a summary. A `--local` run records the revision as `local` rather than a
 path on the machine, and relies on the input file hashes. The Parquet outputs are not committed; they go to GitHub release assets, with a copy on
 Hugging Face, with each Atlas release.
 
+## Repository names that differ only by case
+
+GitHub treats `owner/name` case-insensitively, and the GitSkills repos table
+has rows that differ only by case (9 in the release read on 26 Nov 2026),
+which would otherwise break the one-row-per-repo key. The importer keeps one
+row per name: the latest `pushed_at`, then the most stars, then the spelling
+that sorts first. Occurrences under any spelling move to the kept one. Where
+that leaves two occurrences with the same repo and path, it keeps the
+representative row, then the latest `discovered_at`. The manifest's
+`duplicate_repo_names` section lists every merged repository and counts the
+merged occurrences, with examples.
+
 ## Resuming
 
 Each remote data file's selected columns are saved under
