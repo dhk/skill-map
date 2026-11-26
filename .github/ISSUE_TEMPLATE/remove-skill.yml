@@ -1,0 +1,35 @@
+name: Remove my skills
+description: Ask for your SKILL.md files to be removed from the crawl snapshots, derived data and future crawls.
+title: "[remove] owner/repo"
+labels: ["removal-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Crawl snapshots under `crawls/` store the text of public `SKILL.md`
+        files for research reproducibility. If you wrote a skill that appears
+        here and want it out, tell us which repository. See
+        [DATA-POLICY.md](https://github.com/dhk/skill-map/blob/main/DATA-POLICY.md)
+        for what removal covers.
+  - type: input
+    id: repo
+    attributes:
+      label: Repository (owner/repo)
+      placeholder: your-org/your-skills
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: What should be removed?
+      description: The whole repository, or specific SKILL.md paths.
+      placeholder: "Everything from this repo"
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirm
+      options:
+        - label: I own or maintain this repository, or wrote the skills in it.
+          required: true

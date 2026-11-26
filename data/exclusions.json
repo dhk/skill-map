@@ -1,0 +1,318 @@
+{
+  "_about": "Removal list. See DATA-POLICY.md. Repos: authors who asked to be left out. Blobs: SKILL.md texts (git blob SHA-1) removed by content from every repository.",
+  "repos": [],
+  "blobs": [
+    {
+      "sha": "0f35c3251a33ba7eb0c05e21a164040b375f4b1f",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "davila7/claude-code-templates"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "1180568c07885f6b00e9ef833cffa61ed0591b68",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
+      "seen_in": [
+        "dmccreary/claude-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "141c95dce90f3f43c463caac3dcb12ecadbd7a34",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "BbgnsurfTech/claude-skills-collection",
+        "davila7/claude-code-templates"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "1710646015c7f047c39d2f6d649d5dfad42dc37c",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "flonat/claude-research"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "1dfeb4268b91b17ae51ade90bb6c23b51661e1e0",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "flonat/claude-research"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "1fd5b53b0287b2fb6749e071aec56bc17f5399f3",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
+      "seen_in": [
+        "dmccreary/claude-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "22db189c8b17d48f94f11fa0c45343441239ff40",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "BbgnsurfTech/claude-skills-collection",
+        "QuestForTech-Investments/claude-code-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "27ea53bc82cda004fe42a370bd98430ad84cde3b",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
+      "seen_in": [
+        "dmccreary/claude-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "2951e559989765293b6fbf83942378a3c2d0cba6",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "anthropics/skills",
+        "davila7/claude-code-templates"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "2adedebe0a1630e0f2942987334ff96f970b6519",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "davila7/claude-code-templates"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "36ea48969a9d325705a2c40298bd0f6cc9b5bfb3",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "davila7/claude-code-templates"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "377d3ea4f0d9720a6cf6078cd5a62fd3ba5a96d2",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
+      "seen_in": [
+        "dmccreary/claude-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "50029dc0c47606d32ef45429b332ee60014d4845",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "BbgnsurfTech/claude-skills-collection",
+        "davila7/claude-code-templates"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "664663895bcd11b88a632301d830b313cbabb845",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "BbgnsurfTech/claude-skills-collection",
+        "QuestForTech-Investments/claude-code-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "67a44a484ddd75998794dacc175cebd179e0d388",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
+      "seen_in": [
+        "dmccreary/claude-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "81ab6785426f92e4e9f26fe9bfe9d8c4e2de80e2",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
+      "seen_in": [
+        "dmccreary/claude-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "877eb2230c4fcf8b0e7f451c3505767e8bd8424b",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
+      "seen_in": [
+        "dmccreary/claude-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "9b4bdd1dec009c128e84d86d726124e7dac71175",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "BbgnsurfTech/claude-skills-collection",
+        "davila7/claude-code-templates"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "9b8361f1a8e205507917ec17a9d289b9b6db05c2",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
+      "seen_in": [
+        "dmccreary/claude-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "9d530a16a3765ad78bcc04223e42cb28763464fc",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "davila7/claude-code-templates"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "b3a63c466097ff0854a35b8d639794f0cd13b55c",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "BbgnsurfTech/claude-skills-collection",
+        "davila7/claude-code-templates"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "b437ad6e12b956ec804cb201ceac4603e1c046e3",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
+      "seen_in": [
+        "dmccreary/claude-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "b93b875fe11cf805bdfbbe5f0e7878a7562896ac",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "BbgnsurfTech/claude-skills-collection",
+        "QuestForTech-Investments/claude-code-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "c04842ca935bd1432eb633657da3fe9b48c9bb47",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "flonat/claude-research"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "c5c881be9ebaa2bfcdd02f97de2ebd711ab78803",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "anthropics/skills",
+        "davila7/claude-code-templates"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "c5f616b20a128a8ca0b43d49e3bdf60af9c9c2d7",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
+      "seen_in": [
+        "dmccreary/claude-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "d3e046a5ae107a6cb23cfb16c219837094ab35d3",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "anthropics/skills",
+        "davila7/claude-code-templates"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "d871991cda07838b60b20a4668c70dec0347f270",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
+      "seen_in": [
+        "dmccreary/claude-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "df5000e17ef60ecf400e65bfcd3c58ff88b604c3",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "anthropics/skills",
+        "davila7/claude-code-templates"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    },
+    {
+      "sha": "f6a22ddf88fdc7e7b7603f4c9064cc51bd930ad9",
+      "reason": "frontmatter licence is proprietary or non-commercial",
+      "license": "Proprietary. LICENSE.txt has complete terms",
+      "seen_in": [
+        "BbgnsurfTech/claude-skills-collection",
+        "QuestForTech-Investments/claude-code-skills"
+      ],
+      "added": "2026-11-26",
+      "decision": "maintainer review decision, 2026-11-26"
+    }
+  ]
+}
