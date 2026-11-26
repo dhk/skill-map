@@ -1,6 +1,6 @@
 # Skill Concepts Atlas: study plan
 
-Date: 2026-11-26 · Status: proposed (phase 0); method decisions open
+Date: 2026-11-26 · Status: accepted (phase 0); method decisions settled by DHK on 26 Nov 2026
 
 ## Question
 
@@ -39,22 +39,35 @@ read in full; the others from abstracts and excerpts.
 ## Corpus
 
 - Public GitHub `SKILL.md` files plus the major marketplaces (skills.sh,
-  SkillsMP, claude-plugins.dev, ClawHub, Smithery).
+  SkillsMP, claude-plugins.dev, ClawHub, Smithery). Each marketplace's terms
+  of service and robots rules are checked, and the result recorded, before it
+  is crawled; a marketplace whose terms forbid scraping is left out or used
+  only through an official API or export.
 - "ChatGPT skills" means public `SKILL.md` files used by ChatGPT and Codex,
   found under `.codex/skills`, `.agents/skills`, the `openai/skills` catalogue
   and OpenAI plugin repos, and recognisable by `agents/openai.yaml`.
 - Custom GPTs are out of v1. AGENTS.md, CLAUDE.md, Cursor rules and Copilot
   instructions are a sibling study for later.
-- Base: GitSkills, pinned to Zenodo version 1.0.0 (10 Aug 2026), plus our own delta crawl for
-  August to November 2026 and the existing Skill Map snapshots.
+- Base: GitSkills, pinned to a full Hugging Face commit of
+  `mvaccargiu/gitskills`, plus the existing Skill Map snapshots. We cite the
+  dataset by its Zenodo DOI (version 1.0.0, 10 Aug 2026); the import manifest
+  records the exact Hugging Face commit it read.
+- Delta: rerun GitSkills' own collection strategy, code search split into
+  file-size ranges so each query stays under GitHub's result cap, then diff
+  the result against GitSkills by blob SHA. New SHAs are the August to
+  November 2026 additions; changed paths become new occurrences.
 
 See [ADR 0004](../adr/0004-atlas-scope-and-corpus.md).
 
 ## Dating
 
-Every signal is kept at grain. The first-seen estimate is the earliest date
-supported by two independent signals; otherwise it is the single signal with a
-low-confidence label. Vendor launch dates act as floors: 16 Oct 2025 for
+Every signal is kept at grain. Each text gets a **date window**: from the
+latest lower bound (vendor floor, repo `created_at`) to the earliest upper
+bound (Software Heritage first-seen, registry first-listed, crawl date). When
+the git first-commit date falls inside the window, it is the point estimate.
+When it falls outside or is missing, the estimate is the window's upper bound
+with a low-confidence label, and an outside git date is flagged. Vendor launch
+dates act as floors: 16 Oct 2025 for
 `SKILL.md` files generally ([Anthropic](https://www.anthropic.com/news/skills)),
 and 19 Dec 2025 for skills in OpenAI folders such as `.codex/skills`, when
 OpenAI announced Codex support
@@ -85,7 +98,9 @@ is on or before them: they are **upper bounds**.
    [ADR 0006](../adr/0006-atlas-sophistication-ladder.md).
 4. **Lineage and morphing:** inherited spread (along a copy edge) is kept
    separate from convergent spread (independent emergence). Morphs are variant
-   forms of one concept linked across a lineage.
+   forms of one concept linked across a lineage. Spread is counted once per
+   near-copy family (texts linked by copy or light-edit edges), so a concept
+   copied into a hundred catalogues counts once, not a hundred times.
 5. **Context:** repo language, repo signature, location class (operational
    project or catalogue), agent platform by folder (`.claude`, `.codex`,
    `.agents`, `.github`, `.cursor`, `.gemini`), type of work, and industry with
@@ -113,13 +128,14 @@ and the [data policy](../../DATA-POLICY.md).
 | `content` | blob SHA, front matter fields, size, excerpt pointer |
 | `repo` | repo, owner, stars, forks, language, license, created and pushed dates |
 | `date_evidence` | content or occurrence, signal type, date, source URL, retrieved_at |
-| `first_seen_estimate` | content (blob SHA), derived date, confidence, rule version |
+| `first_seen_estimate` | content (blob SHA), window start, window end, point estimate, confidence, rule version |
 | `purpose_label` | content (blob SHA), label, method, model and prompt version, confidence, evidence span |
 | `context_label` | occurrence (the same text can sit in different settings), label, method, model and prompt version, confidence |
 | `concept` | ID, name, definition, status, created_in_release |
 | `concept_observation` | content, concept, evidence span offsets, extractor, confidence |
-| `sophistication_feature` | content, feature, value, detector version |
+| `sophistication_feature` | content, feature, value, detector version, skill-creator scaffold flag |
 | `lineage_edge` | from, to, type (copy, edit, inherited-concept, convergent), source |
+| `family` | blob SHA, near-copy family ID, method version |
 | `vendor_match` | content, vendor ancestor, class, similarity |
 
 ## Phases
@@ -127,9 +143,9 @@ and the [data policy](../../DATA-POLICY.md).
 | Phase | Delivers |
 |---|---|
 | 0 Scoping | This plan and ADRs 0003 to 0007 |
-| 1 Exposition | GitSkills import, merge with Skill Map snapshots, vendor reference set, delta crawl, purpose and context labels, sophistication features, first site and FAQ |
-| 2 Dating | Commit dates for the roughly 76% of distinct texts GitSkills lacks, Software Heritage lookups, registry dates, estimate rule, validation sample |
-| 3 Concepts | Extraction, clustering, naming, taxonomy v1, accuracy check on about 200 skills |
+| 1 Exposition | GitSkills import, merge with Skill Map snapshots, vendor reference set, marketplace terms check, delta crawl, purpose and context labels, sophistication features, first site and FAQ |
+| 2 Dating | Commit dates for the roughly 76% of distinct texts GitSkills lacks, Software Heritage lookups, registry dates, date windows, validation sample |
+| 3 Concepts | A 50,000-skill model sample first, reporting cost and accuracy before any full run; then extraction, clustering, naming and a frozen taxonomy v1; DHK's hand-labelled stratified sample across every dimension |
 | 4 Timeline and morphing | Growth curves, inherited versus convergent spread, morph catalogue |
 | 5 Publication | Release with DOI, concept pages, guidelines, first article |
 
@@ -153,9 +169,10 @@ change.
 
 ## FAQ (draft)
 
-**How are dates estimated?** From at least two independent signals where
-possible, always labelled as estimates with a confidence level and the
-evidence behind them.
+**How are dates estimated?** Each skill gets a window between the latest date
+it could not have existed before and the earliest date it is known to have
+existed. The git date is used when it falls inside that window. Every date is
+labelled as an estimate, with a confidence level and the evidence behind it.
 
 **Is a copy of a vendor skill counted as a new skill?** It stays in the data,
 classed as a mirror, light edit or derivative, and mirrors do not count toward

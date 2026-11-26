@@ -4,7 +4,7 @@ Date: 2026-11-26
 
 ## Status
 
-Proposed. Becomes Accepted once DHK settles the open method decisions.
+Accepted (2026-11-26).
 
 ## Context
 
@@ -29,7 +29,12 @@ Detect features per distinct skill text and present them as a ladder:
 - **L6 Composed:** hands off to other skills or subagents.
 
 Features are stored in `sophistication_feature` with a detector version. The
-ladder level is a view computed from them.
+ladder level is a view computed from them. Reports lead with each feature's
+share of skills over time, and the ladder comes second.
+
+Skills scaffolded by skill-creator (matched against the vendor reference set)
+are flagged, because the scaffold supplies some features, such as
+`references/` folders, that the author did not choose.
 
 ## Consequences
 

@@ -4,7 +4,7 @@ Date: 2026-11-26
 
 ## Status
 
-Proposed. Becomes Accepted once DHK settles the open method decisions.
+Accepted (2026-11-26).
 
 ## Context
 
@@ -21,8 +21,15 @@ GitHub code-search counts are not usable as population sizes.
 ## Decision
 
 - Corpus v1: public GitHub `SKILL.md` files plus the major marketplaces.
-- Start from GitSkills, pinned to Zenodo version 1.0.0 (10 Aug 2026), and the existing Skill
-  Map snapshots; add our own delta crawl for August to November 2026.
+- Start from GitSkills, pinned to a full Hugging Face commit SHA of
+  `mvaccargiu/gitskills`, and the existing Skill Map snapshots. We cite the
+  dataset by its Zenodo DOI (version 1.0.0, 10 Aug 2026). The import reads from
+  Hugging Face because it can fetch single columns without the 44 GB database,
+  and its manifest records the exact commit.
+- Add a delta crawl for August to November 2026 by rerunning GitSkills'
+  size-split code search and diffing by blob SHA.
+- Check each marketplace's terms of service and robots rules before crawling
+  it, and record the result.
 - Exclude Custom GPTs from v1. Treat AGENTS.md, CLAUDE.md, Cursor rules and
   Copilot instructions as a later sibling study.
 - All work lives in this repository. Write-ups may move to Alexandria later.
@@ -35,5 +42,8 @@ GitHub code-search counts are not usable as population sizes.
   license. Our reading follows the card: the Atlas credits GitSkills, reuses its
   metadata, republishes pointers and derived labels, and uses `repos.license`
   to decide where full text may be included.
-- The delta crawl reuses `crawlers/crawl.py` and adds license detection.
+- The delta crawl adds a size-split search mode alongside `crawlers/crawl.py`
+  and records license detection for the repository and the skill.
+- A marketplace whose terms forbid scraping is left out or used only through
+  an official API or export.
 - Pre-October-2025 history is out of scope until the sibling study.
