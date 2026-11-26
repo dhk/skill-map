@@ -17,8 +17,9 @@ How a version is found:
 - renames show as a delete and an add with the same blob SHA.
 
 Who wrote a skill is read from the nearest plugin manifest above it
-(`.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, or any
-`.<name>-plugin/plugin.json`) at the commit that added or changed it:
+(`plugin.json` inside any `.<name>-plugin/` or `.plugin/` folder, such as
+`.claude-plugin`, `.codex-plugin` or `.cursor-plugin`) at the commit that added
+or changed it. A manifest that is a symlink inside the repository is followed:
 
 - first-party:  the manifest's author matches one of the vendor's names;
 - other-author: the manifest names someone else (a partner company, a team,
@@ -38,11 +39,20 @@ other Atlas tables; manifest.json is committed):
 
 - version.parquet: one row per SKILL.md add, change or delete;
 - skill.parquet:   one row per repository and skill directory;
+- cross_vendor.parquet: one row per vendor version that another vendor later
+                   published byte for byte (origin, copy, both landing dates);
 - mirror.parquet:  with --gitskills, one row per GitSkills occurrence outside
                    the vendor repositories whose blob SHA is a vendor version
                    (an exact copy of something a vendor published);
 - manifest.json:   method version, each repository's pinned HEAD, row counts,
                    output hashes.
+
+All dates are UTC (`YYYY-MM-DDTHH:MM:SSZ`), so they sort correctly as text;
+ties keep git's landing order.
+
+The removal list (data/exclusions.json) is loaded as the GitSkills importer
+loads it: repositories on it are skipped, and texts on it keep their pointer
+with `removal_listed` set.
 
 Usage:
     python -m crawlers.atlas.vendor_reference
@@ -59,14 +69,20 @@ import subprocess
 import sys
 from pathlib import Path, PurePosixPath
 
+import os
+import re
+
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-METHOD_VERSION = "vendor-reference/1.0.0"
+from crawlers import exclusions as removal
+
+METHOD_VERSION = "vendor-reference/1.1.0"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 VENDORS = Path(__file__).with_name("vendors.json")
 DEFAULT_OUT = REPO_ROOT / "data" / "atlas" / "vendor_reference"
 DEFAULT_CLONES = REPO_ROOT / "data" / "atlas" / ".cache" / "vendor-clones"
+DEFAULT_EXCLUSIONS = REPO_ROOT / "data" / "exclusions.json"
 NULL_SHA = "0" * 40
 SKILL_FILE = "SKILL.md"
 CHANGE = {"A": "added", "M": "modified", "D": "deleted", "T": "modified"}
@@ -106,9 +122,12 @@ def load_vendors(path: Path = VENDORS) -> list[dict]:
 
 # ---------------------------------------------------------------- git
 
+GIT_ENV = {**os.environ, "TZ": "UTC"}
+
+
 def git(repo_dir: Path, *args: str, input: str | None = None) -> str:
     res = subprocess.run(["git", "-C", str(repo_dir), *args], input=input,
-                         capture_output=True, text=True, check=False)
+                         capture_output=True, text=True, check=False, env=GIT_ENV)
     if res.returncode != 0:
         raise RuntimeError(f"git {' '.join(args[:3])} failed in {repo_dir}: {res.stderr.strip()}")
     return res.stdout
@@ -128,7 +147,9 @@ def clone_or_update(repo: str, dest: Path, offline: bool = False) -> str:
     return git(dest, "rev-parse", "HEAD").strip()
 
 
-LOG_FORMAT = "%x00%H%x09%cI%x09%aI"
+# Dates rendered in UTC (TZ=UTC with format-local), so text order is time order.
+DATE_FMT = "--date=format-local:%Y-%m-%dT%H:%M:%SZ"
+LOG_FORMAT = "%x00%H%x09%cd%x09%ad"
 
 
 def parse_log(text: str) -> list[dict]:
@@ -164,7 +185,7 @@ def parse_log(text: str) -> list[dict]:
 def skill_changes(repo_dir: Path) -> list[dict]:
     """Every SKILL.md add, change and delete that landed on the default branch, oldest first."""
     text = git(repo_dir, "log", "--first-parent", "--diff-merges=first-parent",
-               "--no-renames", "--raw", "--no-abbrev", "--reverse",
+               "--no-renames", "--raw", "--no-abbrev", "--reverse", DATE_FMT,
                f"--format={LOG_FORMAT}", "HEAD", "--", f"*{SKILL_FILE}")
     return parse_log(text)
 
@@ -176,14 +197,64 @@ def skill_dir(path: str) -> str:
     return "" if parent == "." else parent
 
 
-def manifest_candidates(path: str) -> list[str]:
-    """Plugin manifest paths to look for, nearest directory first."""
+def ancestor_dirs(path: str) -> list[str]:
+    """Directories above a file, nearest first, ending with the root ("")."""
     parts = PurePosixPath(path).parent.parts
-    dirs = [str(PurePosixPath(*parts[:i])) if i else "" for i in range(len(parts), -1, -1)]
-    out = []
-    for d in dirs:
-        for kind in (".claude-plugin", ".codex-plugin"):
-            out.append(f"{d}/{kind}/plugin.json" if d else f"{kind}/plugin.json")
+    return [str(PurePosixPath(*parts[:i])) if i else "" for i in range(len(parts), -1, -1)]
+
+
+PLUGIN_DIR = re.compile(r"^\.(?:[A-Za-z0-9_.-]+-)?plugin$")
+PLUGIN_DIR_ORDER = [".claude-plugin", ".codex-plugin", ".cursor-plugin", ".plugin"]
+
+
+def plugin_dirs(entries: list[tuple[str, str]]) -> list[str]:
+    """Plugin folders among a tree's (mode, name) entries, in preference order."""
+    found = [name for mode, name in entries
+             if mode in ("40000", "120000") and PLUGIN_DIR.match(name)]
+    rank = {n: i for i, n in enumerate(PLUGIN_DIR_ORDER)}
+    return sorted(found, key=lambda n: (rank.get(n, len(rank)), n))
+
+
+def parse_tree(data: bytes) -> list[tuple[str, str]]:
+    """(mode, name) entries of a raw git tree object."""
+    out, i = [], 0
+    while i < len(data):
+        sp = data.index(b" ", i)
+        nul = data.index(b"\0", sp)
+        out.append((data[i:sp].decode(), data[sp + 1:nul].decode("utf-8", "surrogateescape")))
+        i = nul + 21
+    return out
+
+
+def cat_batch(repo_dir: Path, names: list[str], follow_symlinks: bool = False) -> dict:
+    """Read objects named like `rev:path` with one `git cat-file --batch`.
+
+    Returns {name: (type, bytes)} for names that resolve to an object. With
+    follow_symlinks, a symlink inside the repository is followed to its target;
+    links that leave the tree, dangle or loop count as missing."""
+    if not names:
+        return {}
+    args = ["git", "-C", str(repo_dir), "cat-file", "--batch"]
+    if follow_symlinks:
+        args.append("--follow-symlinks")
+    res = subprocess.run(args, input=("\n".join(names) + "\n").encode(),
+                         capture_output=True, check=False, env=GIT_ENV)
+    if res.returncode != 0:
+        raise RuntimeError(f"git cat-file --batch failed in {repo_dir}: {res.stderr.decode().strip()}")
+    data, pos, out = res.stdout, 0, {}
+    for name in names:
+        nl = data.index(b"\n", pos)
+        header = data[pos:nl].decode("utf-8", "surrogateescape")
+        pos = nl + 1
+        parts = header.split(" ")
+        if header.endswith((" missing", " ambiguous")):
+            continue
+        if len(parts) == 2 and parts[0] in {"symlink", "dangling", "loop", "notdir"}:
+            pos += int(parts[1]) + 1
+            continue
+        _sha, kind, size = parts[-3], parts[-2], int(parts[-1])
+        out[name] = (kind, data[pos:pos + size])
+        pos += size + 1
     return out
 
 
@@ -218,49 +289,43 @@ def classify(author: str | None, path: str, names: list[str],
     return "unstated", "none"
 
 
-class ManifestReader:
-    """Resolve `commit:path` names in batches and read manifests once each."""
-
-    def __init__(self, repo_dir: Path):
-        self.repo_dir = repo_dir
-        self.authors: dict[str, str | None] = {}
-
-    def resolve(self, names: list[str]) -> dict[str, str]:
-        if not names:
-            return {}
-        out = git(self.repo_dir, "cat-file", "--batch-check=%(objectname) %(objecttype)",
-                  input="\n".join(names) + "\n")
-        found = {}
-        for name, line in zip(names, out.splitlines()):
-            parts = line.split(" ")
-            if len(parts) == 2 and parts[1] == "blob":
-                found[name] = parts[0]
-        return found
-
-    def author_of(self, blob: str) -> str | None:
-        if blob not in self.authors:
-            self.authors[blob] = manifest_author(git(self.repo_dir, "cat-file", "blob", blob))
-        return self.authors[blob]
+def _spec(rev: str, path: str) -> str:
+    return f"{rev}:{path}"
 
 
 def attach_authorship(rows: list[dict], repo_dir: Path, names: list[str],
                       partner_paths: list[str]) -> None:
     """Add plugin_manifest, manifest_author, authorship and its basis to each change row."""
-    reader = ManifestReader(repo_dir)
-    wanted = []
     for r in rows:
         # A deleted file is read as it stood just before the delete.
         r["_rev"] = f"{r['commit']}^1" if r["change"] == "deleted" else r["commit"]
-        r["_cands"] = [f"{r['_rev']}:{c}" for c in manifest_candidates(r["path"])]
-        wanted.extend(r["_cands"])
-    found = reader.resolve(sorted(set(wanted)))
+        r["_dirs"] = ancestor_dirs(r["path"])
+    # 1. Which plugin folders sit in each directory at each revision.
+    tree_specs = sorted({_spec(r["_rev"], d) for r in rows for d in r["_dirs"]})
+    trees = {k: plugin_dirs(parse_tree(v[1]))
+             for k, v in cat_batch(repo_dir, tree_specs).items() if v[0] == "tree"}
+    # 2. Their plugin.json files, following symlinks inside the repository.
+    manifest_specs = sorted({
+        _spec(r["_rev"], f"{d}/{pd}/plugin.json" if d else f"{pd}/plugin.json")
+        for r in rows for d in r["_dirs"] for pd in trees.get(_spec(r["_rev"], d), [])})
+    blobs = {k: v[1].decode("utf-8", "replace")
+             for k, v in cat_batch(repo_dir, manifest_specs, follow_symlinks=True).items()
+             if v[0] == "blob"}
     for r in rows:
-        hit = next((c for c in r["_cands"] if c in found), None)
-        r["plugin_manifest"] = hit.split(":", 1)[1] if hit else None
-        r["manifest_author"] = reader.author_of(found[hit]) if hit else None
+        hit = None
+        for d in r["_dirs"]:
+            for pd in trees.get(_spec(r["_rev"], d), []):
+                path = f"{d}/{pd}/plugin.json" if d else f"{pd}/plugin.json"
+                if _spec(r["_rev"], path) in blobs:
+                    hit = path
+                    break
+            if hit:
+                break
+        r["plugin_manifest"] = hit
+        r["manifest_author"] = manifest_author(blobs[_spec(r["_rev"], hit)]) if hit else None
         r["authorship"], r["authorship_basis"] = classify(
             r["manifest_author"], r["path"], names, partner_paths)
-        del r["_rev"], r["_cands"]
+        del r["_rev"], r["_dirs"]
 
 
 # ---------------------------------------------------------------- tables
@@ -272,11 +337,13 @@ VERSION_SCHEMA = pa.schema([
     ("blob_sha", pa.string()), ("previous_blob_sha", pa.string()),
     ("plugin_manifest", pa.string()), ("manifest_author", pa.string()),
     ("authorship", pa.string()), ("authorship_basis", pa.string()),
-    ("method_version", pa.string()),
+    ("removal_listed", pa.bool_()), ("method_version", pa.string()),
 ])
 
 
-def version_rows(repo_cfg: dict, changes: list[dict]) -> list[dict]:
+def version_rows(repo_cfg: dict, changes: list[dict],
+                 ex: removal.Exclusions | None = None) -> list[dict]:
+    ex = ex or removal.Exclusions(set(), set())
     out = []
     for c in changes:
         out.append({
@@ -290,6 +357,7 @@ def version_rows(repo_cfg: dict, changes: list[dict]) -> list[dict]:
             "manifest_author": c.get("manifest_author"),
             "authorship": c.get("authorship", "unstated"),
             "authorship_basis": c.get("authorship_basis", "none"),
+            "removal_listed": ex.blob_excluded(c["blob_sha"]),
             "method_version": METHOD_VERSION,
         })
     return out
@@ -323,13 +391,64 @@ def skill_rows(versions: list[dict]) -> list[dict]:
     return out
 
 
-def mirror_rows(versions: list[dict], occurrence: pa.Table) -> list[dict]:
+def first_landings(versions: list[dict]) -> dict[tuple[str, str], dict]:
+    """The first live version of each (blob SHA, vendor), in UTC then git order."""
+    first: dict[tuple[str, str], dict] = {}
+    for v in sorted(versions, key=lambda v: v["committed_at"]):  # stable: ties keep git order
+        if v["change"] != "deleted":
+            first.setdefault((v["blob_sha"], v["vendor"]), v)
+    return first
+
+
+def cross_vendor_rows(versions: list[dict]) -> list[dict]:
+    """One row per vendor that published, byte for byte, a text another vendor published first."""
+    by_blob: dict[str, list[dict]] = {}
+    for (sha, _vendor), v in first_landings(versions).items():
+        by_blob.setdefault(sha, []).append(v)
+    out = []
+    for sha, vs in sorted(by_blob.items()):
+        if len(vs) < 2:
+            continue
+        vs = sorted(vs, key=lambda v: v["committed_at"])
+        origin = vs[0]
+        for c in vs[1:]:
+            out.append({
+                "blob_sha": sha,
+                "origin_vendor": origin["vendor"], "origin_repo": origin["repo"],
+                "origin_path": origin["path"], "origin_landed_at": origin["committed_at"],
+                "copy_vendor": c["vendor"], "copy_repo": c["repo"], "copy_path": c["path"],
+                "copy_skill_dir": c["skill_dir"], "copy_landed_at": c["committed_at"],
+                "copy_manifest_author": c["manifest_author"],
+                "copy_authorship": c["authorship"],
+                "same_day": origin["committed_at"][:10] == c["committed_at"][:10],
+                "method_version": METHOD_VERSION,
+            })
+    return out
+
+
+def cross_vendor_summary(rows: list[dict]) -> dict:
+    pairs: dict[str, int] = {}
+    for r in rows:
+        k = f"{r['origin_vendor']} -> {r['copy_vendor']}"
+        pairs[k] = pairs.get(k, 0) + 1
+    return {
+        "copies": len(rows),
+        "copy_skills": len({(r["copy_repo"], r["copy_skill_dir"]) for r in rows}),
+        "texts": len({r["blob_sha"] for r in rows}),
+        "same_day": sum(r["same_day"] for r in rows),
+        "copy_manifest_names_copier": sum(r["copy_authorship"] == "first-party" for r in rows),
+        "by_pair": dict(sorted(pairs.items(), key=lambda kv: (-kv[1], kv[0]))),
+    }
+
+
+def mirror_rows(versions: list[dict], occurrence: pa.Table,
+                ex: removal.Exclusions | None = None) -> list[dict]:
     """GitSkills occurrences outside vendor repositories that are byte-identical to a vendor version."""
     vendor_repos = {v["repo"].lower() for v in versions}
     first: dict[str, dict] = {}
-    for v in sorted(versions, key=lambda v: v["committed_at"]):
-        if v["change"] != "deleted":
-            first.setdefault(v["blob_sha"], v)
+    for (sha, _vendor), v in sorted(first_landings(versions).items(),
+                                    key=lambda kv: kv[1]["committed_at"]):
+        first.setdefault(sha, v)
     repos = occurrence.column("repo_full_name").to_pylist()
     paths = occurrence.column("path").to_pylist()
     shas = occurrence.column("blob_sha").to_pylist()
@@ -339,6 +458,8 @@ def mirror_rows(versions: list[dict], occurrence: pa.Table) -> list[dict]:
     for repo, path, sha, folder in zip(repos, paths, shas, folders):
         v = first.get(sha)
         if v is None or (repo or "").lower() in vendor_repos:
+            continue
+        if ex is not None and ex.repo_excluded(repo):
             continue
         out.append({
             "blob_sha": sha, "vendor": v["vendor"], "vendor_repo": v["repo"],
@@ -381,29 +502,36 @@ def summarise(versions: list[dict], skills: list[dict]) -> dict:
 
 
 def run(out: Path = DEFAULT_OUT, clones: Path = DEFAULT_CLONES, vendors_path: Path = VENDORS,
-        offline: bool = False, gitskills: Path | None = None) -> dict:
+        offline: bool = False, gitskills: Path | None = None,
+        exclusions_path: Path = DEFAULT_EXCLUSIONS) -> dict:
     repos = load_vendors(vendors_path)
+    ex = removal.load(exclusions_path)
     out.mkdir(parents=True, exist_ok=True)
-    versions, pinned = [], []
+    versions, pinned, skipped = [], [], []
     for cfg in repos:
+        if ex.repo_excluded(cfg["repo"]):
+            skipped.append(cfg["repo"])
+            continue
         dest = clones / cfg["repo"].replace("/", "__")
         head = clone_or_update(cfg["repo"], dest, offline=offline)
         changes = skill_changes(dest)
         attach_authorship(changes, dest, cfg["names"], cfg["partner_paths"])
-        rows = version_rows(cfg, changes)
+        rows = version_rows(cfg, changes, ex)
         versions.extend(rows)
         pinned.append({"vendor": cfg["vendor"], "repo": cfg["repo"], "head": head,
                        "license": cfg["license"], "version_rows": len(rows)})
         print(f"{cfg['repo']}: {len(rows)} SKILL.md changes at {head[:12]}", file=sys.stderr)
     skills = skill_rows(versions)
     source = "vendor repositories listed in crawlers/atlas/vendors.json"
+    cross = cross_vendor_rows(versions)
     outputs = [_write(_table(versions, VERSION_SCHEMA), out / "version.parquet", source),
-               _write(_table(skills), out / "skill.parquet", source)]
+               _write(_table(skills), out / "skill.parquet", source),
+               _write(_table(cross), out / "cross_vendor.parquet", source)]
     mirror_summary = None
     if gitskills is not None:
         occ = pq.read_table(gitskills / "occurrence.parquet",
                             columns=["repo_full_name", "path", "blob_sha", "platform_folder"])
-        mirrors = mirror_rows(versions, occ)
+        mirrors = mirror_rows(versions, occ, ex)
         outputs.append(_write(_table(mirrors), out / "mirror.parquet",
                               "GitSkills occurrence table matched to vendor versions"))
         gm = json.loads((gitskills / "manifest.json").read_text(encoding="utf-8"))
@@ -420,7 +548,14 @@ def run(out: Path = DEFAULT_OUT, clones: Path = DEFAULT_CLONES, vendors_path: Pa
         "vendors_config": {"path": "crawlers/atlas/vendors.json",
                            "sha256": hashlib.sha256(vendors_path.read_bytes()).hexdigest()},
         "repos": pinned,
+        "removal_list": {
+            "path": "data/exclusions.json",
+            "sha256": hashlib.sha256(Path(exclusions_path).read_bytes()).hexdigest(),
+            "stats": {"repos_excluded": skipped,
+                      "versions_removal_listed": sum(v["removal_listed"] for v in versions)},
+        },
         "summary": summarise(versions, skills),
+        "cross_vendor": cross_vendor_summary(cross),
         "mirror": mirror_summary,
         "outputs": outputs,
     }
@@ -434,10 +569,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--clones", type=Path, default=DEFAULT_CLONES)
     ap.add_argument("--vendors", type=Path, default=VENDORS)
     ap.add_argument("--offline", action="store_true", help="reuse existing clones without fetching")
+    ap.add_argument("--exclusions", type=Path, default=DEFAULT_EXCLUSIONS)
     ap.add_argument("--gitskills", type=Path, default=None,
                     help="GitSkills import output directory, to match exact copies")
     args = ap.parse_args(argv)
-    m = run(args.out, args.clones, args.vendors, args.offline, args.gitskills)
+    m = run(args.out, args.clones, args.vendors, args.offline, args.gitskills, args.exclusions)
     print(json.dumps(m["summary"], indent=2))
     return 0
 

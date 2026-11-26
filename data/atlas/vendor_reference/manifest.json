@@ -1,6 +1,6 @@
 {
-  "method_version": "vendor-reference/1.0.0",
-  "built_at": "2026-11-26T19:55:18+00:00",
+  "method_version": "vendor-reference/1.1.0",
+  "built_at": "2026-11-26T20:04:13+00:00",
   "attribution": {
     "license": "CC-BY-4.0",
     "attribution": "Skill Map vendor reference set by Dave Holmes-Kinsella and contributors (https://github.com/dhk/skill-map). Pointers to files in each vendor's public repository; no file text is included."
@@ -151,6 +151,14 @@
       "version_rows": 222
     }
   ],
+  "removal_list": {
+    "path": "data/exclusions.json",
+    "sha256": "5f0bf7a29b324c4ef6a348437c28bfef3b289c0035ee832cfdf3bf52c380c5ad",
+    "stats": {
+      "repos_excluded": [],
+      "versions_removal_listed": 24
+    }
+  },
   "summary": {
     "version_rows": 8168,
     "distinct_blobs": 5111,
@@ -194,9 +202,9 @@
       "Microsoft": {
         "skill_paths": 1057,
         "present_at_head": 500,
-        "first-party": 462,
+        "first-party": 473,
         "other-author": 10,
-        "unstated": 585
+        "unstated": 574
       },
       "OpenAI": {
         "skill_paths": 1020,
@@ -221,27 +229,37 @@
       }
     }
   },
-  "mirror": {
-    "gitskills_revision": "ebab17454a7c236f8f26b183567f1a126f42e3f8",
-    "copies": 74596,
-    "copy_repos": 9699,
-    "vendor_blobs_copied": 2445
+  "cross_vendor": {
+    "copies": 24,
+    "copy_skills": 22,
+    "texts": 23,
+    "same_day": 7,
+    "copy_manifest_names_copier": 4,
+    "by_pair": {
+      "Hugging Face -> OpenAI": 8,
+      "Cloudflare -> OpenAI": 6,
+      "Supabase -> OpenAI": 5,
+      "Anthropic -> Microsoft": 2,
+      "Vercel -> OpenAI": 2,
+      "Anthropic -> Supabase": 1
+    }
   },
+  "mirror": null,
   "outputs": [
     {
       "path": "version.parquet",
       "rows": 8168,
-      "sha256": "a48bd4b2a55cd5bc5c70251923ce373bcfd860fac53abb82a4584f622f08aef6"
+      "sha256": "99bd62289e7c8cff8e35534a712cdb94a81a2182eea2654b9043b4999a004418"
     },
     {
       "path": "skill.parquet",
       "rows": 2709,
-      "sha256": "a9e2df0ad4cc3cf2fde9f2b3548fb4d73bb11d47550464cb083344e92fa4ba8a"
+      "sha256": "57c39086bb6f18f2c34934bda2f78109a61bf4edb29438dfca051bfdf7c514ac"
     },
     {
-      "path": "mirror.parquet",
-      "rows": 74596,
-      "sha256": "0eecd042c9f757f71ceaa9d914c6a5c31d7c4ff95a81c39355f9f0c5b2b8804f"
+      "path": "cross_vendor.parquet",
+      "rows": 24,
+      "sha256": "5aa189be1573daec0b978f98f9ff3bed8aaae3813acd52d87b5630c9e9880544"
     }
   ]
 }

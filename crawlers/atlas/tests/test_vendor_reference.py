@@ -58,6 +58,13 @@ def vendor_repo(tmp_path: Path) -> dict:
     write(repo, "partner-built/gamma/SKILL.md", "gamma v1\n")
     write(repo, "SKILL.md", "root\n")
     write(repo, "plugins/core/skills/alpha/README.md", "not a skill\n")
+    # A manifest that is a symlink to a shared .plugin/ folder, and a .cursor-plugin folder.
+    write(repo, "plugins/linked/.plugin/plugin.json", json.dumps({"author": {"name": "Acme Inc"}}))
+    (repo / "plugins/linked/.claude-plugin").mkdir(parents=True)
+    os.symlink("../.plugin/plugin.json", repo / "plugins/linked/.claude-plugin/plugin.json")
+    write(repo, "plugins/linked/skills/eps/SKILL.md", "eps\n")
+    write(repo, "plugins/cur/.cursor-plugin/plugin.json", json.dumps({"author": "Initech"}))
+    write(repo, "plugins/cur/skills/zeta/SKILL.md", "zeta\n")
     c1 = commit(repo, "first", "2026-01-01T00:00:00+00:00")
 
     # A change made on a branch and merged later: it lands when the merge does.
@@ -181,11 +188,77 @@ def test_classify_names_are_case_insensitive_substrings():
     assert vr.classify("Acme", "partner-built/x", ["Acme"], ["partner-built/"]) == ("first-party", "manifest")
 
 
-def test_manifest_candidates_nearest_first():
-    c = vr.manifest_candidates("a/b/SKILL.md")
-    assert c[:2] == ["a/b/.claude-plugin/plugin.json", "a/b/.codex-plugin/plugin.json"]
-    assert c[-1] == ".codex-plugin/plugin.json"
-    assert vr.manifest_candidates("SKILL.md") == [".claude-plugin/plugin.json", ".codex-plugin/plugin.json"]
+def test_symlinked_manifest_is_followed(vendor_repo):
+    e = by_path(changes(vendor_repo), "plugins/linked/skills/eps/SKILL.md")
+    assert e["plugin_manifest"] == "plugins/linked/.claude-plugin/plugin.json"
+    assert (e["manifest_author"], e["authorship"]) == ("Acme Inc", "first-party")
+
+
+def test_any_plugin_folder_counts(vendor_repo):
+    z = by_path(changes(vendor_repo), "plugins/cur/skills/zeta/SKILL.md")
+    assert z["plugin_manifest"] == "plugins/cur/.cursor-plugin/plugin.json"
+    assert (z["manifest_author"], z["authorship"]) == ("Initech", "other-author")
+
+
+def test_ancestor_dirs_nearest_first():
+    assert vr.ancestor_dirs("a/b/SKILL.md") == ["a/b", "a", ""]
+    assert vr.ancestor_dirs("SKILL.md") == [""]
+
+
+def test_plugin_dirs_order_and_filter():
+    entries = [("40000", ".plugin"), ("40000", ".zed-plugin"), ("40000", ".codex-plugin"),
+               ("40000", ".claude-plugin"), ("100644", ".cursor-plugin"), ("40000", "plugin"),
+               ("40000", ".github")]
+    assert vr.plugin_dirs(entries) == [".claude-plugin", ".codex-plugin", ".plugin", ".zed-plugin"]
+
+
+def test_dates_are_utc_and_sort_as_time(tmp_path):
+    repo = tmp_path / "tz"
+    repo.mkdir()
+    sh(repo, "init", "-q", "-b", "main")
+    write(repo, "a/SKILL.md", "a\n")
+    commit(repo, "east", "2026-06-01T20:00:00+09:00")   # 11:00 UTC
+    write(repo, "a/SKILL.md", "a2\n")
+    commit(repo, "west", "2026-06-01T08:00:00-07:00")   # 15:00 UTC, earlier as local text
+    rows = vr.skill_changes(repo)
+    assert [r["committed_at"] for r in rows] == ["2026-06-01T11:00:00Z", "2026-06-01T15:00:00Z"]
+    assert rows[0]["authored_at"] == "2026-06-01T11:00:00Z"
+
+
+def _v(vendor, repo, path, sha, at, author=None, authorship="unstated", change="added"):
+    return {"vendor": vendor, "repo": repo, "path": path, "skill_dir": path.rsplit("/", 1)[0],
+            "blob_sha": sha, "committed_at": at, "change": change,
+            "manifest_author": author, "authorship": authorship}
+
+
+def test_cross_vendor_rows():
+    versions = [
+        _v("X", "x/r", "s/one/SKILL.md", "a" * 40, "2026-03-01T11:00:00Z"),
+        _v("Y", "y/r", "p/one/SKILL.md", "a" * 40, "2026-03-01T15:00:00Z", "Y", "first-party"),
+        _v("Y", "y/r", "q/one/SKILL.md", "a" * 40, "2026-04-01T00:00:00Z"),  # same vendor again: not a new copy
+        _v("Z", "z/r", "two/SKILL.md", "b" * 40, "2026-05-01T00:00:00Z", change="deleted"),
+        _v("X", "x/r", "two/SKILL.md", "b" * 40, "2026-06-01T00:00:00Z"),  # Z only had it as a delete
+        _v("X", "x/r", "solo/SKILL.md", "c" * 40, "2026-01-01T00:00:00Z"),
+    ]
+    rows = vr.cross_vendor_rows(versions)
+    assert len(rows) == 1
+    r = rows[0]
+    assert (r["origin_vendor"], r["copy_vendor"], r["copy_path"]) == ("X", "Y", "p/one/SKILL.md")
+    assert r["same_day"] and r["copy_authorship"] == "first-party"
+    s = vr.cross_vendor_summary(rows)
+    assert s == {"copies": 1, "copy_skills": 1, "texts": 1, "same_day": 1,
+                 "copy_manifest_names_copier": 1, "by_pair": {"X -> Y": 1}}
+
+
+def test_removal_list_flags_blobs_and_skips_copy_repos(vendor_repo):
+    from crawlers.exclusions import Exclusions
+    ex = Exclusions({"bad/fork"}, {blob("alpha v1\n")})
+    versions = vr.version_rows(CFG, changes(vendor_repo), ex)
+    flagged = {v["path"] for v in versions if v["removal_listed"]}
+    assert flagged == {"plugins/core/skills/alpha/SKILL.md"}
+    occ = pa.table({"repo_full_name": ["bad/fork", "good/fork"], "path": ["SKILL.md"] * 2,
+                    "blob_sha": [blob("eps\n")] * 2, "platform_folder": [None, None]})
+    assert [m["copy_repo"] for m in vr.mirror_rows(versions, occ, ex)] == ["good/fork"]
 
 
 # ---------------------------------------------------------------- tables
@@ -250,11 +323,20 @@ def test_run_end_to_end(vendor_repo, tmp_path):
         "repo_full_name": ["someone/fork"], "path": ["SKILL.md"],
         "blob_sha": [blob("alpha v2\n")], "platform_folder": [None]}), gs / "occurrence.parquet")
     (gs / "manifest.json").write_text(json.dumps({"revision": "abc"}))
+    exc = tmp_path / "exclusions.json"
+    exc.write_text(json.dumps({"repos": [{"repo": "other/skills"}], "blobs": []}))
+    cfg_doc = json.loads(cfg.read_text())
+    cfg_doc["vendors"]["Other"] = {"repos": [{"repo": "other/skills"}]}  # on the removal list, never cloned
+    cfg.write_text(json.dumps(cfg_doc))
     out = tmp_path / "out"
-    m = vr.run(out=out, clones=vendor_repo["dir"].parent, vendors_path=cfg, offline=True, gitskills=gs)
+    m = vr.run(out=out, clones=vendor_repo["dir"].parent, vendors_path=cfg, offline=True,
+               gitskills=gs, exclusions_path=exc)
+    assert m["removal_list"]["stats"]["repos_excluded"] == ["other/skills"]
+    assert m["cross_vendor"]["copies"] == 0
     assert m["repos"][0]["head"] == vendor_repo["last"]
     assert m["mirror"] == {"gitskills_revision": "abc", "copies": 1, "copy_repos": 1, "vendor_blobs_copied": 1}
-    assert {o["path"] for o in m["outputs"]} == {"version.parquet", "skill.parquet", "mirror.parquet"}
+    assert {o["path"] for o in m["outputs"]} == {"version.parquet", "skill.parquet",
+                                              "cross_vendor.parquet", "mirror.parquet"}
     t = pq.read_table(out / "version.parquet")
     assert t.num_rows == m["summary"]["version_rows"]
     assert json.loads(t.schema.metadata[b"attribution"])["license"] == "CC-BY-4.0"
