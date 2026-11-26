@@ -1,6 +1,6 @@
 {
   "method_version": "vendor-reference/1.1.0",
-  "built_at": "2026-11-26T20:04:13+00:00",
+  "built_at": "2026-11-26T20:36:03+00:00",
   "attribution": {
     "license": "CC-BY-4.0",
     "attribution": "Skill Map vendor reference set by Dave Holmes-Kinsella and contributors (https://github.com/dhk/skill-map). Pointers to files in each vendor's public repository; no file text is included."
@@ -244,7 +244,12 @@
       "Anthropic -> Supabase": 1
     }
   },
-  "mirror": null,
+  "mirror": {
+    "gitskills_revision": "ebab17454a7c236f8f26b183567f1a126f42e3f8",
+    "copies": 74596,
+    "copy_repos": 9699,
+    "vendor_blobs_copied": 2445
+  },
   "outputs": [
     {
       "path": "version.parquet",
@@ -260,6 +265,11 @@
       "path": "cross_vendor.parquet",
       "rows": 24,
       "sha256": "5aa189be1573daec0b978f98f9ff3bed8aaae3813acd52d87b5630c9e9880544"
+    },
+    {
+      "path": "mirror.parquet",
+      "rows": 74596,
+      "sha256": "7d6612b43fa9d842c0329b3fd5818d6b82b8397b3a55bfc730ea8a54567171b1"
     }
   ]
 }
