@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How vendor skills get copied · Skill Concepts Atlas</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+<style>
+.viz-root {
+  color-scheme: light;
+  --surface-0: #f7f7f5;
+  --surface-1: #ffffff;
+  --surface-2: #f0f0ee;
+  --border: #e2e2df;
+  --grid: #ececea;
+  --text-primary: #191919;
+  --text-secondary: #666666;
+  --text-muted: #8a8a8a;
+  --neutral-node: #b9b9b4;
+  --link-neutral: #c9c9c4;
+  --series-1: #257de0; --series-2: #f47230; --series-3: #00b894; --series-4: #f2a600;
+  --series-5: #ee7fac; --series-6: #008a17; --series-7: #6a4ce2; --series-8: #ec4647;
+  --series-other: #9a9a94;
+  --focus: #191919;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .viz-root {
+    color-scheme: dark;
+    --surface-0: #111111; --surface-1: #191919; --surface-2: #232323;
+    --border: #333333; --grid: #2a2a2a;
+    --text-primary: #efefef; --text-secondary: #9c9c9c; --text-muted: #7a7a7a;
+    --neutral-node: #5a5a5a; --link-neutral: #444444;
+    --series-1: #338ced; --series-2: #e76624; --series-3: #00a888; --series-4: #d28e05;
+    --series-5: #e24d8b; --series-6: #0aac23; --series-7: #9887ef; --series-8: #eb6263;
+    --series-other: #7d7d78; --focus: #efefef;
+  }
+}
+:root[data-theme="dark"] .viz-root {
+  color-scheme: dark;
+  --surface-0: #111111; --surface-1: #191919; --surface-2: #232323;
+  --border: #333333; --grid: #2a2a2a;
+  --text-primary: #efefef; --text-secondary: #9c9c9c; --text-muted: #7a7a7a;
+  --neutral-node: #5a5a5a; --link-neutral: #444444;
+  --series-1: #338ced; --series-2: #e76624; --series-3: #00a888; --series-4: #d28e05;
+  --series-5: #e24d8b; --series-6: #0aac23; --series-7: #9887ef; --series-8: #eb6263;
+  --series-other: #7d7d78; --focus: #efefef;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+.viz-root {
+  font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--surface-0); color: var(--text-primary); min-height: 100vh;
+  padding: 28px clamp(16px, 4vw, 48px) 48px;
+}
+h1 { font-size: 24px; font-weight: 650; margin: 0 0 6px; letter-spacing: -0.01em; }
+.lede { color: var(--text-secondary); max-width: 760px; margin: 0 0 20px; }
+.tiles { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; min-width: 170px; }
+.tile .v { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.tile .l { color: var(--text-secondary); font-size: 12.5px; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.tabs button { background: none; border: 0; border-bottom: 2px solid transparent; color: var(--text-secondary);
+  font: inherit; font-weight: 550; padding: 8px 12px; cursor: pointer; }
+.tabs button[aria-selected="true"] { color: var(--text-primary); border-bottom-color: var(--text-primary); }
+.tabs button:focus-visible, .controls :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.panel { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px 16px 8px; margin-bottom: 18px; }
+.panel h2 { font-size: 15px; font-weight: 650; margin: 0 0 2px; }
+.panel .sub { color: var(--text-secondary); font-size: 12.5px; margin: 0 0 10px; }
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; margin: 4px 0 12px; font-size: 13px; color: var(--text-secondary); }
+.controls label { display: inline-flex; gap: 8px; align-items: center; }
+.controls input[type="range"] { width: 140px; }
+.controls input[type="search"] { font: inherit; padding: 5px 8px; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--surface-1); color: var(--text-primary); width: 220px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--text-secondary); margin: 2px 0 8px; }
+.legend .chip { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+.legend .chip[aria-pressed="false"] { opacity: 0.35; }
+.legend .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+svg text { fill: var(--text-primary); font-size: 11.5px; paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; stroke-linejoin: round; }
+svg text.muted { fill: var(--text-secondary); }
+.tooltip { position: fixed; pointer-events: none; background: var(--surface-1); color: var(--text-primary);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; line-height: 1.4;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12); max-width: 320px; opacity: 0; transition: opacity 80ms; z-index: 10; }
+.tooltip b { font-weight: 650; }
+.tooltip .k { color: var(--text-secondary); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--grid); }
+th { color: var(--text-secondary); font-weight: 550; cursor: pointer; white-space: nowrap; }
+td.n, th.n { text-align: right; }
+.note { color: var(--text-muted); font-size: 12px; margin-top: 18px; max-width: 900px; }
+.empty { color: var(--text-secondary); padding: 40px 0; text-align: center; }
+#graph svg { cursor: grab; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <h1>How vendor skills get copied</h1>
+  <p class="lede">Every SKILL.md file in public GitHub repositories (from GitSkills) that is
+  byte-identical to a version a vendor published. Edited copies are not counted yet.</p>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="publish">Publication view</button>
+    <button role="tab" aria-selected="false" data-tab="explore">Explore the graph</button>
+    <button role="tab" aria-selected="false" data-tab="table">Table</button>
+  </div>
+
+  <section data-panel="publish">
+    <div class="panel">
+      <h2>From vendor, to skill, to where copies land</h2>
+      <p class="sub">Band width is the number of copied files. The middle column shows the most
+      copied skills; the rest of each vendor's skills are grouped. The right column is the
+      agent folder the copy sits in.</p>
+      <div class="controls">
+        <label>Skills shown <input type="range" id="sk-n" min="5" max="60" value="25"><span id="sk-n-v">25</span></label>
+      </div>
+      <div class="legend" id="legend-sankey"></div>
+      <div id="sankey"></div>
+    </div>
+    <div class="panel">
+      <h2>Between vendors</h2>
+      <p class="sub">Skills one vendor published that another vendor later shipped unchanged.
+      Band width is the number of copies.</p>
+      <div id="sankey-vendors"></div>
+    </div>
+  </section>
+
+  <section data-panel="explore" hidden>
+    <div class="panel">
+      <h2>Skills and the repositories that copy them</h2>
+      <p class="sub">Coloured circles are vendor skills, sized by how many repositories copy them.
+      Grey dots are repositories; an arrow runs from a skill to each repository holding a copy.
+      Drag to move, scroll to zoom, click a node to focus on its neighbours.</p>
+      <div class="controls">
+        <label>Top skills <input type="range" id="g-sk" min="10" max="300" value="80"><span id="g-sk-v">80</span></label>
+        <label>Repos copying at least <input type="range" id="g-min" min="3" max="40" value="8"><span id="g-min-v">8</span> skills</label>
+        <label><input type="search" id="g-q" placeholder="Find a skill or repository"></label>
+      </div>
+      <div class="legend" id="legend-graph"></div>
+      <div id="graph"></div>
+    </div>
+  </section>
+
+  <section data-panel="table" hidden>
+    <div class="panel">
+      <h2>Most copied vendor skills</h2>
+      <p class="sub">Click a column to sort.</p>
+      <div id="table"></div>
+    </div>
+  </section>
+
+  <p class="note" id="note"></p>
+  <div class="tooltip" id="tip" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+(async function () {
+  const VENDOR_ORDER = ["Anthropic", "OpenAI", "Microsoft", "Google", "Hugging Face", "Vercel", "Cloudflare"];
+  const css = getComputedStyle(document.querySelector(".viz-root"));
+  const colorVar = v => {
+    const i = VENDOR_ORDER.indexOf(v);
+    return i >= 0 ? `var(--series-${i + 1})` : "var(--series-other)";
+  };
+  const vendorGroup = v => VENDOR_ORDER.includes(v) ? v : "Other vendors";
+  const fmt = d3.format(",");
+  const PLATFORM_LABEL = { claude: ".claude", agents: ".agents", codex: ".codex", cursor: ".cursor",
+    github: ".github", opencode: ".opencode", gemini: ".gemini", kiro: ".kiro", windsurf: ".windsurf",
+    other: "Other locations" };
+
+  let data;
+  const inline = document.getElementById("copy-flow-data");
+  if (inline) data = JSON.parse(inline.textContent);
+  else {
+    try { data = await (await fetch("data/atlas/vendor_reference/copy_flow.json")).json(); }
+    catch (e) {
+      document.getElementById("sankey").innerHTML =
+        '<p class="empty">No copy-flow data yet. Run <code>python -m crawlers.atlas.copy_flow</code>.</p>';
+      return;
+    }
+  }
+
+  const tip = document.getElementById("tip");
+  function showTip(html, ev) {
+    tip.innerHTML = html; tip.style.opacity = 1;
+    const x = Math.min(ev.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+    const y = Math.min(ev.clientY + 14, window.innerHeight - tip.offsetHeight - 8);
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  }
+  const hideTip = () => { tip.style.opacity = 0; };
+  // Two vendors can publish skills with the same folder name; label those with their repo.
+  const nameCount = d3.rollup(data.skills, v => v.length, s => s.name);
+  const repoShort = s => s.repo.split("/").pop();
+  const nameRepoCount = d3.rollup(data.skills, v => v.length, s => s.name + "|" + s.repo);
+  data.skills.forEach(s => {
+    s.label = nameCount.get(s.name) === 1 ? s.name
+      : nameRepoCount.get(s.name + "|" + s.repo) === 1 ? `${s.name} (${repoShort(s)})`
+      : `${s.name} (${repoShort(s)}/${s.path.split("/")[0]})`;
+  });
+  const skillById = new Map(data.skills.map(s => [s.id, s]));
+  const skillTip = s => `<b>${s.label || s.name}</b> <span class="k">· ${s.vendor}</span><br>
+    <span class="k">${s.repo}/${s.path}</span><br>
+    ${fmt(s.copy_repos)} repositories · ${fmt(s.copies)} files<br>
+    ${s.versions_copied} of ${s.versions ?? "?"} versions copied
+    ${s.authorship ? `<br><span class="k">Manifest author: ${s.manifest_author ?? "not stated"}</span>` : ""}`;
+
+  // ---------------------------------------------------------------- tiles
+  const t = data.totals;
+  const tiles = [
+    [fmt(t.copies), "copied files"],
+    [fmt(t.copy_repos), "repositories holding a copy"],
+    [`${fmt(t.skills_copied)} of ${fmt(t.skills_published)}`, "vendor skills copied at least once"],
+    [fmt(data.cross_vendor.length), "copies between vendors"],
+  ];
+  document.getElementById("tiles").innerHTML = tiles.map(([v, l]) =>
+    `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+  // ---------------------------------------------------------------- legends
+  const groups = [...VENDOR_ORDER, "Other vendors"].filter(g =>
+    data.skills.some(s => vendorGroup(s.vendor) === g));
+  const active = new Set(groups);
+  function legend(el, onToggle) {
+    el.innerHTML = "";
+    groups.forEach(g => {
+      const b = document.createElement("span");
+      b.className = "chip"; b.setAttribute("role", "button"); b.tabIndex = 0;
+      b.setAttribute("aria-pressed", active.has(g));
+      b.innerHTML = `<span class="sw" style="background:${colorVar(g === "Other vendors" ? "" : g)}"></span>${g}`;
+      const toggle = () => {
+        if (active.has(g) && active.size > 1) active.delete(g); else active.add(g);
+        drawAll();
+      };
+      b.onclick = toggle;
+      b.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } };
+      el.appendChild(b);
+    });
+  }
+
+  // ---------------------------------------------------------------- sankey
+  function drawSankey() {
+    const host = document.getElementById("sankey");
+    host.innerHTML = "";
+    const n = +document.getElementById("sk-n").value;
+    const skills = data.skills.filter(s => active.has(vendorGroup(s.vendor)));
+    if (!skills.length) { host.innerHTML = '<p class="empty">No skills for this selection.</p>'; return; }
+    const top = skills.slice().sort((a, b) => b.copies - a.copies).slice(0, n);
+    const topIds = new Set(top.map(s => s.id));
+    const nodes = [], idx = new Map();
+    const node = (id, attrs) => { if (!idx.has(id)) { idx.set(id, nodes.length); nodes.push({ id, ...attrs }); } return idx.get(id); };
+    const links = [];
+    const add = (s, tgt, v, attrs) => { if (v > 0) links.push({ source: s, target: tgt, value: v, ...attrs }); };
+    const restByVendor = new Map();
+    skills.forEach(s => {
+      const g = vendorGroup(s.vendor);
+      const vNode = node("v:" + g, { kind: "vendor", label: g, group: g });
+      let mid;
+      if (topIds.has(s.id)) mid = node("s:" + s.id, { kind: "skill", label: s.label, group: g, skill: s });
+      else {
+        mid = node("r:" + g, { kind: "rest", label: g === "Other vendors" ? "Skills from other vendors" : `Other ${g} skills`, group: g, count: 0 });
+        nodes[mid].count = (nodes[mid].count || 0) + 1;
+      }
+      add(vNode, mid, s.copies, { group: g });
+      Object.entries(s.by_platform).forEach(([p, c]) => {
+        const pNode = node("p:" + p, { kind: "platform", label: PLATFORM_LABEL[p] || p, group: null });
+        add(mid, pNode, c.copies, { group: g });
+      });
+    });
+    // merge duplicate links (rest buckets)
+    const merged = new Map();
+    links.forEach(l => { const k = l.source + ">" + l.target; if (merged.has(k)) merged.get(k).value += l.value; else merged.set(k, { ...l }); });
+    const W = Math.max(720, host.clientWidth), H = Math.max(420, Math.min(1400, 22 * (top.length + groups.length + 4)));
+    const svg = d3.select(host).append("svg").attr("viewBox", [0, 0, W, H]).attr("width", "100%")
+      .attr("role", "img").attr("aria-label", "Sankey diagram of copies from vendor to skill to agent folder");
+    const gOrder = g => { const i = groups.indexOf(g); return i < 0 ? 99 : i; };
+    const sankey = d3.sankey().nodeId(d => d.index).nodeWidth(10).nodePadding(8)
+      .nodeAlign(d3.sankeyJustify).extent([[150, 8], [W - 120, H - 8]])
+      .nodeSort((a, b) => a.kind === "platform" || b.kind === "platform"
+        ? (a.id === "p:other") - (b.id === "p:other") || b.value - a.value
+        : gOrder(a.group) - gOrder(b.group) || (a.kind === "rest") - (b.kind === "rest") || b.value - a.value)
+      .linkSort((a, b) => gOrder(a.group) - gOrder(b.group) || b.value - a.value);
+    const graph = sankey({ nodes: nodes.map(d => ({ ...d })), links: [...merged.values()].map(d => ({ ...d })) });
+    svg.append("g").attr("fill", "none").selectAll("path").data(graph.links).join("path")
+      .attr("d", d3.sankeyLinkHorizontal())
+      .attr("stroke", d => d.group ? colorVar(d.group === "Other vendors" ? "" : d.group) : "var(--link-neutral)")
+      .attr("stroke-opacity", 0.32).attr("stroke-width", d => Math.max(1, d.width))
+      .on("mousemove", (ev, d) => showTip(`${d.source.label} → ${d.target.label}<br><b>${fmt(d.value)}</b> copied files`, ev))
+      .on("mouseleave", hideTip);
+    svg.append("g").selectAll("rect").data(graph.nodes).join("rect")
+      .attr("x", d => d.x0).attr("y", d => d.y0).attr("width", d => d.x1 - d.x0)
+      .attr("height", d => Math.max(1, d.y1 - d.y0)).attr("rx", 2)
+      .attr("fill", d => d.group ? colorVar(d.group === "Other vendors" ? "" : d.group) : "var(--neutral-node)")
+      .on("mousemove", (ev, d) => {
+        const body = d.kind === "skill" ? skillTip(d.skill)
+          : d.kind === "rest" ? `<b>${d.label}</b><br>${fmt(d.count)} skills · ${fmt(d.value)} copied files`
+          : `<b>${d.label}</b><br>${fmt(d.value)} copied files`;
+        showTip(body, ev);
+      }).on("mouseleave", hideTip);
+    svg.append("g").selectAll("text").data(graph.nodes).join("text")
+      .attr("x", d => d.x0 < W / 2 ? d.x0 - 6 : d.x1 + 6)
+      .attr("y", d => (d.y0 + d.y1) / 2).attr("dy", "0.35em")
+      .attr("text-anchor", d => d.x0 < W / 2 ? "end" : "start")
+      .attr("class", d => d.kind === "rest" ? "muted" : null)
+      .text(d => (d.y1 - d.y0) < 4 && d.kind !== "vendor" ? "" : d.kind === "skill" || d.kind === "rest" ? `${d.label} · ${fmt(d.value)}` : d.label)
+      .each(function (d) { if (d.kind === "skill" && d.x0 > 150 && d.x1 < W - 120) d3.select(this).attr("x", d.x1 + 6).attr("text-anchor", "start"); });
+  }
+
+  function drawVendorSankey() {
+    const host = document.getElementById("sankey-vendors");
+    host.innerHTML = "";
+    const pairs = d3.rollups(data.cross_vendor, v => v.length, d => d.origin_vendor, d => d.copy_vendor);
+    if (!pairs.length) { host.innerHTML = '<p class="empty">No copies between vendors.</p>'; return; }
+    const nodes = [], idx = new Map(), links = [];
+    const node = (id, label, group) => { if (!idx.has(id)) { idx.set(id, nodes.length); nodes.push({ id, label, group }); } return idx.get(id); };
+    pairs.forEach(([o, cs]) => cs.forEach(([c, n]) => {
+      links.push({ source: node("o:" + o, o, o), target: node("c:" + c, c, c), value: n, group: o });
+    }));
+    const W = Math.max(600, host.clientWidth), H = 60 + 26 * nodes.length;
+    const svg = d3.select(host).append("svg").attr("viewBox", [0, 0, W, H]).attr("width", "100%")
+      .attr("role", "img").attr("aria-label", "Sankey diagram of copies between vendors");
+    const g = d3.sankey().nodeId(d => d.index).nodeWidth(10).nodePadding(14).extent([[140, 10], [W - 140, H - 10]])(
+      { nodes: nodes.map(d => ({ ...d })), links: links.map(d => ({ ...d })) });
+    svg.append("g").attr("fill", "none").selectAll("path").data(g.links).join("path")
+      .attr("d", d3.sankeyLinkHorizontal()).attr("stroke", d => colorVar(d.group))
+      .attr("stroke-opacity", 0.35).attr("stroke-width", d => Math.max(1, d.width))
+      .on("mousemove", (ev, d) => {
+        const rows = data.cross_vendor.filter(c => c.origin_vendor === d.source.label && c.copy_vendor === d.target.label);
+        const names = [...new Set(rows.map(r => r.copy_path.split("/").slice(-2, -1)[0]))];
+        showTip(`<b>${d.source.label} → ${d.target.label}</b><br>${d.value} copies<br><span class="k">${names.join(", ")}</span>`, ev);
+      }).on("mouseleave", hideTip);
+    svg.append("g").selectAll("rect").data(g.nodes).join("rect")
+      .attr("x", d => d.x0).attr("y", d => d.y0).attr("width", d => d.x1 - d.x0)
+      .attr("height", d => Math.max(1, d.y1 - d.y0)).attr("rx", 2).attr("fill", d => colorVar(d.group));
+    svg.append("g").selectAll("text").data(g.nodes).join("text")
+      .attr("x", d => d.x0 < W / 2 ? d.x0 - 6 : d.x1 + 6).attr("y", d => (d.y0 + d.y1) / 2).attr("dy", "0.35em")
+      .attr("text-anchor", d => d.x0 < W / 2 ? "end" : "start")
+      .text(d => `${d.label} (${d.value})`);
+  }
+
+  // ---------------------------------------------------------------- graph
+  let sim;
+  function drawGraph() {
+    const host = document.getElementById("graph");
+    if (host.closest("section").hidden) return;
+    host.innerHTML = "";
+    if (sim) sim.stop();
+    const nSk = +document.getElementById("g-sk").value;
+    const minSk = +document.getElementById("g-min").value;
+    const q = document.getElementById("g-q").value.trim().toLowerCase();
+    const skills = data.skills.filter(s => active.has(vendorGroup(s.vendor))).slice(0, nSk);
+    const skillSet = new Set(skills.map(s => s.id));
+    const edges = data.edges.filter(e => skillSet.has(e.skill));
+    const repoDeg = d3.rollup(edges, v => v.length, e => e.repo);
+    const repos = data.repos.filter(r => (repoDeg.get(r.repo) || 0) >= minSk);
+    const repoSet = new Set(repos.map(r => r.repo));
+    const E = edges.filter(e => repoSet.has(e.repo));
+    if (!E.length) { host.innerHTML = '<p class="empty">No repositories meet this threshold. Lower it or show more skills.</p>'; return; }
+    const usedSkills = new Set(E.map(e => e.skill));
+    const shown = skills.filter(s => usedSkills.has(s.id));
+    const rSkill = d3.scaleSqrt().domain([0, d3.max(shown, s => s.copy_repos) || 1]).range([3, 20]);
+    const rRepo = d3.scaleSqrt().domain([0, d3.max(repos, r => repoDeg.get(r.repo)) || 1]).range([1.5, 6]);
+    const nodes = [
+      ...shown.map(s => ({ id: s.id, kind: "skill", s, r: rSkill(s.copy_repos) })),
+      ...repos.map(r => ({ id: "repo:" + r.repo, kind: "repo", repo: r, deg: repoDeg.get(r.repo), r: rRepo(repoDeg.get(r.repo)) })),
+    ];
+    const links = E.map(e => ({ source: e.skill, target: "repo:" + e.repo, copies: e.copies }));
+    const W = Math.max(720, host.clientWidth), H = 640;
+    const svg = d3.select(host).append("svg").attr("viewBox", [0, 0, W, H]).attr("width", "100%")
+      .attr("role", "img").attr("aria-label", "Network of vendor skills and the repositories that copy them");
+    svg.append("defs").append("marker").attr("id", "arrow").attr("viewBox", "0 -4 8 8").attr("refX", 8).attr("refY", 0)
+      .attr("markerWidth", 5).attr("markerHeight", 5).attr("orient", "auto")
+      .append("path").attr("d", "M0,-4L8,0L0,4").attr("fill", "var(--link-neutral)");
+    const root = svg.append("g");
+    svg.call(d3.zoom().scaleExtent([0.2, 6]).on("zoom", ev => root.attr("transform", ev.transform)));
+    const link = root.append("g").selectAll("line").data(links).join("line")
+      .attr("stroke", "var(--link-neutral)").attr("stroke-width", 0.8).attr("stroke-opacity", 0.55)
+      .attr("marker-end", links.length < 2500 ? "url(#arrow)" : null);
+    const node = root.append("g").selectAll("circle").data(nodes).join("circle")
+      .attr("r", d => d.r)
+      .attr("fill", d => d.kind === "skill" ? colorVar(vendorGroup(d.s.vendor) === "Other vendors" ? "" : d.s.vendor) : "var(--neutral-node)")
+      .attr("stroke", "var(--surface-1)").attr("stroke-width", d => d.kind === "skill" ? 1.5 : 0.8)
+      .on("mousemove", (ev, d) => showTip(d.kind === "skill" ? skillTip(d.s)
+        : `<b>${d.repo.repo}</b><br>copies ${fmt(d.repo.skills)} vendor skills (${fmt(d.deg)} shown)<br>${fmt(d.repo.copies)} files<br>
+           <span class="k">${Object.entries(d.repo.vendors).map(([v, n]) => `${v} ${fmt(n)}`).join(" · ")}</span>`, ev))
+      .on("mouseleave", hideTip)
+      .call(d3.drag()
+        .on("start", (ev, d) => { if (!ev.active) sim.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y; })
+        .on("drag", (ev, d) => { d.fx = ev.x; d.fy = ev.y; })
+        .on("end", (ev, d) => { if (!ev.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+    const labels = root.append("g").selectAll("text").data(nodes.filter(d => d.kind === "skill").sort((a, b) => b.s.copy_repos - a.s.copy_repos).slice(0, 12))
+      .join("text").attr("dx", d => d.r + 3).attr("dy", "0.35em").text(d => d.s.label).attr("pointer-events", "none");
+    const neighbours = new Map(nodes.map(n => [n.id, new Set([n.id])]));
+    links.forEach(l => { neighbours.get(l.source).add(l.target); neighbours.get(l.target).add(l.source); });
+    let focus = null;
+    function applyFocus() {
+      const keep = focus ? neighbours.get(focus) : null;
+      const match = q ? new Set(nodes.filter(n => (n.kind === "skill" ? n.s.name + " " + n.s.repo : n.repo.repo).toLowerCase().includes(q)).map(n => n.id)) : null;
+      node.attr("opacity", d => (keep && !keep.has(d.id)) || (match && !match.has(d.id) && !(keep && keep.has(d.id))) ? 0.12 : 1)
+        .attr("stroke", d => match && match.has(d.id) ? "var(--focus)" : "var(--surface-1)");
+      link.attr("stroke-opacity", l => keep ? (keep.has(l.source.id) && keep.has(l.target.id) && (l.source.id === focus || l.target.id === focus) ? 0.9 : 0.04) : 0.55);
+      labels.attr("opacity", d => keep && !keep.has(d.id) ? 0.15 : 1);
+    }
+    node.on("click", (ev, d) => { focus = focus === d.id ? null : d.id; applyFocus(); ev.stopPropagation(); });
+    svg.on("click", () => { focus = null; applyFocus(); });
+    sim = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id(d => d.id).distance(l => 30 + l.source.r).strength(0.25))
+      .force("charge", d3.forceManyBody().strength(d => d.kind === "skill" ? -40 - d.r * 6 : -10))
+      .force("collide", d3.forceCollide(d => d.r + 1.5))
+      .force("x", d3.forceX(W / 2).strength(0.04)).force("y", d3.forceY(H / 2).strength(0.05))
+      .on("tick", () => {
+        link.each(function (l) {
+          const dx = l.target.x - l.source.x, dy = l.target.y - l.source.y, dist = Math.hypot(dx, dy) || 1;
+          d3.select(this).attr("x1", l.source.x).attr("y1", l.source.y)
+            .attr("x2", l.target.x - dx / dist * (l.target.r + 1)).attr("y2", l.target.y - dy / dist * (l.target.r + 1));
+        });
+        node.attr("cx", d => d.x).attr("cy", d => d.y);
+        labels.attr("x", d => d.x).attr("y", d => d.y);
+      });
+    applyFocus();
+  }
+
+  // ---------------------------------------------------------------- table
+  let sortKey = "copy_repos", sortDir = -1;
+  function drawTable() {
+    const cols = [["name", "Skill"], ["vendor", "Vendor"], ["copy_repos", "Repositories", true], ["copies", "Files", true],
+      ["versions_copied", "Versions copied", true], ["claude", "In .claude", true], ["agents", "In .agents", true]];
+    const val = (s, k) => k === "claude" || k === "agents" ? (s.by_platform[k]?.copies || 0) : s[k];
+    const rows = data.skills.filter(s => active.has(vendorGroup(s.vendor)))
+      .slice().sort((a, b) => d3.ascending(val(a, sortKey), val(b, sortKey)) * -sortDir || d3.ascending(a.id, b.id)).slice(0, 200);
+    const host = document.getElementById("table");
+    host.innerHTML = `<table><thead><tr>${cols.map(([k, l, n]) =>
+      `<th class="${n ? "n" : ""}" data-k="${k}" aria-sort="${k === sortKey ? (sortDir < 0 ? "descending" : "ascending") : "none"}">${l}${k === sortKey ? (sortDir < 0 ? " ↓" : " ↑") : ""}</th>`).join("")}</tr></thead>
+      <tbody>${rows.map(s => `<tr><td title="${s.repo}/${s.path}">${s.label}${s.removal_listed ? " *" : ""}</td><td>${s.vendor}</td>
+      ${cols.slice(2).map(([k]) => `<td class="n">${fmt(val(s, k))}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    host.querySelectorAll("th").forEach(th => th.onclick = () => {
+      const k = th.dataset.k; if (k === sortKey) sortDir = -sortDir; else { sortKey = k; sortDir = -1; } drawTable();
+    });
+  }
+
+  // ---------------------------------------------------------------- wiring
+  function drawAll() {
+    legend(document.getElementById("legend-sankey"));
+    legend(document.getElementById("legend-graph"));
+    drawSankey(); drawVendorSankey(); drawGraph(); drawTable();
+  }
+  document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => {
+    document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
+    document.querySelectorAll("section[data-panel]").forEach(p => p.hidden = p.dataset.panel !== b.dataset.tab);
+    if (b.dataset.tab === "explore") drawGraph();
+  });
+  const bind = (id, fn) => { const el = document.getElementById(id); el.oninput = () => {
+    const out = document.getElementById(id + "-v"); if (out) out.textContent = el.value; fn(); }; };
+  bind("sk-n", drawSankey); bind("g-sk", drawGraph); bind("g-min", drawGraph); bind("g-q", drawGraph);
+  let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { drawSankey(); drawVendorSankey(); drawGraph(); }, 200); });
+
+  const m = data.meta || {};
+  document.getElementById("note").innerHTML =
+    `Exact copies only: a file counts when its git blob SHA equals a vendor version's. Repositories on the
+    removal list are left out; skills marked * have text on it (pointers only). Vendor repositories are those in
+    crawlers/atlas/vendors.json. GitSkills revision ${m.gitskills_revision ? m.gitskills_revision.slice(0, 8) : "unknown"};
+    built ${m.built_at || "unknown"}. ${m.attribution || ""}`;
+  drawAll();
+})();
+</script>
+</body>
+</html>
