@@ -3,9 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>How vendor skills get copied · Skill Concepts Atlas</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+<title>Where vendor skill texts also appear · Skill Concepts Atlas</title>
+<!-- Integrity hashes are of the npm package files, which jsDelivr serves unchanged. -->
+<script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"
+  integrity="sha384-su5kReKyYlIFrI62mbQRKXHzFobMa7BHp1cK6julLPbnYcCW9NIZKJiTODjLPeDh" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"
+  integrity="sha384-SM54CE5h+qdDI046d2Y5ym7wq1kq4uxcQ1cqGq5/+5jrE5tPLeDJSq711Q8sIska" crossorigin="anonymous"></script>
 <style>
 .viz-root {
   color-scheme: light;
@@ -94,9 +97,11 @@ td.n, th.n { text-align: right; }
 </head>
 <body>
 <div class="viz-root">
-  <h1>How vendor skills get copied</h1>
+  <h1>Where vendor skill texts also appear</h1>
   <p class="lede">Every SKILL.md file in public GitHub repositories (from GitSkills) that is
-  byte-identical to a version a vendor published. Edited copies are not counted yet.</p>
+  byte-identical to a version a vendor published. Edited copies are not counted yet. Each text is
+  credited only to the earliest vendor path that published it, so a skill that a vendor later
+  moved or republished can show no copies under its newer path.</p>
 
   <div class="tiles" id="tiles"></div>
 
@@ -109,9 +114,11 @@ td.n, th.n { text-align: right; }
   <section data-panel="publish">
     <div class="panel">
       <h2>From vendor, to skill, to where copies land</h2>
-      <p class="sub">Band width is the number of copied files. The middle column shows the most
-      copied skills; the rest of each vendor's skills are grouped. The right column is the
-      agent folder the copy sits in.</p>
+      <p class="sub">The middle column shows the skills found in the most repositories, the same
+      ranking as the graph and the table; the rest of each vendor's skills are grouped. Band width
+      is the number of files, because files add up across columns and repositories don't (one
+      repository can hold a skill in several folders). The right column is the agent folder the
+      file sits in.</p>
       <div class="controls">
         <label>Skills shown <input type="range" id="sk-n" min="5" max="60" value="25"><span id="sk-n-v">25</span></label>
       </div>
@@ -144,8 +151,9 @@ td.n, th.n { text-align: right; }
 
   <section data-panel="table" hidden>
     <div class="panel">
-      <h2>Most copied vendor skills</h2>
-      <p class="sub">Click a column to sort.</p>
+      <h2>Vendor skills found in the most repositories</h2>
+      <p class="sub">Click a column to sort. * marks a skill with files whose text is on the
+      removal list; they are counted as pointers only.</p>
       <div id="table"></div>
     </div>
   </section>
@@ -164,6 +172,8 @@ td.n, th.n { text-align: right; }
   };
   const vendorGroup = v => VENDOR_ORDER.includes(v) ? v : "Other vendors";
   const fmt = d3.format(",");
+  const ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ESC[c]);
   const PLATFORM_LABEL = { claude: ".claude", agents: ".agents", codex: ".codex", cursor: ".cursor",
     github: ".github", opencode: ".opencode", gemini: ".gemini", kiro: ".kiro", windsurf: ".windsurf",
     other: "Other locations" };
@@ -198,18 +208,18 @@ td.n, th.n { text-align: right; }
       : `${s.name} (${repoShort(s)}/${s.path.split("/")[0]})`;
   });
   const skillById = new Map(data.skills.map(s => [s.id, s]));
-  const skillTip = s => `<b>${s.label || s.name}</b> <span class="k">· ${s.vendor}</span><br>
-    <span class="k">${s.repo}/${s.path}</span><br>
+  const skillTip = s => `<b>${esc(s.label || s.name)}</b> <span class="k">· ${esc(s.vendor)}</span><br>
+    <span class="k">${esc(s.repo)}/${esc(s.path)}</span><br>
     ${fmt(s.copy_repos)} repositories · ${fmt(s.copies)} files<br>
     ${s.versions_copied} of ${s.versions ?? "?"} versions copied
-    ${s.authorship ? `<br><span class="k">Manifest author: ${s.manifest_author ?? "not stated"}</span>` : ""}`;
+    ${s.authorship ? `<br><span class="k">Manifest author: ${esc(s.manifest_author ?? "not stated")}</span>` : ""}`;
 
   // ---------------------------------------------------------------- tiles
   const t = data.totals;
   const tiles = [
-    [fmt(t.copies), "copied files"],
+    [fmt(t.copies), "files matching a vendor text"],
     [fmt(t.copy_repos), "repositories holding a copy"],
-    [`${fmt(t.skills_copied)} of ${fmt(t.skills_published)}`, "vendor skills copied at least once"],
+    [`${fmt(t.skills_copied)} of ${fmt(t.skills_published)}`, "vendor skills found in other repositories"],
     [fmt(data.cross_vendor.length), "copies between vendors"],
   ];
   document.getElementById("tiles").innerHTML = tiles.map(([v, l]) =>
@@ -225,7 +235,7 @@ td.n, th.n { text-align: right; }
       const b = document.createElement("span");
       b.className = "chip"; b.setAttribute("role", "button"); b.tabIndex = 0;
       b.setAttribute("aria-pressed", active.has(g));
-      b.innerHTML = `<span class="sw" style="background:${colorVar(g === "Other vendors" ? "" : g)}"></span>${g}`;
+      b.innerHTML = `<span class="sw" style="background:${colorVar(g === "Other vendors" ? "" : g)}"></span>${esc(g)}`;
       const toggle = () => {
         if (active.has(g) && active.size > 1) active.delete(g); else active.add(g);
         drawAll();
@@ -243,7 +253,8 @@ td.n, th.n { text-align: right; }
     const n = +document.getElementById("sk-n").value;
     const skills = data.skills.filter(s => active.has(vendorGroup(s.vendor)));
     if (!skills.length) { host.innerHTML = '<p class="empty">No skills for this selection.</p>'; return; }
-    const top = skills.slice().sort((a, b) => b.copies - a.copies).slice(0, n);
+    // Same ranking as the table and graph: repositories first, files to break ties.
+    const top = skills.slice().sort((a, b) => b.copy_repos - a.copy_repos || b.copies - a.copies).slice(0, n);
     const topIds = new Set(top.map(s => s.id));
     const nodes = [], idx = new Map();
     const node = (id, attrs) => { if (!idx.has(id)) { idx.set(id, nodes.length); nodes.push({ id, ...attrs }); } return idx.get(id); };
@@ -276,14 +287,15 @@ td.n, th.n { text-align: right; }
       .nodeAlign(d3.sankeyJustify).extent([[150, 8], [W - 120, H - 8]])
       .nodeSort((a, b) => a.kind === "platform" || b.kind === "platform"
         ? (a.id === "p:other") - (b.id === "p:other") || b.value - a.value
-        : gOrder(a.group) - gOrder(b.group) || (a.kind === "rest") - (b.kind === "rest") || b.value - a.value)
+        : gOrder(a.group) - gOrder(b.group) || (a.kind === "rest") - (b.kind === "rest")
+          || (b.skill?.copy_repos ?? 0) - (a.skill?.copy_repos ?? 0) || b.value - a.value)
       .linkSort((a, b) => gOrder(a.group) - gOrder(b.group) || b.value - a.value);
     const graph = sankey({ nodes: nodes.map(d => ({ ...d })), links: [...merged.values()].map(d => ({ ...d })) });
     svg.append("g").attr("fill", "none").selectAll("path").data(graph.links).join("path")
       .attr("d", d3.sankeyLinkHorizontal())
       .attr("stroke", d => d.group ? colorVar(d.group === "Other vendors" ? "" : d.group) : "var(--link-neutral)")
       .attr("stroke-opacity", 0.32).attr("stroke-width", d => Math.max(1, d.width))
-      .on("mousemove", (ev, d) => showTip(`${d.source.label} → ${d.target.label}<br><b>${fmt(d.value)}</b> copied files`, ev))
+      .on("mousemove", (ev, d) => showTip(`${esc(d.source.label)} → ${esc(d.target.label)}<br><b>${fmt(d.value)}</b> files`, ev))
       .on("mouseleave", hideTip);
     svg.append("g").selectAll("rect").data(graph.nodes).join("rect")
       .attr("x", d => d.x0).attr("y", d => d.y0).attr("width", d => d.x1 - d.x0)
@@ -291,8 +303,8 @@ td.n, th.n { text-align: right; }
       .attr("fill", d => d.group ? colorVar(d.group === "Other vendors" ? "" : d.group) : "var(--neutral-node)")
       .on("mousemove", (ev, d) => {
         const body = d.kind === "skill" ? skillTip(d.skill)
-          : d.kind === "rest" ? `<b>${d.label}</b><br>${fmt(d.count)} skills · ${fmt(d.value)} copied files`
-          : `<b>${d.label}</b><br>${fmt(d.value)} copied files`;
+          : d.kind === "rest" ? `<b>${esc(d.label)}</b><br>${fmt(d.count)} skills · ${fmt(d.value)} files`
+          : `<b>${esc(d.label)}</b><br>${fmt(d.value)} files`;
         showTip(body, ev);
       }).on("mouseleave", hideTip);
     svg.append("g").selectAll("text").data(graph.nodes).join("text")
@@ -300,7 +312,8 @@ td.n, th.n { text-align: right; }
       .attr("y", d => (d.y0 + d.y1) / 2).attr("dy", "0.35em")
       .attr("text-anchor", d => d.x0 < W / 2 ? "end" : "start")
       .attr("class", d => d.kind === "rest" ? "muted" : null)
-      .text(d => (d.y1 - d.y0) < 4 && d.kind !== "vendor" ? "" : d.kind === "skill" || d.kind === "rest" ? `${d.label} · ${fmt(d.value)}` : d.label)
+      .text(d => (d.y1 - d.y0) < 4 && d.kind !== "vendor" ? "" : d.kind === "skill" ? `${d.label} · ${fmt(d.skill.copy_repos)} repos`
+        : d.kind === "rest" ? `${d.label} (${fmt(d.count)})` : d.label)
       .each(function (d) { if (d.kind === "skill" && d.x0 > 150 && d.x1 < W - 120) d3.select(this).attr("x", d.x1 + 6).attr("text-anchor", "start"); });
   }
 
@@ -325,7 +338,7 @@ td.n, th.n { text-align: right; }
       .on("mousemove", (ev, d) => {
         const rows = data.cross_vendor.filter(c => c.origin_vendor === d.source.label && c.copy_vendor === d.target.label);
         const names = [...new Set(rows.map(r => r.copy_path.split("/").slice(-2, -1)[0]))];
-        showTip(`<b>${d.source.label} → ${d.target.label}</b><br>${d.value} copies<br><span class="k">${names.join(", ")}</span>`, ev);
+        showTip(`<b>${esc(d.source.label)} → ${esc(d.target.label)}</b><br>${d.value} copies<br><span class="k">${names.map(esc).join(", ")}</span>`, ev);
       }).on("mouseleave", hideTip);
     svg.append("g").selectAll("rect").data(g.nodes).join("rect")
       .attr("x", d => d.x0).attr("y", d => d.y0).attr("width", d => d.x1 - d.x0)
@@ -379,8 +392,8 @@ td.n, th.n { text-align: right; }
       .attr("fill", d => d.kind === "skill" ? colorVar(vendorGroup(d.s.vendor) === "Other vendors" ? "" : d.s.vendor) : "var(--neutral-node)")
       .attr("stroke", "var(--surface-1)").attr("stroke-width", d => d.kind === "skill" ? 1.5 : 0.8)
       .on("mousemove", (ev, d) => showTip(d.kind === "skill" ? skillTip(d.s)
-        : `<b>${d.repo.repo}</b><br>copies ${fmt(d.repo.skills)} vendor skills (${fmt(d.deg)} shown)<br>${fmt(d.repo.copies)} files<br>
-           <span class="k">${Object.entries(d.repo.vendors).map(([v, n]) => `${v} ${fmt(n)}`).join(" · ")}</span>`, ev))
+        : `<b>${esc(d.repo.repo)}</b><br>holds ${fmt(d.repo.skills)} vendor skills (${fmt(d.deg)} shown)<br>${fmt(d.repo.copies)} files<br>
+           <span class="k">${Object.entries(d.repo.vendors).map(([v, n]) => `${esc(v)} ${fmt(n)}`).join(" · ")}</span>`, ev))
       .on("mouseleave", hideTip)
       .call(d3.drag()
         .on("start", (ev, d) => { if (!ev.active) sim.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y; })
@@ -429,7 +442,7 @@ td.n, th.n { text-align: right; }
     const host = document.getElementById("table");
     host.innerHTML = `<table><thead><tr>${cols.map(([k, l, n]) =>
       `<th class="${n ? "n" : ""}" data-k="${k}" aria-sort="${k === sortKey ? (sortDir < 0 ? "descending" : "ascending") : "none"}">${l}${k === sortKey ? (sortDir < 0 ? " ↓" : " ↑") : ""}</th>`).join("")}</tr></thead>
-      <tbody>${rows.map(s => `<tr><td title="${s.repo}/${s.path}">${s.label}${s.removal_listed ? " *" : ""}</td><td>${s.vendor}</td>
+      <tbody>${rows.map(s => `<tr><td title="${esc(s.repo)}/${esc(s.path)}">${esc(s.label)}${s.removal_listed_copies ? " *" : ""}</td><td>${esc(s.vendor)}</td>
       ${cols.slice(2).map(([k]) => `<td class="n">${fmt(val(s, k))}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
     host.querySelectorAll("th").forEach(th => th.onclick = () => {
       const k = th.dataset.k; if (k === sortKey) sortDir = -sortDir; else { sortKey = k; sortDir = -1; } drawTable();
@@ -455,9 +468,10 @@ td.n, th.n { text-align: right; }
   const m = data.meta || {};
   document.getElementById("note").innerHTML =
     `Exact copies only: a file counts when its git blob SHA equals a vendor version's. Repositories on the
-    removal list are left out; skills marked * have text on it (pointers only). Vendor repositories are those in
-    crawlers/atlas/vendors.json. GitSkills revision ${m.gitskills_revision ? m.gitskills_revision.slice(0, 8) : "unknown"};
-    built ${m.built_at || "unknown"}. ${m.attribution || ""}`;
+    removal list are left out; files whose text is on it are counted as pointers only (${fmt(t.copies_of_removal_listed_texts || 0)}).
+    Each text is credited to the earliest vendor path that published it. Vendor repositories are those in
+    crawlers/atlas/vendors.json. GitSkills revision ${esc(m.gitskills_revision ? m.gitskills_revision.slice(0, 8) : "unknown")};
+    built ${esc(m.built_at || "unknown")}. ${esc(m.attribution || "")}`;
   drawAll();
 })();
 </script>

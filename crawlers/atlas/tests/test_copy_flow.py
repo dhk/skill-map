@@ -1,6 +1,7 @@
 """Tests for the copy-flow export (crawlers/atlas/copy_flow.py)."""
 from __future__ import annotations
 
+import hashlib
 import json
 
 import pyarrow as pa
@@ -45,7 +46,7 @@ CROSS = [{"origin_vendor": "Acme", "origin_repo": "acme/skills", "origin_path": 
           "origin_landed_at": "2026-01-01T00:00:00Z", "copy_vendor": "Globex", "copy_repo": "globex/p",
           "copy_path": "alpha/SKILL.md", "copy_landed_at": "2026-02-01T00:00:00Z",
           "copy_authorship": "first-party", "same_day": False}]
-EX = Exclusions({"bad/fork"}, set())
+EX = Exclusions({"bad/fork"}, {C})
 
 
 def built(**kw):
@@ -59,7 +60,7 @@ def test_skills_aggregate_copies_repos_versions_and_platforms():
     assert alpha["by_platform"] == {"claude": {"copies": 2, "repos": 2}, "agents": {"copies": 1, "repos": 1}}
     assert alpha["authorship"] == "first-party" and alpha["versions"] == 2
     secret = next(s for s in d["skills"] if s["name"] == "secret")
-    assert secret["removal_listed"] and secret["by_platform"] == {"other": {"copies": 1, "repos": 1}}
+    assert secret["removal_listed_copies"] == 1 and secret["by_platform"] == {"other": {"copies": 1, "repos": 1}}
     assert d["skills"][0]["name"] == "alpha"  # most copying repos first
 
 
@@ -68,6 +69,17 @@ def test_removal_list_drops_copy_repos():
     assert d["totals"]["copies_dropped_removal_list"] == 1
     assert "bad/fork" not in {r["repo"] for r in d["repos"]}
     assert d["totals"]["copies"] == 4
+
+
+def test_removal_listed_texts_are_counted_per_copy():
+    # Only the copy whose own text is listed counts, not every copy of a skill with a listed version.
+    mirror = MIRROR + [m(C, "s/alpha/SKILL.md", "u/three", "alpha/SKILL.md", "claude")]
+    d = cf.build(VERSIONS, SKILLS, mirror, CROSS, EX, min_skills=1)
+    alpha = next(s for s in d["skills"] if s["name"] == "alpha")
+    assert (alpha["copies"], alpha["removal_listed_copies"]) == (4, 1)
+    assert d["totals"]["copies_of_removal_listed_texts"] == 2
+    unlisted = cf.build(VERSIONS, SKILLS, MIRROR, CROSS, Exclusions({"bad/fork"}, set()), min_skills=1)
+    assert all(s["removal_listed_copies"] == 0 for s in unlisted["skills"])
 
 
 def test_vendor_rows_include_vendors_with_no_copies():
@@ -90,21 +102,67 @@ def test_cross_vendor_passthrough():
     assert c["origin_skill"] == "acme/skills:s/alpha/SKILL.md" and c["copy_vendor"] == "Globex"
 
 
-def test_run_writes_pointer_only_json(tmp_path):
+def write_inputs(tmp_path, mirror_section=True, **override):
+    outputs = []
     for name, rows in (("version", VERSIONS), ("skill", SKILLS), ("mirror", MIRROR), ("cross_vendor", CROSS)):
-        pq.write_table(pa.Table.from_pylist(rows), tmp_path / f"{name}.parquet")
-    (tmp_path / "manifest.json").write_text(json.dumps(
-        {"method_version": "vendor-reference/1.1.0", "mirror": {"gitskills_revision": "abc"}}))
+        path = tmp_path / f"{name}.parquet"
+        pq.write_table(pa.Table.from_pylist(rows), path)
+        outputs.append({"path": path.name, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+    for o in outputs:
+        o["sha256"] = override.get(o["path"], o["sha256"])
+    (tmp_path / "manifest.json").write_text(json.dumps({
+        "method_version": "vendor-reference/1.1.0",
+        "mirror": {"gitskills_revision": "abc"} if mirror_section else None, "outputs": outputs}))
     exc = tmp_path / "ex.json"
     exc.write_text(json.dumps({"repos": [{"repo": "bad/fork"}], "blobs": []}))
+    return exc
+
+
+TOP_KEYS = {"vendors", "skills", "repos", "edges", "cross_vendor", "totals", "meta"}
+SKILL_KEYS = {"id", "vendor", "repo", "path", "name", "authorship", "manifest_author", "versions",
+              "first_landed_at", "present_at_head", "removal_listed_copies", "copies",
+              "versions_copied", "copy_repos", "by_platform"}
+
+
+def test_run_writes_only_allowed_keys(tmp_path):
+    exc = write_inputs(tmp_path)
     out = tmp_path / "copy_flow.json"
-    d = cf.run(tmp_path, out, exc, min_skills=1)
+    d, written = cf.run(tmp_path, out, exc, min_skills=1)
+    assert written == out
     saved = json.loads(out.read_text())
+    assert set(saved) == TOP_KEYS
+    assert all(set(s) == SKILL_KEYS for s in saved["skills"])
+    assert all(set(r) == {"repo", "skills", "copies", "vendors"} for r in saved["repos"])
+    assert all(set(e) == {"skill", "repo", "copies"} for e in saved["edges"])
+    assert all(set(c) == {"origin_vendor", "origin_skill", "origin_landed_at", "copy_vendor", "copy_repo",
+                          "copy_path", "copy_landed_at", "copy_authorship", "same_day"}
+               for c in saved["cross_vendor"])
+    assert set(saved["meta"]["inputs_sha256"]) == set(cf.INPUTS) | {"manifest.json"}
     assert saved["meta"]["gitskills_revision"] == "abc"
     assert saved["totals"] == d["totals"]
-    assert "content" not in out.read_text() and "description" not in out.read_text()
 
 
 def test_run_needs_mirror(tmp_path):
     with pytest.raises(FileNotFoundError):
         cf.run(tmp_path, tmp_path / "x.json")
+
+
+def test_run_refuses_manifest_without_mirror(tmp_path):
+    exc = write_inputs(tmp_path, mirror_section=False)
+    with pytest.raises(cf.StaleInputError, match="no mirror section"):
+        cf.run(tmp_path, tmp_path / "x.json", exc)
+
+
+def test_run_refuses_stale_mirror(tmp_path):
+    exc = write_inputs(tmp_path, **{"mirror.parquet": "0" * 64})
+    with pytest.raises(cf.StaleInputError, match="mirror.parquet"):
+        cf.run(tmp_path, tmp_path / "x.json", exc)
+    assert cf.main(["--src", str(tmp_path), "--out", str(tmp_path / "x.json"),
+                    "--exclusions", str(exc)]) == 2
+
+
+def test_oversized_output_goes_to_release_dir(tmp_path):
+    exc = write_inputs(tmp_path)
+    out = tmp_path / "copy_flow.json"
+    _, written = cf.run(tmp_path, out, exc, min_skills=1, max_bytes=100)
+    assert written == tmp_path / "release" / "copy_flow.json" and not out.exists()

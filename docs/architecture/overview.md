@@ -24,6 +24,9 @@ Two products live in this one repo, aimed at two different audiences:
 
 - **skill-map**: a site (`index.html`, `lineage.html`) for anyone browsing the
   published Agent Skills ecosystem.
+  `atlas-copies.html` is the Skill Concepts Atlas view of where vendor skill
+  texts also appear, built from `crawlers/atlas/copy_flow.py`
+  ([method](../atlas/copy-flow.md)).
 - **skill-doctor** (+ **skill-audit**): a tool ensemble (see
   [`WIRING.md`](../../WIRING.md)) for a skill author reviewing their own
   skill or repo — distributed independently of the crawler/site via PyPI, the
@@ -37,7 +40,7 @@ graph TD
     Crawl[crawl.py\nrepo-scoped git tree walks]
     Data[(data/*.json\ncrawls/*/data.json)]
     Pipeline[run_pipeline.py\nscore, type, history,\nlineage, stats]
-    Site[index.html / lineage.html]
+    Site[index.html / lineage.html /\natlas-copies.html]
   end
 
   subgraph "skill-doctor (the tool)"

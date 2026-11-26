@@ -13,9 +13,16 @@ aggregated, pointer-only JSON file for atlas-copies.html:
 
 A "skill" is a vendor repository and SKILL.md path; a copy is a GitSkills
 occurrence outside the vendor repositories whose text is byte-identical to one
-of that skill's versions. No skill text is read or written. Repositories on
-the removal list (data/exclusions.json) are dropped, and skills whose text is
-on it are flagged.
+of that skill's versions. Each text is credited only to the earliest vendor
+path that published it, so a skill that was moved or republished elsewhere can
+show no copies. No skill text is read or written. Repositories on the removal
+list (data/exclusions.json) are dropped, and each copy whose text is on it is
+counted per skill.
+
+The inputs must match the hashes in the vendor reference manifest, and the
+manifest must have a mirror section, so a mirror.parquet left over from an
+older run is refused. Output over MAX_BYTES is written under release/ for a
+GitHub release asset instead (ADR 0007).
 
 Usage:
     python -m crawlers.atlas.copy_flow
@@ -35,11 +42,13 @@ import pyarrow.parquet as pq
 
 from crawlers import exclusions as removal
 
-METHOD_VERSION = "copy-flow/1.0.0"
+METHOD_VERSION = "copy-flow/1.1.0"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_IN = REPO_ROOT / "data" / "atlas" / "vendor_reference"
 DEFAULT_OUT = DEFAULT_IN / "copy_flow.json"
 DEFAULT_EXCLUSIONS = REPO_ROOT / "data" / "exclusions.json"
+INPUTS = ("version.parquet", "skill.parquet", "mirror.parquet", "cross_vendor.parquet")
+MAX_BYTES = 1_000_000
 PLATFORMS = ["claude", "agents", "codex", "cursor", "github", "opencode",
              "gemini", "kiro", "windsurf", "other"]
 
@@ -49,6 +58,10 @@ ATTRIBUTION = (
     "repositories and GitSkills (Destefanis, Graziotin, Vaccargiu and Ortu, "
     "doi:10.5281/zenodo.21875637), CC BY 4.0. Pointers only; no file text."
 )
+
+
+class StaleInputError(RuntimeError):
+    """The vendor reference outputs on disk don't match their manifest."""
 
 
 def skill_id(repo: str, path: str) -> str:
@@ -62,13 +75,12 @@ def skill_name(path: str) -> str:
 
 def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: list[dict],
           ex: removal.Exclusions, max_repos: int = 500, min_skills: int = 3) -> dict:
-    listed = {(v["repo"], v["path"]) for v in versions if v.get("removal_listed")}
     info = {(s["repo"], s["path"]): s for s in skills}
 
     per_skill: dict[str, dict] = {}
     repo_skills: dict[str, Counter] = defaultdict(Counter)
     repo_vendors: dict[str, Counter] = defaultdict(Counter)
-    dropped = 0
+    dropped = listed_copies = 0
     for m in mirror:
         if ex.repo_excluded(m["copy_repo"]):
             dropped += 1
@@ -85,7 +97,7 @@ def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: l
                 "versions": meta.get("versions"),
                 "first_landed_at": meta.get("first_landed_at"),
                 "present_at_head": meta.get("present_at_head"),
-                "removal_listed": (m["vendor_repo"], m["vendor_path"]) in listed,
+                "removal_listed_copies": 0,
                 "_versions_copied": set(), "_repos": set(),
                 "_platform_copies": Counter(), "_platform_repos": defaultdict(set),
                 "copies": 0,
@@ -95,6 +107,9 @@ def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: l
             folder = "other"
         repo = m["copy_repo"]
         s["copies"] += 1
+        if ex.blob_excluded(m["blob_sha"]):
+            s["removal_listed_copies"] += 1
+            listed_copies += 1
         s["_versions_copied"].add(m["blob_sha"])
         s["_repos"].add(repo.lower())
         s["_platform_copies"][folder] += 1
@@ -147,21 +162,46 @@ def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: l
             "skills_copied": len(out_skills),
             "skills_published": len(skills),
             "copies_dropped_removal_list": dropped,
+            "copies_of_removal_listed_texts": listed_copies,
             "repos_shown": len(repos_out), "min_skills_for_repo": min_skills,
         },
     }
 
 
+def check_inputs(src: Path) -> tuple[dict, dict[str, str]]:
+    """Load the manifest and confirm every input is the file it describes."""
+    manifest_path = src / "manifest.json"
+    if not (src / "mirror.parquet").exists() or not manifest_path.exists():
+        raise FileNotFoundError(
+            f"{src / 'mirror.parquet'} or its manifest is missing: run "
+            "`python -m crawlers.atlas.vendor_reference --gitskills data/atlas/gitskills` first")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if not manifest.get("mirror"):
+        raise StaleInputError(
+            "the vendor reference manifest has no mirror section, so mirror.parquet on disk "
+            "is from another run: rerun vendor_reference with --gitskills")
+    recorded = {o["path"]: o["sha256"] for o in manifest.get("outputs") or []}
+    hashes = {}
+    for name in INPUTS:
+        path = src / name
+        if not path.exists():
+            raise FileNotFoundError(f"{path} is missing: rerun vendor_reference with --gitskills")
+        h = hashlib.sha256(path.read_bytes()).hexdigest()
+        if recorded.get(name) != h:
+            raise StaleInputError(
+                f"{name} does not match the hash in {manifest_path.name}: rerun "
+                "vendor_reference with --gitskills so the tables and manifest agree")
+        hashes[name] = h
+    hashes["manifest.json"] = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+    return manifest, hashes
+
+
 def run(src: Path = DEFAULT_IN, out: Path = DEFAULT_OUT,
         exclusions_path: Path = DEFAULT_EXCLUSIONS, max_repos: int = 500,
-        min_skills: int = 3) -> dict:
-    mirror_path = src / "mirror.parquet"
-    if not mirror_path.exists():
-        raise FileNotFoundError(
-            f"{mirror_path} is missing: run "
-            "`python -m crawlers.atlas.vendor_reference --gitskills data/atlas/gitskills` first")
+        min_skills: int = 3, max_bytes: int = MAX_BYTES) -> tuple[dict, Path]:
+    """Write the export; return it and the path written (under release/ when too big)."""
+    manifest, hashes = check_inputs(src)
     read = lambda name: pq.read_table(src / name).to_pylist()  # noqa: E731
-    manifest = json.loads((src / "manifest.json").read_text(encoding="utf-8"))
     data = build(read("version.parquet"), read("skill.parquet"), read("mirror.parquet"),
                  read("cross_vendor.parquet"), removal.load(exclusions_path),
                  max_repos=max_repos, min_skills=min_skills)
@@ -169,15 +209,20 @@ def run(src: Path = DEFAULT_IN, out: Path = DEFAULT_OUT,
         "method_version": METHOD_VERSION,
         "built_at": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat(),
         "attribution": ATTRIBUTION,
+        "credit_rule": "each text is credited to the earliest vendor path that published it",
         "vendor_reference": {"method_version": manifest.get("method_version"),
-                             "built_at": manifest.get("built_at"),
-                             "outputs": manifest.get("outputs")},
-        "gitskills_revision": (manifest.get("mirror") or {}).get("gitskills_revision"),
+                             "built_at": manifest.get("built_at")},
+        "inputs_sha256": hashes,
+        "gitskills_revision": manifest["mirror"].get("gitskills_revision"),
         "removal_list_sha256": hashlib.sha256(Path(exclusions_path).read_bytes()).hexdigest(),
         "platforms": PLATFORMS,
     }
-    out.write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False) + "\n", encoding="utf-8")
-    return data
+    body = (json.dumps(data, separators=(",", ":"), ensure_ascii=False) + "\n").encode("utf-8")
+    if len(body) > max_bytes:
+        out = out.parent / "release" / out.name
+        out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_bytes(body)
+    return data, out
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -187,9 +232,23 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--exclusions", type=Path, default=DEFAULT_EXCLUSIONS)
     ap.add_argument("--max-repos", type=int, default=500)
     ap.add_argument("--min-skills", type=int, default=3)
+    ap.add_argument("--max-bytes", type=int, default=MAX_BYTES,
+                    help="larger output goes under release/ for a release asset, not a commit")
     args = ap.parse_args(argv)
-    data = run(args.src, args.out, args.exclusions, args.max_repos, args.min_skills)
+    try:
+        data, written = run(args.src, args.out, args.exclusions, args.max_repos,
+                            args.min_skills, args.max_bytes)
+    except (FileNotFoundError, StaleInputError) as e:
+        print(f"copy_flow: {e}", file=sys.stderr)
+        return 2
     print(json.dumps(data["totals"], indent=2))
+    size = written.stat().st_size
+    if written != args.out:
+        print(f"copy_flow: output is {size:,} bytes, over {args.max_bytes:,}, so it was written to "
+              f"{written} for a release asset. Don't commit it; lower --max-repos to fit, or "
+              "attach it to a release (ADR 0007).", file=sys.stderr)
+        return 3
+    print(f"wrote {written} ({size:,} bytes)", file=sys.stderr)
     return 0
 
 

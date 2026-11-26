@@ -61,6 +61,8 @@ over time. Its decisions are ADRs 0004 to 0007.
 |---|---|
 | [`atlas/plan.md`](atlas/plan.md) | Question, corpus, dating, dimensions, data tables, phases and FAQ |
 | [`atlas/gitskills-import.md`](atlas/gitskills-import.md) | How GitSkills metadata becomes the base catalogue |
+| [`atlas/vendor-reference.md`](atlas/vendor-reference.md) | Every historical version of vendor skills, their authorship, and exact copies in GitSkills |
+| [`atlas/copy-flow.md`](atlas/copy-flow.md) | The export and diagrams behind `atlas-copies.html` |
 
 ## Planning and outreach
 
