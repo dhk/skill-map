@@ -1,0 +1,7 @@
+# Bulk Atlas tables are published as GitHub release assets, with a Hugging Face copy, not in
+# git (DATA-POLICY.md, ADR 0007). Manifests stay tracked.
+*.parquet
+*.csv
+*.jsonl
+# Saved remote columns, so an interrupted import resumes (crawlers/atlas/gitskills.py).
+.cache/

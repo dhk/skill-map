@@ -1,0 +1,19 @@
+{
+  "gitskills": {
+    "title": "GitSkills: A Dataset of Agent Skills on GitHub",
+    "authors": ["Giuseppe Destefanis", "Daniel Graziotin", "Matteo Vaccargiu", "Marco Ortu"],
+    "paper": "https://arxiv.org/abs/2608.10906",
+    "hf_repo": "mvaccargiu/gitskills",
+    "hf_revision": "ebab17454a7c236f8f26b183567f1a126f42e3f8",
+    "hf_revision_note": "Full commit resolved from the short id ebab174 by the first import run, 2026-11-26 (data/atlas/gitskills/manifest.json). The importer refuses any other commit.",
+    "zenodo_doi": "10.5281/zenodo.21875637",
+    "zenodo_version": "1.0.0",
+    "zenodo_file": "agent_skills_release.db",
+    "zenodo_md5": "b058631fb1926efac6e82a4706646742",
+    "license": "CC-BY-4.0 for metadata and aggregation; file text stays under each origin repository's license",
+    "expected_rows": {
+      "artifacts": 3797117,
+      "repos": 282200
+    }
+  }
+}

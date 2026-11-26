@@ -9,6 +9,7 @@ their generator and should not be edited by hand.
 |---|---|
 | [`architecture/overview.md`](architecture/overview.md) | System context and containers for the Skill Map, skill-doctor, pipeline, and CI guards |
 | [`adr/`](adr/) | Immutable architecture decision records |
+| [`../DATA-POLICY.md`](../DATA-POLICY.md) | What third-party text the repo stores, licensing, and removal requests |
 | [`../ROADMAP.md`](../ROADMAP.md) | Current product and engineering themes |
 
 Start with the architecture overview when changing boundaries between the site,
@@ -59,6 +60,7 @@ over time. Its decisions are ADRs 0004 to 0007.
 | Path | What it covers |
 |---|---|
 | [`atlas/plan.md`](atlas/plan.md) | Question, corpus, dating, dimensions, data tables, phases and FAQ |
+| [`atlas/gitskills-import.md`](atlas/gitskills-import.md) | How GitSkills metadata becomes the base catalogue |
 
 ## Planning and outreach
 
