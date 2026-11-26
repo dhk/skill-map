@@ -4,7 +4,7 @@ Date: 2026-11-26
 
 ## Status
 
-Accepted
+Proposed. Becomes Accepted once DHK settles the open method decisions.
 
 ## Context
 
@@ -21,19 +21,19 @@ GitHub code-search counts are not usable as population sizes.
 ## Decision
 
 - Corpus v1: public GitHub `SKILL.md` files plus the major marketplaces.
-- Start from GitSkills, pinned to one Zenodo version, and the existing Skill
+- Start from GitSkills, pinned to Zenodo version 1.0.0 (10 Aug 2026), and the existing Skill
   Map snapshots; add our own delta crawl for August to November 2026.
 - Exclude Custom GPTs from v1. Treat AGENTS.md, CLAUDE.md, Cursor rules and
   Copilot instructions as a later sibling study.
-- All work lives in this repository. Write-ups may move to a separate
-  publication repo later.
+- All work lives in this repository. Write-ups may move to Alexandria later.
 - Produce the exposition (catalogue and labels) before the timeline.
 
 ## Consequences
 
-- GitSkills releases its metadata under CC BY 4.0, so the Atlas credits it and
-  can reuse that metadata. Its file text stays under each origin repository's
-  license, so the Atlas republishes pointers and derived labels, and uses
-  `repos.license` to decide where full text may be included.
+- Zenodo v1.0.0 lists CC BY 4.0 for the whole GitSkills record, while its
+  Hugging Face card says file text stays under each origin repository's
+  license. Our reading follows the card: the Atlas credits GitSkills, reuses its
+  metadata, republishes pointers and derived labels, and uses `repos.license`
+  to decide where full text may be included.
 - The delta crawl reuses `crawlers/crawl.py` and adds license detection.
 - Pre-October-2025 history is out of scope until the sibling study.
