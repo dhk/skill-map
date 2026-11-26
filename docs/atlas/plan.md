@@ -1,6 +1,6 @@
 # Skill Concepts Atlas: study plan
 
-Date: 2026-11-26 · Status: phase 1 in progress
+Date: 2026-11-26 · Status: proposed (phase 0); method decisions open
 
 ## Question
 
@@ -25,7 +25,7 @@ layer on these sources:
 
 | Source | Scale | Gives us | Does not give us |
 |---|---|---|---|
-| [GitSkills](https://arxiv.org/html/2608.10906) ([Zenodo](https://doi.org/10.5281/zenodo.21875637), [Hugging Face](https://huggingface.co/datasets/mvaccargiu/gitskills)) | 3,797,117 files, 282,200 repos, July 2026 | Occurrence table, content hashes, repo metadata, first/last commit dates for 458,548 records | Metadata is CC BY 4.0 but file text stays under origin licenses; exact-byte dedup only; no purpose, concept or context labels |
+| [GitSkills](https://arxiv.org/html/2608.10906) ([Zenodo](https://doi.org/10.5281/zenodo.21875637), [Hugging Face](https://huggingface.co/datasets/mvaccargiu/gitskills)) | 3,797,117 files, 282,200 repos, July 2026 | Occurrence table, content hashes, repo metadata, first/last commit dates for 458,548 files (about 24% of 1,877,981 distinct texts) | Zenodo v1.0.0 lists CC BY 4.0 for the whole record; the Hugging Face card says file text stays under origin licenses, and we follow that reading. Exact-byte dedup only; no purpose, concept or context labels |
 | [Skill Constellations](https://arxiv.org/html/2610.11169) | 2,193,119 dated adoptions | Directed copy network | Lineage of files, not ideas |
 | [How Agent Skills Evolve](https://arxiv.org/html/2611.04456) | 84,200 skills | Component taxonomy and change patterns | Cross-repo spread or context |
 | [From Anatomy to Smells](https://arxiv.org/html/2607.01456) | 238 coded skills | 13 high-level and 44 low-level components, 26 smells | Small sample, one marketplace |
@@ -45,7 +45,7 @@ read in full; the others from abstracts and excerpts.
   and OpenAI plugin repos, and recognisable by `agents/openai.yaml`.
 - Custom GPTs are out of v1. AGENTS.md, CLAUDE.md, Cursor rules and Copilot
   instructions are a sibling study for later.
-- Base: GitSkills, pinned to one Zenodo version, plus our own delta crawl for
+- Base: GitSkills, pinned to Zenodo version 1.0.0 (10 Aug 2026), plus our own delta crawl for
   August to November 2026 and the existing Skill Map snapshots.
 
 See [ADR 0004](../adr/0004-atlas-scope-and-corpus.md).
@@ -54,15 +54,25 @@ See [ADR 0004](../adr/0004-atlas-scope-and-corpus.md).
 
 Every signal is kept at grain. The first-seen estimate is the earliest date
 supported by two independent signals; otherwise it is the single signal with a
-low-confidence label. Vendor launch dates (16 Oct 2025 for Anthropic) act as
-floors for `SKILL.md`-format files.
+low-confidence label. Vendor launch dates act as floors: 16 Oct 2025 for
+`SKILL.md` files generally ([Anthropic](https://www.anthropic.com/news/skills)),
+and 19 Dec 2025 for skills in OpenAI folders such as `.codex/skills`, when
+OpenAI announced Codex support
+([openai/codex#5291](https://github.com/openai/codex/issues/5291)); its
+experimental support was merged earlier that December, so earlier `.codex`
+dates are flagged rather than dropped.
+
+Signals bound the date from different sides. Git commits and repo creation can
+be set or reset, so they are claims. Software Heritage first-seen and registry
+first-listed dates say the file existed by then, so the true first publication
+is on or before them: they are **upper bounds**.
 
 | Signal | Strength | Weakness |
 |---|---|---|
-| Git first commit adding the file | Wide coverage | Dates can be set freely; imports and catalogue copies reset them. This repo's own lineage trace marked 217 of 261 clusters date-unreliable |
-| Software Heritage content first-seen | Independent archive, keyed by the git blob SHA already stored | Only a lower bound; depends on archive crawl frequency |
+| Git first commit adding the file | Direct evidence where present; GitSkills has it for about 24% of distinct texts | Dates can be set freely; imports and catalogue copies reset them. This repo's own lineage trace marked 217 of 261 clusters date-unreliable |
+| Software Heritage content first-seen | Independent archive, keyed by the git blob SHA already stored | Only an upper bound (the file existed by then); depends on archive crawl frequency |
 | Copy-network direction | Orders copies relative to each other | Inherits git dating problems |
-| Registry first-listed | Independent of git | Listing lags publication |
+| Registry first-listed | Independent of git | Only an upper bound: listing lags publication |
 | Repo `created_at`, vendor announcements | Hard bounds | Coarse |
 
 ## Analytical dimensions
@@ -92,17 +102,20 @@ kept in the data but excluded from concept-growth counts.
 ## Data at the lowest grain
 
 One table per entity, stable IDs, every derived row naming its method version.
-Bulk tables go to Hugging Face and release assets; this repo holds code,
+Bulk tables go to GitHub release assets on this repo, with a copy on Hugging
+Face; the repo itself holds code,
 manifests and small tables. See [ADR 0007](../adr/0007-atlas-hosting-and-publication.md)
 and the [data policy](../../DATA-POLICY.md).
 
 | Table | Grain and key fields |
 |---|---|
 | `occurrence` | repo, path, blob SHA, SWHID, location class, platform folder, crawl source |
-| `content` | blob SHA, front matter fields, size, repo license, excerpt pointer |
+| `content` | blob SHA, front matter fields, size, excerpt pointer |
+| `repo` | repo, owner, stars, forks, language, license, created and pushed dates |
 | `date_evidence` | content or occurrence, signal type, date, source URL, retrieved_at |
-| `first_seen_estimate` | derived date, confidence, rule version |
-| `purpose_label`, `context_label` | label, method, model and prompt version, confidence, evidence span |
+| `first_seen_estimate` | content (blob SHA), derived date, confidence, rule version |
+| `purpose_label` | content (blob SHA), label, method, model and prompt version, confidence, evidence span |
+| `context_label` | occurrence (the same text can sit in different settings), label, method, model and prompt version, confidence |
 | `concept` | ID, name, definition, status, created_in_release |
 | `concept_observation` | content, concept, evidence span offsets, extractor, confidence |
 | `sophistication_feature` | content, feature, value, detector version |
@@ -115,7 +128,7 @@ and the [data policy](../../DATA-POLICY.md).
 |---|---|
 | 0 Scoping | This plan and ADRs 0003 to 0007 |
 | 1 Exposition | GitSkills import, merge with Skill Map snapshots, vendor reference set, delta crawl, purpose and context labels, sophistication features, first site and FAQ |
-| 2 Dating | Multi-signal date evidence, Software Heritage lookups, estimate rule, validation sample |
+| 2 Dating | Commit dates for the roughly 76% of distinct texts GitSkills lacks, Software Heritage lookups, registry dates, estimate rule, validation sample |
 | 3 Concepts | Extraction, clustering, naming, taxonomy v1, accuracy check on about 200 skills |
 | 4 Timeline and morphing | Growth curves, inherited versus convergent spread, morph catalogue |
 | 5 Publication | Release with DOI, concept pages, guidelines, first article |

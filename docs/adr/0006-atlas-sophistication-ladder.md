@@ -4,7 +4,7 @@ Date: 2026-11-26
 
 ## Status
 
-Accepted
+Proposed. Becomes Accepted once DHK settles the open method decisions.
 
 ## Context
 
