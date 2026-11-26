@@ -69,10 +69,72 @@ def test_build_tables_shapes_and_policy():
     assert t["repo"].num_rows == 3
     assert "content" not in t["content"].column_names  # never carry full text
     assert t["occurrence"].column("platform_folder").to_pylist() == ["other", "claude", "codex", "other"]
+    c = t["content"]
+    # Descriptions only where the earliest copy's licence is on the allow-list.
+    assert c.column("description_excerpt").to_pylist() == ["Use when working with PDFs.", None, None]
+    assert c.column("description_withheld").to_pylist() == [None, "licence", "licence"]
+    assert c.column("content_license_spdx").to_pylist() == ["Apache-2.0", None, None]
+    assert c.column("license_from_repo").to_pylist() == ["anthropics/skills", "other/app", "other/app"]
+    assert t["repo"].column("license_permits_text").to_pylist() == [True, False, False]
+
+
+def _with_repo_license(name, licence):
+    r = _repos().to_pydict()
+    r["license"][r["full_name"].index(name)] = licence
+    return pa.table(r, schema=_repos().schema)
+
+
+def test_long_description_truncated_when_licence_allows():
+    t = g.build_tables(_artifacts(), _with_repo_license("other/app", "MIT"), "t")
     desc = t["content"].column("description_excerpt").to_pylist()
     assert len(desc[1]) == g.EXCERPT_LIMIT
     assert t["content"].column("description_truncated").to_pylist() == [False, True, False]
-    assert t["repo"].column("license_permits_text").to_pylist() == [True, False, False]
+
+
+def test_earliest_copy_licence_wins():
+    a = _artifacts().to_pydict()
+    a["first_commit_at"][1] = "2025-11-01T00:00:00Z"  # the unlicensed mirror is older
+    t = g.build_tables(pa.table(a, schema=_artifacts().schema), _repos(), "t")
+    c = t["content"]
+    assert c.column("license_from_repo").to_pylist()[0] == "someone/mirror"
+    assert c.column("description_withheld").to_pylist()[0] == "licence"
+
+
+def test_earliest_copy_falls_back_to_repo_creation():
+    a = _artifacts().to_pydict()
+    a["first_commit_at"] = [None] * 4
+    r = _repos().to_pydict()
+    r["created_at"][1] = "2025-01-01T00:00:00Z"  # mirror repo created first
+    lic = g.earliest_copy_licence(pa.table(a, schema=_artifacts().schema),
+                                  pa.table(r, schema=_repos().schema))
+    assert lic["a" * 40] == (None, "someone/mirror")
+
+
+def test_removal_list_drops_repo_and_reassigns_representative():
+    ex = g.removal.Exclusions(repos={"Anthropics/Skills"}, blobs=set())
+    t = g.build_tables(_artifacts(), _repos(), "t", ex)
+    assert t["occurrence"].num_rows == 3
+    assert t["repo"].num_rows == 2
+    assert t["content"].num_rows == 3
+    assert t["content"].column("representative_repo").to_pylist()[0] == "someone/mirror"
+    assert "anthropics/skills" not in [r.lower() for r in t["occurrence"].column("repo_full_name").to_pylist()]
+
+
+def test_removal_list_blob_keeps_pointer_only():
+    ex = g.removal.Exclusions(repos=set(), blobs={"a" * 40})
+    c = g.build_tables(_artifacts(), _repos(), "t", ex)["content"]
+    assert c.column("blob_sha").to_pylist()[0] == "a" * 40
+    assert c.column("name").to_pylist()[0] is None
+    assert c.column("description_excerpt").to_pylist()[0] is None
+    assert c.column("description_withheld").to_pylist()[0] == "removal-list"
+
+
+def test_tables_carry_cc_by_attribution():
+    t = g.build_tables(_artifacts(), _repos(), "t")
+    for table in t.values():
+        meta = table.schema.metadata
+        assert meta[b"license"] == b"CC-BY-4.0"
+        assert b"GitSkills" in meta[b"attribution"]
 
 
 def test_summarise_counts_overlap():
@@ -110,6 +172,26 @@ def test_run_local_writes_tables_and_manifest(tmp_path: Path):
     assert pq.read_table(out / "content.parquet").num_rows == 3
     assert saved["source"]["revision"] == "local"
     assert str(tmp_path) not in (out / "manifest.json").read_text()
+
+
+def test_run_requires_removal_list(tmp_path: Path):
+    data = _write_local(tmp_path)
+    with pytest.raises(FileNotFoundError):
+        g.run(tmp_path / "out", local=data, check_counts=False,
+              skillmap_root=_empty_skillmap(tmp_path), exclusions_path=tmp_path / "missing.json")
+
+
+def test_run_local_records_removal_and_attribution(tmp_path: Path):
+    data = _write_local(tmp_path)
+    ex = tmp_path / "ex.json"
+    ex.write_text(json.dumps({"repos": [{"repo": "someone/mirror"}], "blobs": []}))
+    out = tmp_path / "out"
+    m = g.run(out, local=data, check_counts=False, skillmap_root=_empty_skillmap(tmp_path),
+              exclusions_path=ex)
+    assert m["removal_list"]["repos_excluded"] == 1
+    assert m["removal_list"]["occurrences_dropped"] == 1
+    assert m["attribution"]["license"] == "CC-BY-4.0"
+    assert pq.read_schema(out / "content.parquet").metadata[b"license"] == b"CC-BY-4.0"
 
 
 def test_run_local_rejects_wrong_counts(tmp_path: Path):
@@ -226,6 +308,24 @@ def test_remote_read_uses_pinned_commit(monkeypatch, tmp_path):
     assert all(f"@{full}/" in p for p in fs.opened)
     assert m["inputs"]["artifacts"][0]["sha256"] == "f" * 64
     assert m["outputs"]["content"]["rows"] == 3
+
+
+def test_remote_read_resumes_from_saved_columns(monkeypatch, tmp_path):
+    pin = json.loads(g.SOURCES.read_text())["gitskills"]["hf_revision"]
+    full = pin + "0" * (40 - len(pin))
+    fs = _fake_hub(monkeypatch, tmp_path, full)
+    out = tmp_path / "out"
+    root = _empty_skillmap(tmp_path)
+    g.run(out, check_counts=False, skillmap_root=root)
+    assert len(fs.opened) == 2
+    fs.opened.clear()
+    m = g.run(out, check_counts=False, skillmap_root=root)
+    assert fs.opened == []  # both files came from the saved columns
+    assert m["outputs"]["content"]["rows"] == 3
+    # A different column list must not reuse the saved file.
+    info = g.resolve_revision("x/y", pin)
+    g.read_remote("x/y", info, "repos", g.REPO_COLUMNS[:3], out / ".cache")
+    assert len(fs.opened) == 1
 
 
 def test_remote_read_rejects_wrong_commit(monkeypatch, tmp_path):

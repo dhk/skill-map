@@ -3,3 +3,5 @@
 *.parquet
 *.csv
 *.jsonl
+# Saved remote columns, so an interrupted import resumes (crawlers/atlas/gitskills.py).
+.cache/

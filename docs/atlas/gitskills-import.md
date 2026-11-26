@@ -13,11 +13,13 @@ version 1.0.0) and writes three Atlas tables:
 | Table | Grain | Main fields |
 |---|---|---|
 | `occurrence` | one `SKILL.md` occurrence | repo, path, blob SHA, location class, platform folder, discovered_at |
-| `content` | one distinct blob SHA | representative repo and path, name, description excerpt (300 characters at most), body size, scripts and references flags, first and last commit dates, commit count |
+| `content` | one distinct blob SHA | representative repo and path, name, description excerpt (300 characters at most, only where licensed) and why it was withheld otherwise, licence of the earliest copy and the repo it came from, body size, scripts and references flags, first and last commit dates, commit count |
 | `repo` | one repository | stars, forks, fork flag, language, license, whether the license permits redistributing text, created and pushed dates |
 
 Every row in all three tables carries `source` (the dataset and resolved
-revision) and `method_version`.
+revision) and `method_version`. Each table's Parquet metadata carries the
+CC BY 4.0 licence and attribution for the annotations and for GitSkills, with
+a note that description excerpts stay under their authors' terms.
 
 Before writing anything, the importer checks its keys and stops on any failure:
 one representative row per blob SHA, no representative with an empty SHA,
@@ -29,14 +31,28 @@ occurrence. Repo names and licenses are matched without regard to case.
 - **File text and commit messages.** GitSkills releases its metadata under
   CC BY 4.0, but its `content` fields stay under each origin repository's
   license. Following the [data policy](../../DATA-POLICY.md), the import never
-  reads them. Descriptions, which are part of the file, are cut to 300
-  characters and flagged when cut.
+  reads them.
+- **Descriptions without a licence that allows them.** A description is part of
+  the file, so it is published (cut to 300 characters and flagged when cut)
+  only when the licence of the text's earliest copy is on the allow-list in
+  [`crawlers/licensing.py`](../../crawlers/licensing.py). Otherwise the row
+  keeps its pointer and `description_withheld` says `licence`. The earliest
+  copy is the one with the earliest git first-commit date; when no copy has
+  one, it is the copy whose repository was created first.
+- **Anything on the removal list.** Repositories in
+  [`data/exclusions.json`](../../data/exclusions.json) are dropped from all
+  three tables; if that removes a text's representative, another copy takes
+  its place. Texts listed by blob SHA keep only their pointer, with
+  `description_withheld` set to `removal-list`. The run stops if the list is
+  missing, and the manifest records its hash and what it removed.
 - **Commit author codes.** GitSkills replaces authors with keyed one-way codes.
   The catalogue doesn't need them; lineage work can add them later.
 
 ## Pinning and provenance
 
-The Hugging Face revision is pinned to commit `ebab174`, the short id shown on
+GitSkills is read from Hugging Face, which can serve single columns without the
+44 GB Zenodo database, and cited by its Zenodo DOI. The Hugging Face revision is
+pinned to commit `ebab174`, the short id shown on
 the dataset's file page on 26 Nov 2026. The importer resolves it to the full
 commit and stops if it resolves to anything else. The pin will be replaced with
 the full 40-character commit once the first run can reach Hugging Face. It also checks the expected row
@@ -47,6 +63,14 @@ file with its size and hash, the columns read, output row counts and hashes,
 and a summary. A `--local` run records the revision as `local` rather than a
 path on the machine, and relies on the input file hashes. The Parquet outputs are not committed; they go to GitHub release assets, with a copy on
 Hugging Face, with each Atlas release.
+
+## Resuming
+
+Each remote data file's selected columns are saved under
+`data/atlas/gitskills/.cache/` as soon as they arrive, next to a small record
+of the revision, file size, file hash and column list. A later run reuses a
+saved file only when all four match, so an interrupted import picks up where
+it stopped. `--no-cache` reads everything again.
 
 ## Platform folder
 
@@ -81,5 +105,9 @@ still fetched, so the transfer is small but not exactly the listed columns.
   out-star the parent (from the dataset card).
 - Commit dates exist for 458,548 files in standard locations plus a sample;
   they are one dating signal among several (see the [plan](plan.md)).
-- `license_permits_text` uses a fixed list of permissive SPDX ids and treats a
+- `license_permits_text` uses the data policy's allow-list and treats a
   missing or `NOASSERTION` license as not permitting redistribution.
+- The skill's own frontmatter licence can't be checked here, because the import
+  never reads the text. It is checked when text is fetched for later phases;
+  until then, only the repository licence and the removal list gate a
+  description.
