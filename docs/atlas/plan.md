@@ -112,7 +112,9 @@ of vendor skills (`anthropics/skills`, `openai/skills` including
 `.system/skill-creator`, OpenAI plugin repos, `vercel-labs/agent-skills` and
 others found). Template influence, such as a skill scaffolded by skill-creator
 that adds new ideas, is recorded separately and is not repackaging. Mirrors are
-kept in the data but excluded from concept-growth counts.
+kept in the data but excluded from concept-growth counts. The reference set is built by
+[`vendor_reference.py`](vendor-reference.md) from the repositories in
+`crawlers/atlas/vendors.json`.
 
 ## Data at the lowest grain
 
@@ -136,6 +138,8 @@ and the [data policy](../../DATA-POLICY.md).
 | `sophistication_feature` | content, feature, value, detector version, skill-creator scaffold flag |
 | `lineage_edge` | from, to, type (copy, edit, inherited-concept, convergent), source |
 | `family` | blob SHA, near-copy family ID, method version |
+| `vendor_version` | vendor, repo, path, commit, landed date, change, blob SHA, plugin manifest author, authorship |
+| `vendor_mirror` | vendor blob SHA, vendor repo and path, copy repo and path (exact copies only) |
 | `vendor_match` | content, vendor ancestor, class, similarity |
 
 ## Phases
