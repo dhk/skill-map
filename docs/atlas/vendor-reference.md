@@ -36,6 +36,15 @@ step that comes later.
 | Google | 7 | 4 | 5 | 0 | 2 |
 | Supabase | 5 | 2 | 0 | 0 | 5 |
 
+Matched against the GitSkills occurrence table (run on 26 Nov 2026, GitSkills
+commit `ebab1745`): **74,596 occurrences in 9,699 repositories are
+byte-identical to a vendor version**, covering 2,445 of the 5,111 vendor texts
+(48%). That is 2.0% of GitSkills' 3,797,113 occurrences and 3.4% of its
+282,191 repositories. Only exact copies count here; edited copies need the
+similarity step. Vendor versions published after the GitSkills crawl cannot
+have copies in it, so the 48% understates how much of the recent vendor output
+gets copied.
+
 Each repository's HEAD at the time of the run is pinned in
 [`data/atlas/vendor_reference/manifest.json`](../../data/atlas/vendor_reference/manifest.json).
 
