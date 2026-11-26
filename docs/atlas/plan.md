@@ -25,7 +25,7 @@ layer on these sources:
 
 | Source | Scale | Gives us | Does not give us |
 |---|---|---|---|
-| [GitSkills](https://arxiv.org/html/2608.10906) ([Zenodo](https://doi.org/10.5281/zenodo.21875637), [Hugging Face](https://huggingface.co/datasets/mvaccargiu/gitskills)) | 3,797,117 files, 282,200 repos, July 2026 | Occurrence table, content hashes, repo metadata, first/last commit dates for 458,548 records | No stated license, exact-byte dedup only, no purpose, concept or context labels |
+| [GitSkills](https://arxiv.org/html/2608.10906) ([Zenodo](https://doi.org/10.5281/zenodo.21875637), [Hugging Face](https://huggingface.co/datasets/mvaccargiu/gitskills)) | 3,797,117 files, 282,200 repos, July 2026 | Occurrence table, content hashes, repo metadata, first/last commit dates for 458,548 records | Metadata is CC BY 4.0 but file text stays under origin licenses; exact-byte dedup only; no purpose, concept or context labels |
 | [Skill Constellations](https://arxiv.org/html/2610.11169) | 2,193,119 dated adoptions | Directed copy network | Lineage of files, not ideas |
 | [How Agent Skills Evolve](https://arxiv.org/html/2611.04456) | 84,200 skills | Component taxonomy and change patterns | Cross-repo spread or context |
 | [From Anatomy to Smells](https://arxiv.org/html/2607.01456) | 238 coded skills | 13 high-level and 44 low-level components, 26 smells | Small sample, one marketplace |

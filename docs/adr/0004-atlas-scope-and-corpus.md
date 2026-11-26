@@ -31,7 +31,9 @@ GitHub code-search counts are not usable as population sizes.
 
 ## Consequences
 
-- Phase 1 depends on GitSkills' terms. Because it states no license, the Atlas
-  republishes its pointers and our derived labels, not its file contents.
+- GitSkills releases its metadata under CC BY 4.0, so the Atlas credits it and
+  can reuse that metadata. Its file text stays under each origin repository's
+  license, so the Atlas republishes pointers and derived labels, and uses
+  `repos.license` to decide where full text may be included.
 - The delta crawl reuses `crawlers/crawl.py` and adds license detection.
 - Pre-October-2025 history is out of scope until the sibling study.
