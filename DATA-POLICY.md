@@ -29,7 +29,9 @@ snapshots and has been corrected.
 - Annotations produced by this project (labels, scores, concept assignments,
   dates, lineage edges) are released under
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) from the Skill
-  Concepts Atlas onward, so they can be reused with attribution.
+  Concepts Atlas onward, so they can be reused with attribution. Short excerpts
+  quoted inside annotations as evidence are not covered by CC BY 4.0; they stay
+  under their authors' terms.
 
 ## Rules for new datasets and studies
 
@@ -45,7 +47,9 @@ Concepts Atlas.
    short span (at most 300 characters per excerpt) with its pointer.
 4. **Full text only where the license allows.** Full `SKILL.md` text is
    included in a published dataset only for repositories whose detected license
-   permits redistribution, and the license is recorded beside the text.
+   permits redistribution, and the license name and the original copyright
+   notice are recorded beside the text, as licenses such as MIT and Apache 2.0
+   require.
 5. **Bulk data lives outside git history.** Large tables are published as
    Parquet and CSV on Hugging Face and as release assets, not committed here.
 6. **Built for machine reuse.** Data is kept at the lowest grain, with stable
@@ -61,8 +65,10 @@ issue, or email the maintainer through [dhk.io](https://www.dhk.io).
 On a valid request (you control the source repository or are its author):
 
 - the repository is added to an exclusion list so future crawls skip it;
-- its text is removed from the current snapshot files and from derived data in
-  the next pipeline run, and from published datasets in their next release;
+- its text is removed by hand from the current snapshot files in `crawls/`
+  (the pipeline never edits snapshots), derived data is then rebuilt with
+  `crawlers/run_pipeline.py`, and published datasets drop it in their next
+  release;
 - the request and the date it was handled are recorded in the issue.
 
 Git history keeps earlier commits of this repository. Rewriting history to

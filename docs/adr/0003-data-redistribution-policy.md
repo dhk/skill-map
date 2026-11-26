@@ -9,7 +9,8 @@ Accepted
 ## Context
 
 The crawl snapshots under `crawls/` store the full text of public `SKILL.md`
-files (`skill_md_content`, 8,768 non-empty rows across three crawls). The
+files (`skill_md_content`: 8,768 non-empty rows across three crawls, holding
+4,341 unique texts from 43 repositories). The
 submission form and the community seed list told authors that nothing is
 copied into this repository. The repository's MIT license could also be read as
 covering that third-party text, which it cannot.
@@ -33,8 +34,9 @@ policy adopts.
 - Keep bulk data on Hugging Face and in release assets, not in git history.
 - Offer a removal route: an issue template plus an exclusion list honoured by
   future crawls and releases.
-- Leave the existing snapshots and git history in place. They are the evidence
-  behind published numbers, and rewriting history would break that audit trail.
+- Leave the existing snapshots and git history in place, except for removal
+  requests. They are the evidence behind published numbers, and rewriting
+  history would break that audit trail.
 
 ## Consequences
 
