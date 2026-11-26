@@ -64,3 +64,11 @@ corpus evidence.
 
 Treat dated planning documents as historical context unless the roadmap or an
 open issue confirms that the work is active.
+
+## Papers
+
+Drafts that describe this project's methods for readers outside it.
+
+| Path | What it covers |
+|---|---|
+| [`paper/agentic-repo-crawling.md`](paper/agentic-repo-crawling.md) | Draft methods paper: research-grade, agent-run crawling of git repositories, with the Atlas's failures as evidence |
