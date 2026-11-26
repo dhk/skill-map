@@ -1,6 +1,6 @@
 {
-  "method_version": "gitskills-import/1.2.0",
-  "generated_at": "2026-11-26T18:30:08+00:00",
+  "method_version": "gitskills-import/1.2.1",
+  "generated_at": "2026-11-26T19:43:17+00:00",
   "source": {
     "dataset": "mvaccargiu/gitskills",
     "revision": "ebab17454a7c236f8f26b183567f1a126f42e3f8",
@@ -80,26 +80,43 @@
     ],
     "repo_rows_dropped": 9,
     "occurrences_merged": 4,
+    "texts_dropped": 1,
     "occurrence_examples": [
       {
         "repo": "lzzmm/GPUbk",
         "path": "src/bk/data/codex-skill/gpubk/SKILL.md",
-        "merged_spelling": "lzzmm/gpubk"
+        "dropped_row_spelling": "lzzmm/gpubk",
+        "kept_row_spelling": "lzzmm/GPUbk",
+        "dropped_sha": "f5b619f2aaf299053f18afc797e09b5f12cb5063",
+        "kept_sha": "3d4d84553ddd3fb61f52a6b8523e053a667d88e3",
+        "dropped_text_kept_elsewhere": false
       },
       {
         "repo": "JubileeZ/Alpha-Zero-G",
         "path": "templates/global/skills/vendor/mattpocock-skills/productivity/grill-me/SKILL.md",
-        "merged_spelling": "JubileeZ/Alpha-Zero-G"
+        "dropped_row_spelling": "JubileeZ/Alpha-Zero-G",
+        "kept_row_spelling": "JubileeZ/alpha-zero-g",
+        "dropped_sha": "9470cfcfe231a35e46494cddbacdd395991afb1e",
+        "kept_sha": "9470cfcfe231a35e46494cddbacdd395991afb1e",
+        "dropped_text_kept_elsewhere": true
       },
       {
         "repo": "danheean/jurepi-kr",
         "path": ".claude/skills/dev-people-author/SKILL.md",
-        "merged_spelling": "danheean/jurepi-kr"
+        "dropped_row_spelling": "danheean/jurepi-kr",
+        "kept_row_spelling": "danheean/Jurepi-kr",
+        "dropped_sha": "fec9f0d15eb21a6b5261d3058c6ca61cf0f9d332",
+        "kept_sha": "fec9f0d15eb21a6b5261d3058c6ca61cf0f9d332",
+        "dropped_text_kept_elsewhere": true
       },
       {
         "repo": "danheean/jurepi-kr",
         "path": ".claude/skills/clean-architecture/SKILL.md",
-        "merged_spelling": "danheean/jurepi-kr"
+        "dropped_row_spelling": "danheean/jurepi-kr",
+        "kept_row_spelling": "danheean/Jurepi-kr",
+        "dropped_sha": "070380b6513abdd9618dbf8a5a61a7504a4667c8",
+        "kept_sha": "070380b6513abdd9618dbf8a5a61a7504a4667c8",
+        "dropped_text_kept_elsewhere": true
       }
     ],
     "representatives_reassigned": 0
@@ -310,17 +327,17 @@
     "occurrence": {
       "file": "occurrence.parquet",
       "rows": 3797113,
-      "sha256": "839cf4a9faea2fce64348e540d0e68ca1396cba30c574a26b6046de292872ccc"
+      "sha256": "48a43145f4b574f7090e650d02eafe670a2a62bbfbe025e826b9f504ef929c79"
     },
     "content": {
       "file": "content.parquet",
       "rows": 1877980,
-      "sha256": "f7f3fa30ff25cc76741b09a112f1c8f6366de305c95011b0d1c6dd3c57780c61"
+      "sha256": "34213eff721966a0fdcbff206b6faa0be1d986212b9b97f7bbe2fcc150bee4d3"
     },
     "repo": {
       "file": "repo.parquet",
       "rows": 282191,
-      "sha256": "e79d85ba82e0d1e1bf619e210c106bebd1dac76c061b8036163b529caa18b860"
+      "sha256": "a8270c53704166e552baf1210842567424900636660c5e13334ab52297d59ac6"
     }
   },
   "summary": {
