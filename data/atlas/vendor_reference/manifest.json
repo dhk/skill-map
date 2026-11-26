@@ -1,0 +1,237 @@
+{
+  "method_version": "vendor-reference/1.0.0",
+  "built_at": "2026-11-26T19:45:09+00:00",
+  "attribution": {
+    "license": "CC-BY-4.0",
+    "attribution": "Skill Map vendor reference set by Dave Holmes-Kinsella and contributors (https://github.com/dhk/skill-map). Pointers to files in each vendor's public repository; no file text is included."
+  },
+  "vendors_config": {
+    "path": "crawlers/atlas/vendors.json",
+    "sha256": "ac0262c04f9f9b72af522378341f0d859e616eadeea8e4040dcf80d5c3032b95"
+  },
+  "repos": [
+    {
+      "vendor": "Anthropic",
+      "repo": "anthropics/skills",
+      "head": "e4bb5d960d87126ff3b3a8af1a104b7db67560ba",
+      "license": null,
+      "version_rows": 138
+    },
+    {
+      "vendor": "Anthropic",
+      "repo": "anthropics/claude-plugins-official",
+      "head": "0fbfda5a91f4adc311daca25acc99132f40f0b6e",
+      "license": "Apache-2.0",
+      "version_rows": 108
+    },
+    {
+      "vendor": "Anthropic",
+      "repo": "anthropics/knowledge-work-plugins",
+      "head": "5e504ae11498f2b8daa30d86b7dab97b2ecd8092",
+      "license": "Apache-2.0",
+      "version_rows": 428
+    },
+    {
+      "vendor": "Anthropic",
+      "repo": "anthropics/k12-teacher-skills",
+      "head": "31fd6dbb0c07cb50bb3ce7f62a4135a393bd0e8c",
+      "license": "Apache-2.0",
+      "version_rows": 12
+    },
+    {
+      "vendor": "Anthropic",
+      "repo": "anthropics/claude-code",
+      "head": "a3b7a20a282a7b75ed68c2f8a0d0ecc822171c3e",
+      "license": null,
+      "version_rows": 23
+    },
+    {
+      "vendor": "OpenAI",
+      "repo": "openai/skills",
+      "head": "49f948faa9258a0c61caceaf225e179651397431",
+      "license": null,
+      "version_rows": 155
+    },
+    {
+      "vendor": "OpenAI",
+      "repo": "openai/plugins",
+      "head": "981b02c0c44058b595f3b4180002c3ae3c806d40",
+      "license": null,
+      "version_rows": 1747
+    },
+    {
+      "vendor": "OpenAI",
+      "repo": "openai/role-specific-plugins",
+      "head": "7a24b7988a36b563c1fddec4264e87e42b8cf697",
+      "license": null,
+      "version_rows": 274
+    },
+    {
+      "vendor": "Google",
+      "repo": "google-gemini/gemini-skills",
+      "head": "c4d0c62c1240e08a90546186bf320600ab6a039a",
+      "license": "Apache-2.0",
+      "version_rows": 72
+    },
+    {
+      "vendor": "Microsoft",
+      "repo": "microsoft/skills",
+      "head": "47eb3888eb42aef074fcb617931bf6e5934e45d9",
+      "license": "MIT",
+      "version_rows": 2068
+    },
+    {
+      "vendor": "Microsoft",
+      "repo": "microsoft/azure-skills",
+      "head": "7847020998043c6231929b364c35393b7cdab270",
+      "license": "MIT",
+      "version_rows": 817
+    },
+    {
+      "vendor": "Microsoft",
+      "repo": "microsoft/skills-for-fabric",
+      "head": "540c3c58abc804c2715c6632026784f04b342388",
+      "license": "MIT",
+      "version_rows": 678
+    },
+    {
+      "vendor": "Microsoft",
+      "repo": "microsoft/power-platform-skills",
+      "head": "8bbba80a64e16e2fbe3e2fe56ec9ef22c6c7a170",
+      "license": "MIT",
+      "version_rows": 891
+    },
+    {
+      "vendor": "Hugging Face",
+      "repo": "huggingface/skills",
+      "head": "aafb3adfb80951cc90836cc6fd17bb345aa49eef",
+      "license": "Apache-2.0",
+      "version_rows": 185
+    },
+    {
+      "vendor": "Vercel",
+      "repo": "vercel-labs/agent-skills",
+      "head": "5a37a6329fbad3666c3207392a6a7c0110e92efb",
+      "license": null,
+      "version_rows": 65
+    },
+    {
+      "vendor": "Vercel",
+      "repo": "vercel-labs/next-skills",
+      "head": "c522619e45aa3492fd2bfc916b308b275eff7798",
+      "license": null,
+      "version_rows": 67
+    },
+    {
+      "vendor": "Vercel",
+      "repo": "vercel-labs/skills",
+      "head": "57217cf86ba38148a57af9e90d14a4c049558330",
+      "license": "MIT",
+      "version_rows": 18
+    },
+    {
+      "vendor": "Cloudflare",
+      "repo": "cloudflare/skills",
+      "head": "ff191de7d903788eceaf516a514ae7d3b56b924a",
+      "license": "Apache-2.0",
+      "version_rows": 178
+    },
+    {
+      "vendor": "Supabase",
+      "repo": "supabase/agent-skills",
+      "head": "c9be0e931b7930f7d02126d04774d904c381e7d7",
+      "license": "MIT",
+      "version_rows": 22
+    },
+    {
+      "vendor": "Sentry",
+      "repo": "getsentry/skills",
+      "head": "a582c51ee29d0f35e6ac321340796f77d43da733",
+      "license": "Apache-2.0",
+      "version_rows": 222
+    }
+  ],
+  "summary": {
+    "version_rows": 8168,
+    "distinct_blobs": 5111,
+    "skill_paths": 2709,
+    "by_vendor": {
+      "Anthropic": {
+        "skill_paths": 426,
+        "present_at_head": 338,
+        "first-party": 278,
+        "other-author": 81,
+        "unstated": 67
+      },
+      "Cloudflare": {
+        "skill_paths": 34,
+        "present_at_head": 24,
+        "first-party": 32,
+        "other-author": 0,
+        "unstated": 2
+      },
+      "Sentry": {
+        "skill_paths": 61,
+        "present_at_head": 31,
+        "first-party": 60,
+        "other-author": 0,
+        "unstated": 1
+      },
+      "Google": {
+        "skill_paths": 7,
+        "present_at_head": 4,
+        "first-party": 5,
+        "other-author": 0,
+        "unstated": 2
+      },
+      "Hugging Face": {
+        "skill_paths": 56,
+        "present_at_head": 20,
+        "first-party": 48,
+        "other-author": 0,
+        "unstated": 8
+      },
+      "Microsoft": {
+        "skill_paths": 1057,
+        "present_at_head": 500,
+        "first-party": 462,
+        "other-author": 10,
+        "unstated": 585
+      },
+      "OpenAI": {
+        "skill_paths": 1020,
+        "present_at_head": 585,
+        "first-party": 342,
+        "other-author": 611,
+        "unstated": 67
+      },
+      "Supabase": {
+        "skill_paths": 5,
+        "present_at_head": 2,
+        "first-party": 0,
+        "other-author": 0,
+        "unstated": 5
+      },
+      "Vercel": {
+        "skill_paths": 43,
+        "present_at_head": 14,
+        "first-party": 0,
+        "other-author": 0,
+        "unstated": 43
+      }
+    }
+  },
+  "mirror": null,
+  "outputs": [
+    {
+      "path": "version.parquet",
+      "rows": 8168,
+      "sha256": "3b2d6291a3c8eb2709ff2885b9398e25e62c1cf937428957af14f11bf6bef2c2"
+    },
+    {
+      "path": "skill.parquet",
+      "rows": 2709,
+      "sha256": "8e0f93a6b5a4eaa60fbec21504dea4744751c25e8e6622c459223aa4296bd7b4"
+    }
+  ]
+}

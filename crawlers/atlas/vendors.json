@@ -1,0 +1,71 @@
+{
+  "_about": "Vendor reference set (crawlers/atlas/vendor_reference.py). Each repository is one that a vendor publishes its own skills or plugins from. Community marketplaces that only list third-party work (anthropics/claude-plugins-community, openai/community-plugins) are left out on purpose. license is GitHub's detected repository licence on 2026-11-26 (search API), recorded as metadata only: no skill text is copied. partner_paths are path prefixes the repository itself sets aside for work by other companies; a plugin manifest's author, where there is one, decides first.",
+  "checked": "2026-11-26",
+  "vendors": {
+    "Anthropic": {
+      "names": ["Anthropic"],
+      "repos": [
+        {"repo": "anthropics/skills", "license": null},
+        {"repo": "anthropics/claude-plugins-official", "license": "Apache-2.0", "partner_paths": ["external_plugins/"]},
+        {"repo": "anthropics/knowledge-work-plugins", "license": "Apache-2.0", "partner_paths": ["partner-built/"]},
+        {"repo": "anthropics/k12-teacher-skills", "license": "Apache-2.0"},
+        {"repo": "anthropics/claude-code", "license": null}
+      ]
+    },
+    "OpenAI": {
+      "names": ["OpenAI"],
+      "repos": [
+        {"repo": "openai/skills", "license": null},
+        {"repo": "openai/plugins", "license": null},
+        {"repo": "openai/role-specific-plugins", "license": null}
+      ]
+    },
+    "Google": {
+      "names": ["Google"],
+      "repos": [
+        {"repo": "google-gemini/gemini-skills", "license": "Apache-2.0"}
+      ]
+    },
+    "Microsoft": {
+      "names": ["Microsoft"],
+      "repos": [
+        {"repo": "microsoft/skills", "license": "MIT"},
+        {"repo": "microsoft/azure-skills", "license": "MIT"},
+        {"repo": "microsoft/skills-for-fabric", "license": "MIT"},
+        {"repo": "microsoft/power-platform-skills", "license": "MIT"}
+      ]
+    },
+    "Hugging Face": {
+      "names": ["Hugging Face", "HuggingFace"],
+      "repos": [
+        {"repo": "huggingface/skills", "license": "Apache-2.0"}
+      ]
+    },
+    "Vercel": {
+      "names": ["Vercel"],
+      "repos": [
+        {"repo": "vercel-labs/agent-skills", "license": null},
+        {"repo": "vercel-labs/next-skills", "license": null},
+        {"repo": "vercel-labs/skills", "license": "MIT"}
+      ]
+    },
+    "Cloudflare": {
+      "names": ["Cloudflare"],
+      "repos": [
+        {"repo": "cloudflare/skills", "license": "Apache-2.0"}
+      ]
+    },
+    "Supabase": {
+      "names": ["Supabase"],
+      "repos": [
+        {"repo": "supabase/agent-skills", "license": "MIT"}
+      ]
+    },
+    "Sentry": {
+      "names": ["Sentry", "Functional Software"],
+      "repos": [
+        {"repo": "getsentry/skills", "license": "Apache-2.0"}
+      ]
+    }
+  }
+}
