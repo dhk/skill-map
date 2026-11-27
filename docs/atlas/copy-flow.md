@@ -18,10 +18,13 @@ manifest has a `mirror` section and every input table matches the hash the
 manifest records, so a `mirror.parquet` left from an older run can't slip in.
 It records those hashes in `meta.inputs_sha256`.
 
-If the output is over 1 MB it is written to `release/copy_flow.json`
-(gitignored) and the command exits with status 3: lower `--max-repos`, or
-attach the file to a release, as [ADR 0007](../adr/0007-atlas-hosting-and-publication.md)
-puts bulk tables in release assets rather than git. Open the page through any static server from the repo
+The output is kept under 1 MB, because [ADR 0007](../adr/0007-atlas-hosting-and-publication.md)
+keeps only small tables in git. If the default caps (400 skills, 500
+repositories) come out larger, the export steps them down (300/300, 200/300,
+150/200, 100/150 repositories/skills) and records the caps it used in
+`meta.caps`. If even the smallest step is over 1 MB, it writes
+`release/copy_flow.json` (gitignored) and exits with status 3, for a release
+asset. The full grain stays in `mirror.parquet`. Open the page through any static server from the repo
 root (for example `python -m http.server`), because browsers block `fetch` from
 `file://`.
 
@@ -46,10 +49,16 @@ Counts and pointers only: repository names, paths, dates, authorship labels and
 copy counts. No skill text. Repositories on the removal list are dropped. Each
 file whose own text is on the removal list is counted in its skill's
 `removal_listed_copies` (and `totals.copies_of_removal_listed_texts`), rather
-than flagging a whole skill because one of its versions is listed. The repository
-list is capped (`--max-repos`, default 500, each copying at least
-`--min-skills` distinct vendor skills, default 3), so the graph view shows the
-heaviest copiers, not every copier; the vendor and skill totals are uncapped.
+than flagging a whole skill because one of its versions is listed.
+
+Two lists are capped. `skills` holds the skills found in the most repositories
+(`--max-skills`, default 400); every other copied skill is summed per vendor in
+`skills_rest`, which the Sankey folds into each vendor's grouped node.
+`repos` holds the repositories with the most distinct vendor skills
+(`--max-repos`, default 500, each with at least `--min-skills`, default 3).
+`edges` are `[skill index, repo index, files]` between those two lists only, so
+the graph shows the heaviest holders, not every one. Vendor rows and `totals`
+are uncapped.
 
 ## Views
 

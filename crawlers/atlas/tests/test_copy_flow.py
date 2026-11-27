@@ -92,9 +92,19 @@ def test_vendor_rows_include_vendors_with_no_copies():
 def test_repos_and_edges_respect_min_skills_and_cap():
     d = built(min_skills=2)
     assert [r["repo"] for r in d["repos"]] == ["u/one"]
-    assert {(e["skill"], e["copies"]) for e in d["edges"]} == {
-        ("acme/skills:s/alpha/SKILL.md", 2), ("acme/skills:s/secret/SKILL.md", 1)}
+    ids = [s["id"] for s in d["skills"]]
+    assert {(ids[si], d["repos"][ri]["repo"], n) for si, ri, n in d["edges"]} == {
+        ("acme/skills:s/alpha/SKILL.md", "u/one", 2), ("acme/skills:s/secret/SKILL.md", "u/one", 1)}
     assert built(min_skills=1, max_repos=1)["totals"]["repos_shown"] == 1
+
+
+def test_skills_beyond_the_cap_are_summed_per_vendor():
+    d = built(min_skills=1, max_skills=1)
+    assert [s["name"] for s in d["skills"]] == ["alpha"]
+    assert d["skills_rest"] == [{"vendor": "Acme", "skills": 1, "copies": 1, "removal_listed_copies": 1,
+                                 "by_platform": {"other": {"copies": 1}}}]
+    assert all(si == 0 for si, _, _ in d["edges"])  # edges only to skills shown
+    assert d["totals"]["skills_copied"] == 2 and d["totals"]["skills_shown"] == 1
 
 
 def test_cross_vendor_passthrough():
@@ -118,7 +128,7 @@ def write_inputs(tmp_path, mirror_section=True, **override):
     return exc
 
 
-TOP_KEYS = {"vendors", "skills", "repos", "edges", "cross_vendor", "totals", "meta"}
+TOP_KEYS = {"vendors", "skills", "skills_rest", "repos", "edges", "cross_vendor", "totals", "meta"}
 SKILL_KEYS = {"id", "vendor", "repo", "path", "name", "authorship", "manifest_author", "versions",
               "first_landed_at", "present_at_head", "removal_listed_copies", "copies",
               "versions_copied", "copy_repos", "by_platform"}
@@ -133,7 +143,7 @@ def test_run_writes_only_allowed_keys(tmp_path):
     assert set(saved) == TOP_KEYS
     assert all(set(s) == SKILL_KEYS for s in saved["skills"])
     assert all(set(r) == {"repo", "skills", "copies", "vendors"} for r in saved["repos"])
-    assert all(set(e) == {"skill", "repo", "copies"} for e in saved["edges"])
+    assert all(len(e) == 3 and all(isinstance(x, int) for x in e) for e in saved["edges"])
     assert all(set(c) == {"origin_vendor", "origin_skill", "origin_landed_at", "copy_vendor", "copy_repo",
                           "copy_path", "copy_landed_at", "copy_authorship", "same_day"}
                for c in saved["cross_vendor"])
@@ -159,6 +169,17 @@ def test_run_refuses_stale_mirror(tmp_path):
         cf.run(tmp_path, tmp_path / "x.json", exc)
     assert cf.main(["--src", str(tmp_path), "--out", str(tmp_path / "x.json"),
                     "--exclusions", str(exc)]) == 2
+
+
+def test_caps_step_down_to_fit(tmp_path, monkeypatch):
+    exc = write_inputs(tmp_path)
+    cf.run(tmp_path, tmp_path / "small.json", exc, min_skills=1, max_skills=1)
+    small = (tmp_path / "small.json").stat().st_size
+    monkeypatch.setattr(cf, "FIT_STEPS", ((500, 1),))
+    d, written = cf.run(tmp_path, tmp_path / "fit.json", exc, min_skills=1, max_bytes=small + 50)
+    assert written == tmp_path / "fit.json"
+    assert d["meta"]["caps"] == {"max_repos": 500, "max_skills": 1, "reduced_to_fit": True}
+    assert len(d["skills"]) == 1 and d["skills_rest"]
 
 
 def test_oversized_output_goes_to_release_dir(tmp_path):

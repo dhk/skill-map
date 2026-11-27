@@ -208,6 +208,13 @@ td.n, th.n { text-align: right; }
       : `${s.name} (${repoShort(s)}/${s.path.split("/")[0]})`;
   });
   const skillById = new Map(data.skills.map(s => [s.id, s]));
+  // Edges arrive as [skill index, repo index, files] to keep the file small.
+  data.edges = data.edges.map(([si, ri, c]) => ({ skill: data.skills[si].id, repo: data.repos[ri].repo, copies: c }));
+  // Skills beyond the export's cap arrive summed per vendor; the Sankey folds them into each vendor's rest.
+  const restRows = (data.skills_rest || []).map(r => ({ ...r, id: "rest:" + r.vendor, rest: true }));
+  const gSk = document.getElementById("g-sk");
+  gSk.max = Math.min(+gSk.max, data.skills.length);
+  if (+gSk.value > +gSk.max) { gSk.value = gSk.max; document.getElementById("g-sk-v").textContent = gSk.value; }
   const skillTip = s => `<b>${esc(s.label || s.name)}</b> <span class="k">· ${esc(s.vendor)}</span><br>
     <span class="k">${esc(s.repo)}/${esc(s.path)}</span><br>
     ${fmt(s.copy_repos)} repositories · ${fmt(s.copies)} files<br>
@@ -253,6 +260,7 @@ td.n, th.n { text-align: right; }
     const n = +document.getElementById("sk-n").value;
     const skills = data.skills.filter(s => active.has(vendorGroup(s.vendor)));
     if (!skills.length) { host.innerHTML = '<p class="empty">No skills for this selection.</p>'; return; }
+    const flows = skills.concat(restRows.filter(r => active.has(vendorGroup(r.vendor))));
     // Same ranking as the table and graph: repositories first, files to break ties.
     const top = skills.slice().sort((a, b) => b.copy_repos - a.copy_repos || b.copies - a.copies).slice(0, n);
     const topIds = new Set(top.map(s => s.id));
@@ -261,14 +269,14 @@ td.n, th.n { text-align: right; }
     const links = [];
     const add = (s, tgt, v, attrs) => { if (v > 0) links.push({ source: s, target: tgt, value: v, ...attrs }); };
     const restByVendor = new Map();
-    skills.forEach(s => {
+    flows.forEach(s => {
       const g = vendorGroup(s.vendor);
       const vNode = node("v:" + g, { kind: "vendor", label: g, group: g });
       let mid;
       if (topIds.has(s.id)) mid = node("s:" + s.id, { kind: "skill", label: s.label, group: g, skill: s });
       else {
         mid = node("r:" + g, { kind: "rest", label: g === "Other vendors" ? "Skills from other vendors" : `Other ${g} skills`, group: g, count: 0 });
-        nodes[mid].count = (nodes[mid].count || 0) + 1;
+        nodes[mid].count = (nodes[mid].count || 0) + (s.rest ? s.skills : 1);
       }
       add(vNode, mid, s.copies, { group: g });
       Object.entries(s.by_platform).forEach(([p, c]) => {

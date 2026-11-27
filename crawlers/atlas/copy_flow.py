@@ -5,10 +5,11 @@ must include mirror.parquet (built with --gitskills), and writes one
 aggregated, pointer-only JSON file for atlas-copies.html:
 
 - vendors:      per vendor, skills published, skills copied, copies, copying repos;
-- skills:       every vendor skill with at least one copy, with its copies and
-                copying repos by agent platform folder;
-- repos:        the repositories that copy the most distinct vendor skills;
-- edges:        skill -> repo copy counts, for those repositories only;
+- skills:       the vendor skills found in the most repositories (--max-skills),
+                with their files and repositories by agent platform folder;
+- skills_rest:  every other copied skill, summed per vendor;
+- repos:        the repositories that hold the most distinct vendor skills;
+- edges:        [skill index, repo index, files] for those skills and repositories;
 - cross_vendor: copies from one vendor's repository into another's.
 
 A "skill" is a vendor repository and SKILL.md path; a copy is a GitSkills
@@ -21,8 +22,10 @@ counted per skill.
 
 The inputs must match the hashes in the vendor reference manifest, and the
 manifest must have a mirror section, so a mirror.parquet left over from an
-older run is refused. Output over MAX_BYTES is written under release/ for a
-GitHub release asset instead (ADR 0007).
+older run is refused. If the output is over MAX_BYTES the skill and repository
+caps step down (FIT_STEPS) until it fits; if it still doesn't, it is written
+under release/ for a GitHub release asset instead (ADR 0007). The full grain
+stays in mirror.parquet.
 
 Usage:
     python -m crawlers.atlas.copy_flow
@@ -42,13 +45,16 @@ import pyarrow.parquet as pq
 
 from crawlers import exclusions as removal
 
-METHOD_VERSION = "copy-flow/1.1.0"
+METHOD_VERSION = "copy-flow/1.2.0"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_IN = REPO_ROOT / "data" / "atlas" / "vendor_reference"
 DEFAULT_OUT = DEFAULT_IN / "copy_flow.json"
 DEFAULT_EXCLUSIONS = REPO_ROOT / "data" / "exclusions.json"
 INPUTS = ("version.parquet", "skill.parquet", "mirror.parquet", "cross_vendor.parquet")
 MAX_BYTES = 1_000_000
+MAX_REPOS, MAX_SKILLS = 500, 400
+# (max_repos, max_skills) tried in order when the output is over MAX_BYTES.
+FIT_STEPS = ((300, 300), (200, 300), (150, 200), (100, 150))
 PLATFORMS = ["claude", "agents", "codex", "cursor", "github", "opencode",
              "gemini", "kiro", "windsurf", "other"]
 
@@ -74,7 +80,8 @@ def skill_name(path: str) -> str:
 
 
 def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: list[dict],
-          ex: removal.Exclusions, max_repos: int = 500, min_skills: int = 3) -> dict:
+          ex: removal.Exclusions, max_repos: int = MAX_REPOS, min_skills: int = 3,
+          max_skills: int = MAX_SKILLS) -> dict:
     info = {(s["repo"], s["path"]): s for s in skills}
 
     per_skill: dict[str, dict] = {}
@@ -138,12 +145,28 @@ def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: l
         })
     vendors.sort(key=lambda v: (-v["copy_repos"], v["vendor"]))
 
+    shown, tail = out_skills[:max_skills], out_skills[max_skills:]
+    rest: dict[str, dict] = {}
+    for t in tail:
+        r = rest.setdefault(t["vendor"], {"vendor": t["vendor"], "skills": 0, "copies": 0,
+                                          "removal_listed_copies": 0, "by_platform": Counter()})
+        r["skills"] += 1
+        r["copies"] += t["copies"]
+        r["removal_listed_copies"] += t["removal_listed_copies"]
+        for p, c in t["by_platform"].items():
+            r["by_platform"][p] += c["copies"]
+    skills_rest = [{**r, "by_platform": {p: {"copies": r["by_platform"][p]} for p in PLATFORMS
+                                         if r["by_platform"][p]}}
+                   for r in sorted(rest.values(), key=lambda r: r["vendor"])]
+
+    # Repositories ranked by how many distinct vendor skills they hold (all skills count).
     ranked = sorted(repo_skills.items(), key=lambda kv: (-len(kv[1]), -sum(kv[1].values()), kv[0]))
     top = [(r, c) for r, c in ranked if len(c) >= min_skills][:max_repos]
     repos_out = [{"repo": r, "skills": len(c), "copies": sum(c.values()),
                   "vendors": dict(sorted(repo_vendors[r].items()))} for r, c in top]
-    edges = [{"skill": sid, "repo": r, "copies": n}
-             for r, c in top for sid, n in sorted(c.items())]
+    skill_index = {sk["id"]: i for i, sk in enumerate(shown)}
+    edges = [[skill_index[sid], ri, n]
+             for ri, (_r, c) in enumerate(top) for sid, n in sorted(c.items()) if sid in skill_index]
 
     cross_out = [{
         "origin_vendor": c["origin_vendor"], "origin_skill": skill_id(c["origin_repo"], c["origin_path"]),
@@ -154,7 +177,7 @@ def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: l
     } for c in cross]
 
     return {
-        "vendors": vendors, "skills": out_skills, "repos": repos_out,
+        "vendors": vendors, "skills": shown, "skills_rest": skills_rest, "repos": repos_out,
         "edges": edges, "cross_vendor": cross_out,
         "totals": {
             "copies": sum(s["copies"] for s in out_skills),
@@ -163,7 +186,8 @@ def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: l
             "skills_published": len(skills),
             "copies_dropped_removal_list": dropped,
             "copies_of_removal_listed_texts": listed_copies,
-            "repos_shown": len(repos_out), "min_skills_for_repo": min_skills,
+            "skills_shown": len(shown), "repos_shown": len(repos_out),
+            "min_skills_for_repo": min_skills,
         },
     }
 
@@ -197,15 +221,34 @@ def check_inputs(src: Path) -> tuple[dict, dict[str, str]]:
 
 
 def run(src: Path = DEFAULT_IN, out: Path = DEFAULT_OUT,
-        exclusions_path: Path = DEFAULT_EXCLUSIONS, max_repos: int = 500,
-        min_skills: int = 3, max_bytes: int = MAX_BYTES) -> tuple[dict, Path]:
+        exclusions_path: Path = DEFAULT_EXCLUSIONS, max_repos: int = MAX_REPOS,
+        min_skills: int = 3, max_bytes: int = MAX_BYTES,
+        max_skills: int = MAX_SKILLS) -> tuple[dict, Path]:
     """Write the export; return it and the path written (under release/ when too big)."""
     manifest, hashes = check_inputs(src)
     read = lambda name: pq.read_table(src / name).to_pylist()  # noqa: E731
-    data = build(read("version.parquet"), read("skill.parquet"), read("mirror.parquet"),
-                 read("cross_vendor.parquet"), removal.load(exclusions_path),
-                 max_repos=max_repos, min_skills=min_skills)
-    data["meta"] = {
+    tables = [read(n) for n in ("version.parquet", "skill.parquet", "mirror.parquet",
+                                "cross_vendor.parquet")]
+    ex = removal.load(exclusions_path)
+    steps = [(max_repos, max_skills)] + [(min(r, max_repos), min(k, max_skills))
+                                         for r, k in FIT_STEPS]
+    for repos_cap, skills_cap in steps:
+        data = build(*tables, ex, max_repos=repos_cap, min_skills=min_skills, max_skills=skills_cap)
+        data["meta"] = _meta(manifest, hashes, exclusions_path,
+                             {"max_repos": repos_cap, "max_skills": skills_cap,
+                              "reduced_to_fit": (repos_cap, skills_cap) != (max_repos, max_skills)})
+        body = (json.dumps(data, separators=(",", ":"), ensure_ascii=False) + "\n").encode("utf-8")
+        if len(body) <= max_bytes:
+            break
+    else:
+        out = out.parent / "release" / out.name
+        out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_bytes(body)
+    return data, out
+
+
+def _meta(manifest: dict, hashes: dict, exclusions_path: Path, caps: dict) -> dict:
+    return {
         "method_version": METHOD_VERSION,
         "built_at": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat(),
         "attribution": ATTRIBUTION,
@@ -216,13 +259,8 @@ def run(src: Path = DEFAULT_IN, out: Path = DEFAULT_OUT,
         "gitskills_revision": manifest["mirror"].get("gitskills_revision"),
         "removal_list_sha256": hashlib.sha256(Path(exclusions_path).read_bytes()).hexdigest(),
         "platforms": PLATFORMS,
+        "caps": caps,
     }
-    body = (json.dumps(data, separators=(",", ":"), ensure_ascii=False) + "\n").encode("utf-8")
-    if len(body) > max_bytes:
-        out = out.parent / "release" / out.name
-        out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_bytes(body)
-    return data, out
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -230,14 +268,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--src", type=Path, default=DEFAULT_IN)
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
     ap.add_argument("--exclusions", type=Path, default=DEFAULT_EXCLUSIONS)
-    ap.add_argument("--max-repos", type=int, default=500)
+    ap.add_argument("--max-repos", type=int, default=MAX_REPOS)
+    ap.add_argument("--max-skills", type=int, default=MAX_SKILLS)
     ap.add_argument("--min-skills", type=int, default=3)
     ap.add_argument("--max-bytes", type=int, default=MAX_BYTES,
                     help="larger output goes under release/ for a release asset, not a commit")
     args = ap.parse_args(argv)
     try:
         data, written = run(args.src, args.out, args.exclusions, args.max_repos,
-                            args.min_skills, args.max_bytes)
+                            args.min_skills, args.max_bytes, args.max_skills)
     except (FileNotFoundError, StaleInputError) as e:
         print(f"copy_flow: {e}", file=sys.stderr)
         return 2
@@ -245,10 +284,13 @@ def main(argv: list[str] | None = None) -> int:
     size = written.stat().st_size
     if written != args.out:
         print(f"copy_flow: output is {size:,} bytes, over {args.max_bytes:,}, so it was written to "
-              f"{written} for a release asset. Don't commit it; lower --max-repos to fit, or "
-              "attach it to a release (ADR 0007).", file=sys.stderr)
+              f"{written} for a release asset. Don't commit it; lower --max-repos and --max-skills "
+              "to fit, or attach it to a release (ADR 0007).", file=sys.stderr)
         return 3
-    print(f"wrote {written} ({size:,} bytes)", file=sys.stderr)
+    caps = data["meta"]["caps"]
+    note = " (caps lowered to fit)" if caps["reduced_to_fit"] else ""
+    print(f"wrote {written} ({size:,} bytes; {caps['max_skills']} skills, "
+          f"{caps['max_repos']} repositories{note})", file=sys.stderr)
     return 0
 
 
