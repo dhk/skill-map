@@ -125,7 +125,7 @@ row counts and output hashes is committed.
 | `version` | one SKILL.md add, change or delete | vendor, repo, repo licence, path, skill directory, commit, committed and authored dates (UTC), change, blob SHA, previous blob SHA, plugin manifest, manifest author, authorship and basis, whether the text is on the removal list |
 | `cross_vendor` | one vendor that published, byte for byte, a text another vendor published first | blob SHA, origin vendor, repo, path and landing date, copy vendor, repo, path and landing date, the copy's manifest author and authorship, same-day flag |
 | `skill` | one repository and path | first landed, last changed, distinct versions, present today, current blob SHA, authorship of its last live version |
-| `mirror` | one GitSkills occurrence outside the vendor repositories whose text is byte-identical to a vendor version | blob SHA, vendor, vendor repo and path, when the vendor first published it, copy repo, copy path, platform folder |
+| `mirror` | one GitSkills occurrence outside the vendor repositories whose text is byte-identical to a vendor version | blob SHA, vendor, vendor repo and path it is credited to, when that path first published it, that path's authorship and manifest author, credit (`vendor` or `repackaged`), copy repo, copy path, platform folder |
 
 Every row carries `method_version`; every table's metadata carries the CC BY
 4.0 attribution.
@@ -173,4 +173,8 @@ uv run --with pyarrow python -m crawlers.atlas.vendor_reference --gitskills data
 ```
 
 That adds `mirror.parquet` and a `mirror` summary to the manifest (copies,
-copying repositories, vendor texts copied, and the GitSkills revision used).
+copying repositories, vendor texts copied, copies by credit, the credit rule and
+the GitSkills revision used). Each text is credited to the earliest path where
+a vendor published it as its own (first-party or unstated); only a text no
+vendor published as its own goes to the earliest path naming another author,
+with credit `repackaged` ([copy-flow.md](copy-flow.md#what-counts)).

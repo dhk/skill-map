@@ -114,7 +114,8 @@ others found). Template influence, such as a skill scaffolded by skill-creator
 that adds new ideas, is recorded separately and is not repackaging. Mirrors are
 kept in the data but excluded from concept-growth counts. The reference set is built by
 [`vendor_reference.py`](vendor-reference.md) from the repositories in
-`crawlers/atlas/vendors.json`.
+`crawlers/atlas/vendors.json`. How those copies spread is drawn in
+`atlas-copies.html`; see [copy-flow.md](copy-flow.md).
 
 ## Data at the lowest grain
 

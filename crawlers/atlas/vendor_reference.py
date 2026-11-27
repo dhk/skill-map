@@ -43,7 +43,12 @@ other Atlas tables; manifest.json is committed):
                    published byte for byte (origin, copy, both landing dates);
 - mirror.parquet:  with --gitskills, one row per GitSkills occurrence outside
                    the vendor repositories whose blob SHA is a vendor version
-                   (an exact copy of something a vendor published);
+                   (an exact copy of something a vendor published). Each text
+                   is credited to one vendor path: the earliest that published
+                   it as the vendor's own (first-party or unstated), else the
+                   earliest that names another author. credit says which
+                   ("vendor" or "repackaged"), with that path's authorship and
+                   manifest author;
 - manifest.json:   method version, each repository's pinned HEAD, row counts,
                    output hashes.
 
@@ -77,7 +82,7 @@ import pyarrow.parquet as pq
 
 from crawlers import exclusions as removal
 
-METHOD_VERSION = "vendor-reference/1.1.0"
+METHOD_VERSION = "vendor-reference/1.2.0"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 VENDORS = Path(__file__).with_name("vendors.json")
 DEFAULT_OUT = REPO_ROOT / "data" / "atlas" / "vendor_reference"
@@ -441,14 +446,37 @@ def cross_vendor_summary(rows: list[dict]) -> dict:
     }
 
 
+# A vendor's own text: its manifest names the vendor, or nothing names anyone else.
+OWN_AUTHORSHIP = {"first-party", "unstated"}
+
+
+def credit_class(authorship: str | None) -> str:
+    """'vendor' for the vendor's own text, 'repackaged' when a manifest or partner path names another author."""
+    return "repackaged" if authorship == "other-author" else "vendor"
+
+
+def credited_landings(versions: list[dict]) -> dict[str, dict]:
+    """The one vendor version each text is credited to.
+
+    The vendor's own publication comes first, since that is the worked example
+    people meet and reuse: the earliest landing whose authorship is first-party
+    or unstated. Only a text that no vendor published as its own is credited to
+    the earliest landing that names another author (a partner, a team or a
+    person), and its copies count as repackaged.
+    """
+    own: dict[str, dict] = {}
+    other: dict[str, dict] = {}
+    for (sha, _vendor), v in sorted(first_landings(versions).items(),
+                                    key=lambda kv: kv[1]["committed_at"]):
+        (own if v.get("authorship", "unstated") in OWN_AUTHORSHIP else other).setdefault(sha, v)
+    return {**other, **own}
+
+
 def mirror_rows(versions: list[dict], occurrence: pa.Table,
                 ex: removal.Exclusions | None = None) -> list[dict]:
     """GitSkills occurrences outside vendor repositories that are byte-identical to a vendor version."""
     vendor_repos = {v["repo"].lower() for v in versions}
-    first: dict[str, dict] = {}
-    for (sha, _vendor), v in sorted(first_landings(versions).items(),
-                                    key=lambda kv: kv[1]["committed_at"]):
-        first.setdefault(sha, v)
+    first = credited_landings(versions)
     repos = occurrence.column("repo_full_name").to_pylist()
     paths = occurrence.column("path").to_pylist()
     shas = occurrence.column("blob_sha").to_pylist()
@@ -464,6 +492,9 @@ def mirror_rows(versions: list[dict], occurrence: pa.Table,
         out.append({
             "blob_sha": sha, "vendor": v["vendor"], "vendor_repo": v["repo"],
             "vendor_path": v["path"], "vendor_first_landed_at": v["committed_at"],
+            "vendor_authorship": v.get("authorship", "unstated"),
+            "vendor_manifest_author": v.get("manifest_author"),
+            "credit": credit_class(v.get("authorship")),
             "copy_repo": repo, "copy_path": path, "copy_platform_folder": folder,
             "method_version": METHOD_VERSION,
         })
@@ -540,6 +571,11 @@ def run(out: Path = DEFAULT_OUT, clones: Path = DEFAULT_CLONES, vendors_path: Pa
             "copies": len(mirrors),
             "copy_repos": len({m["copy_repo"].lower() for m in mirrors}),
             "vendor_blobs_copied": len({m["blob_sha"] for m in mirrors}),
+            "credit_rule": ("each text is credited to the earliest vendor path that published it "
+                            "as the vendor's own; a text no vendor published as its own goes to "
+                            "the earliest path that names another author, as repackaged"),
+            "copies_by_credit": {c: sum(m["credit"] == c for m in mirrors)
+                                 for c in ("vendor", "repackaged")},
         }
     manifest = {
         "method_version": METHOD_VERSION,

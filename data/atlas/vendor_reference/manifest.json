@@ -1,6 +1,6 @@
 {
-  "method_version": "vendor-reference/1.1.0",
-  "built_at": "2026-11-26T20:36:03+00:00",
+  "method_version": "vendor-reference/1.2.0",
+  "built_at": "2026-11-27T23:32:46+00:00",
   "attribution": {
     "license": "CC-BY-4.0",
     "attribution": "Skill Map vendor reference set by Dave Holmes-Kinsella and contributors (https://github.com/dhk/skill-map). Pointers to files in each vendor's public repository; no file text is included."
@@ -41,7 +41,7 @@
     {
       "vendor": "Anthropic",
       "repo": "anthropics/claude-code",
-      "head": "a3b7a20a282a7b75ed68c2f8a0d0ecc822171c3e",
+      "head": "102fafb0953d90cff472b438e443485e7d131d36",
       "license": null,
       "version_rows": 23
     },
@@ -125,7 +125,7 @@
     {
       "vendor": "Vercel",
       "repo": "vercel-labs/skills",
-      "head": "57217cf86ba38148a57af9e90d14a4c049558330",
+      "head": "e7fd0e9e52f029fe87729d8185cb8caf7049f678",
       "license": "MIT",
       "version_rows": 18
     },
@@ -248,28 +248,33 @@
     "gitskills_revision": "ebab17454a7c236f8f26b183567f1a126f42e3f8",
     "copies": 74596,
     "copy_repos": 9699,
-    "vendor_blobs_copied": 2445
+    "vendor_blobs_copied": 2445,
+    "credit_rule": "each text is credited to the earliest vendor path that published it as the vendor's own; a text no vendor published as its own goes to the earliest path that names another author, as repackaged",
+    "copies_by_credit": {
+      "vendor": 56849,
+      "repackaged": 17747
+    }
   },
   "outputs": [
     {
       "path": "version.parquet",
       "rows": 8168,
-      "sha256": "99bd62289e7c8cff8e35534a712cdb94a81a2182eea2654b9043b4999a004418"
+      "sha256": "8ea23be84abdfec2f3665a468468891c8ede441334474a5febdb6006103497fd"
     },
     {
       "path": "skill.parquet",
       "rows": 2709,
-      "sha256": "57c39086bb6f18f2c34934bda2f78109a61bf4edb29438dfca051bfdf7c514ac"
+      "sha256": "3396a05606b3335ac64559e7985220791ebdde670c59ae0e05e5d1bf62ace616"
     },
     {
       "path": "cross_vendor.parquet",
       "rows": 24,
-      "sha256": "5aa189be1573daec0b978f98f9ff3bed8aaae3813acd52d87b5630c9e9880544"
+      "sha256": "e335280e1c5fbe9dacf2f129572ffed6c0c1b04dcd8b6d1b91e61ef5df54cad6"
     },
     {
       "path": "mirror.parquet",
       "rows": 74596,
-      "sha256": "7d6612b43fa9d842c0329b3fd5818d6b82b8397b3a55bfc730ea8a54567171b1"
+      "sha256": "55413eeef8a5b0f0b215774dce0312aeaa4b7742e8746e8055770ac9493efed4"
     }
   ]
 }

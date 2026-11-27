@@ -5,3 +5,5 @@
 *.jsonl
 # Saved remote columns, so an interrupted import resumes (crawlers/atlas/gitskills.py).
 .cache/
+# Copy-flow exports too big to commit, kept for a release asset (crawlers/atlas/copy_flow.py).
+vendor_reference/release/

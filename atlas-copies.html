@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where vendor skill texts also appear · Skill Concepts Atlas</title>
+<!-- Integrity hashes are of the npm package files, which jsDelivr serves unchanged. -->
+<script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"
+  integrity="sha384-su5kReKyYlIFrI62mbQRKXHzFobMa7BHp1cK6julLPbnYcCW9NIZKJiTODjLPeDh" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"
+  integrity="sha384-SM54CE5h+qdDI046d2Y5ym7wq1kq4uxcQ1cqGq5/+5jrE5tPLeDJSq711Q8sIska" crossorigin="anonymous"></script>
+<style>
+.viz-root {
+  color-scheme: light;
+  --surface-0: #f7f7f5;
+  --surface-1: #ffffff;
+  --surface-2: #f0f0ee;
+  --border: #e2e2df;
+  --grid: #ececea;
+  --text-primary: #191919;
+  --text-secondary: #666666;
+  --text-muted: #8a8a8a;
+  --neutral-node: #b9b9b4;
+  --link-neutral: #c9c9c4;
+  --series-1: #257de0; --series-2: #f47230; --series-3: #00b894; --series-4: #f2a600;
+  --series-5: #ee7fac; --series-6: #008a17; --series-7: #6a4ce2; --series-8: #ec4647;
+  --series-other: #9a9a94;
+  --focus: #191919;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .viz-root {
+    color-scheme: dark;
+    --surface-0: #111111; --surface-1: #191919; --surface-2: #232323;
+    --border: #333333; --grid: #2a2a2a;
+    --text-primary: #efefef; --text-secondary: #9c9c9c; --text-muted: #7a7a7a;
+    --neutral-node: #5a5a5a; --link-neutral: #444444;
+    --series-1: #338ced; --series-2: #e76624; --series-3: #00a888; --series-4: #d28e05;
+    --series-5: #e24d8b; --series-6: #0aac23; --series-7: #9887ef; --series-8: #eb6263;
+    --series-other: #7d7d78; --focus: #efefef;
+  }
+}
+:root[data-theme="dark"] .viz-root {
+  color-scheme: dark;
+  --surface-0: #111111; --surface-1: #191919; --surface-2: #232323;
+  --border: #333333; --grid: #2a2a2a;
+  --text-primary: #efefef; --text-secondary: #9c9c9c; --text-muted: #7a7a7a;
+  --neutral-node: #5a5a5a; --link-neutral: #444444;
+  --series-1: #338ced; --series-2: #e76624; --series-3: #00a888; --series-4: #d28e05;
+  --series-5: #e24d8b; --series-6: #0aac23; --series-7: #9887ef; --series-8: #eb6263;
+  --series-other: #7d7d78; --focus: #efefef;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+.viz-root {
+  font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--surface-0); color: var(--text-primary); min-height: 100vh;
+  padding: 28px clamp(16px, 4vw, 48px) 48px;
+}
+h1 { font-size: 24px; font-weight: 650; margin: 0 0 6px; letter-spacing: -0.01em; }
+.lede { color: var(--text-secondary); max-width: 760px; margin: 0 0 20px; }
+.tiles { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; min-width: 170px; }
+.tile .v { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.tile .l { color: var(--text-secondary); font-size: 12.5px; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.tabs button { background: none; border: 0; border-bottom: 2px solid transparent; color: var(--text-secondary);
+  font: inherit; font-weight: 550; padding: 8px 12px; cursor: pointer; }
+.tabs button[aria-selected="true"] { color: var(--text-primary); border-bottom-color: var(--text-primary); }
+.tabs button:focus-visible, .controls :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.panel { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px 16px 8px; margin-bottom: 18px; }
+.panel h2 { font-size: 15px; font-weight: 650; margin: 0 0 2px; }
+.panel .sub { color: var(--text-secondary); font-size: 12.5px; margin: 0 0 10px; }
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; margin: 4px 0 12px; font-size: 13px; color: var(--text-secondary); }
+.controls label { display: inline-flex; gap: 8px; align-items: center; }
+.controls input[type="range"] { width: 140px; }
+.controls input[type="search"] { font: inherit; padding: 5px 8px; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--surface-1); color: var(--text-primary); width: 220px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--text-secondary); margin: 2px 0 8px; }
+.legend .chip { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+.legend .chip[aria-pressed="false"] { opacity: 0.35; }
+.legend .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.legend .sw.hatch { background: repeating-linear-gradient(45deg, var(--text-secondary) 0 2px, transparent 2px 5px);
+  border: 1px solid var(--text-secondary); box-sizing: border-box; }
+svg text { fill: var(--text-primary); font-size: 11.5px; paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; stroke-linejoin: round; }
+svg text.muted { fill: var(--text-secondary); }
+svg text.cluster { font-size: 12.5px; font-weight: 600; fill: var(--text-secondary); }
+.tooltip { position: fixed; pointer-events: none; background: var(--surface-1); color: var(--text-primary);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; line-height: 1.4;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12); max-width: 320px; opacity: 0; transition: opacity 80ms; z-index: 10; }
+.tooltip b { font-weight: 650; }
+.tooltip .k { color: var(--text-secondary); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--grid); }
+th { color: var(--text-secondary); font-weight: 550; cursor: pointer; white-space: nowrap; }
+td.n, th.n { text-align: right; }
+.note { color: var(--text-muted); font-size: 12px; margin-top: 18px; max-width: 900px; }
+.empty { color: var(--text-secondary); padding: 40px 0; text-align: center; }
+#graph svg { cursor: grab; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <h1>Where vendor skill texts also appear</h1>
+  <p class="lede">Every SKILL.md file in public GitHub repositories (from GitSkills) that is
+  byte-identical to a version a vendor published. Edited copies are not counted yet. A vendor's own
+  skills come first: each text is credited to the earliest path where a vendor published it as its
+  own. Skills a vendor only repackaged, whose plugin manifest or partner folder names another author,
+  are striped and counted apart, so a vendor isn't credited with someone else's work. A skill that a
+  vendor later moved or republished can show no copies under its newer path.</p>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="publish">Publication view</button>
+    <button role="tab" aria-selected="false" data-tab="explore">Explore the graph</button>
+    <button role="tab" aria-selected="false" data-tab="table">Table</button>
+  </div>
+
+  <section data-panel="publish">
+    <div class="panel">
+      <h2>From vendor, to skill, to where copies land</h2>
+      <p class="sub">The middle column shows the skills found in the most repositories, the same
+      ranking as the graph and the table; the rest of each vendor's skills are grouped. Band width
+      is the number of files, because files add up across columns and repositories don't (one
+      repository can hold a skill in several folders). The right column is the agent folder the
+      file sits in.</p>
+      <div class="controls">
+        <label>Skills shown <input type="range" id="sk-n" min="5" max="60" value="25"><span id="sk-n-v">25</span></label>
+      </div>
+      <div class="legend" id="legend-sankey"></div>
+      <div id="sankey"></div>
+    </div>
+    <div class="panel">
+      <h2>Between vendors</h2>
+      <p class="sub">Skills one vendor published that another vendor later shipped unchanged.
+      Band width is the number of copies.</p>
+      <div id="sankey-vendors"></div>
+    </div>
+  </section>
+
+  <section data-panel="explore" hidden>
+    <div class="panel">
+      <h2>Skills and the repositories that copy them</h2>
+      <p class="sub">Coloured circles are vendor skills, grouped by vendor and sized by how many
+      repositories copy them; striped ones are skills a vendor repackaged. Grey dots are repositories,
+      drawn between the vendors they copy from, so a dot between two clusters holds skills from both.
+      Hover for names, click a node to see its links, scroll to zoom.</p>
+      <div class="controls">
+        <label>Top skills <input type="range" id="g-sk" min="10" max="300" value="60"><span id="g-sk-v">60</span></label>
+        <label>Repos copying at least <input type="range" id="g-min" min="3" max="40" value="8"><span id="g-min-v">8</span> skills</label>
+        <label><input type="search" id="g-q" placeholder="Find a skill or repository"></label>
+      </div>
+      <div class="legend" id="legend-graph"></div>
+      <div id="graph"></div>
+    </div>
+  </section>
+
+  <section data-panel="table" hidden>
+    <div class="panel">
+      <h2>Vendor skills found in the most repositories</h2>
+      <p class="sub">Click a column to sort. * marks a skill with files whose text is on the
+      removal list; they are counted as pointers only.</p>
+      <div id="table"></div>
+    </div>
+  </section>
+
+  <p class="note" id="note"></p>
+  <div class="tooltip" id="tip" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+(async function () {
+  const VENDOR_ORDER = ["Anthropic", "OpenAI", "Microsoft", "Google", "Hugging Face", "Vercel", "Cloudflare"];
+  const css = getComputedStyle(document.querySelector(".viz-root"));
+  const colorVar = v => {
+    const i = VENDOR_ORDER.indexOf(v);
+    return i >= 0 ? `var(--series-${i + 1})` : "var(--series-other)";
+  };
+  const vendorGroup = v => VENDOR_ORDER.includes(v) ? v : "Other vendors";
+  // A skill a vendor only repackaged (its manifest or partner folder names another author).
+  const REPACK = "Repackaged by a vendor";
+  const isRepack = s => s.credit === "repackaged";
+  const vendorFill = g => colorVar(g === "Other vendors" ? "" : g);
+  // One striped pattern per vendor colour, so repackaged skills keep their channel's colour but read as not the vendor's own.
+  function hatches(svg, prefix) {
+    const defs = svg.append("defs");
+    [...VENDOR_ORDER, "Other vendors"].forEach((g, i) => {
+      const p = defs.append("pattern").attr("id", `${prefix}-h${i}`).attr("patternUnits", "userSpaceOnUse")
+        .attr("width", 6).attr("height", 6).attr("patternTransform", "rotate(45)");
+      p.append("rect").attr("width", 6).attr("height", 6).style("fill", vendorFill(g)).style("opacity", 0.28);
+      p.append("rect").attr("width", 2.5).attr("height", 6).style("fill", vendorFill(g));
+    });
+    return g => { const i = VENDOR_ORDER.indexOf(g); return `url(#${prefix}-h${i < 0 ? VENDOR_ORDER.length : i})`; };
+  }
+  const fmt = d3.format(",");
+  const ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ESC[c]);
+  const PLATFORM_LABEL = { claude: ".claude", agents: ".agents", codex: ".codex", cursor: ".cursor",
+    github: ".github", opencode: ".opencode", gemini: ".gemini", kiro: ".kiro", windsurf: ".windsurf",
+    other: "Other locations" };
+
+  let data;
+  const inline = document.getElementById("copy-flow-data");
+  if (inline) data = JSON.parse(inline.textContent);
+  else {
+    try { data = await (await fetch("data/atlas/vendor_reference/copy_flow.json")).json(); }
+    catch (e) {
+      document.getElementById("sankey").innerHTML =
+        '<p class="empty">No copy-flow data yet. Run <code>python -m crawlers.atlas.copy_flow</code>.</p>';
+      return;
+    }
+  }
+
+  const tip = document.getElementById("tip");
+  function showTip(html, ev) {
+    tip.innerHTML = html; tip.style.opacity = 1;
+    const x = Math.min(ev.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+    const y = Math.min(ev.clientY + 14, window.innerHeight - tip.offsetHeight - 8);
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  }
+  const hideTip = () => { tip.style.opacity = 0; };
+  // Two vendors can publish skills with the same folder name; label those with their repo.
+  const nameCount = d3.rollup(data.skills, v => v.length, s => s.name);
+  const repoShort = s => s.repo.split("/").pop();
+  const nameRepoCount = d3.rollup(data.skills, v => v.length, s => s.name + "|" + s.repo);
+  data.skills.forEach(s => {
+    s.label = nameCount.get(s.name) === 1 ? s.name
+      : nameRepoCount.get(s.name + "|" + s.repo) === 1 ? `${s.name} (${repoShort(s)})`
+      : `${s.name} (${repoShort(s)}/${s.path.split("/")[0]})`;
+  });
+  const skillById = new Map(data.skills.map(s => [s.id, s]));
+  // Edges arrive as [skill index, repo index, files] to keep the file small.
+  data.edges = data.edges.map(([si, ri, c]) => ({ skill: data.skills[si].id, repo: data.repos[ri].repo, copies: c }));
+  // Skills beyond the export's cap arrive summed per vendor; the Sankey folds them into each vendor's rest.
+  const restRows = (data.skills_rest || []).map(r => ({ ...r, id: `rest:${r.vendor}:${r.credit || "vendor"}`, rest: true }));
+  const shownSkill = s => active.has(vendorGroup(s.vendor)) && (!isRepack(s) || active.has(REPACK));
+  const gSk = document.getElementById("g-sk");
+  gSk.max = Math.min(+gSk.max, data.skills.length);
+  if (+gSk.value > +gSk.max) { gSk.value = gSk.max; document.getElementById("g-sk-v").textContent = gSk.value; }
+  const skillTip = s => `<b>${esc(s.label || s.name)}</b> <span class="k">· ${esc(s.vendor)}</span><br>
+    <span class="k">${esc(s.repo)}/${esc(s.path)}</span><br>
+    ${fmt(s.copy_repos)} repositories · ${fmt(s.copies)} files<br>
+    ${s.versions_copied} of ${s.versions ?? "?"} versions copied
+    ${isRepack(s) ? `<br><b>Repackaged</b> by ${esc(s.vendor)}; author ${esc(s.manifest_author ?? "named by a partner folder")}`
+      : s.authorship ? `<br><span class="k">Manifest author: ${esc(s.manifest_author ?? "not stated")}</span>` : ""}`;
+
+  // ---------------------------------------------------------------- tiles
+  const t = data.totals;
+  const byCredit = t.copies_by_credit || { vendor: t.copies, repackaged: 0 };
+  const tiles = [
+    [fmt(byCredit.vendor), "files copying a vendor's own skill"],
+    [fmt(byCredit.repackaged), "more copying a skill a vendor repackaged"],
+    [fmt(t.copy_repos), "repositories holding a copy"],
+    [`${fmt(t.skills_copied)} of ${fmt(t.skills_published)}`, "vendor skills found in other repositories"],
+    [fmt(data.cross_vendor.length), "copies between vendors"],
+  ];
+  document.getElementById("tiles").innerHTML = tiles.map(([v, l]) =>
+    `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+  // ---------------------------------------------------------------- legends
+  const groups = [...VENDOR_ORDER, "Other vendors"].filter(g =>
+    data.skills.some(s => vendorGroup(s.vendor) === g));
+  if (data.skills.some(isRepack) || restRows.some(isRepack)) groups.push(REPACK);
+  const active = new Set(groups);
+  function legend(el, onToggle) {
+    el.innerHTML = "";
+    groups.forEach(g => {
+      const b = document.createElement("span");
+      b.className = "chip"; b.setAttribute("role", "button"); b.tabIndex = 0;
+      b.setAttribute("aria-pressed", active.has(g));
+      b.innerHTML = g === REPACK ? `<span class="sw hatch"></span>${esc(g)}`
+        : `<span class="sw" style="background:${vendorFill(g)}"></span>${esc(g)}`;
+      const toggle = () => {
+        const vendorsOn = [...active].filter(x => x !== REPACK).length;
+        if (active.has(g) && (g === REPACK || vendorsOn > 1)) active.delete(g); else active.add(g);
+        drawAll();
+      };
+      b.onclick = toggle;
+      b.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } };
+      el.appendChild(b);
+    });
+  }
+
+  // ---------------------------------------------------------------- sankey
+  function drawSankey() {
+    const host = document.getElementById("sankey");
+    host.innerHTML = "";
+    const n = +document.getElementById("sk-n").value;
+    const skills = data.skills.filter(shownSkill);
+    if (!skills.length) { host.innerHTML = '<p class="empty">No skills for this selection.</p>'; return; }
+    const flows = skills.concat(restRows.filter(shownSkill));
+    // Same ranking as the table and graph: repositories first, files to break ties.
+    const top = skills.slice().sort((a, b) => b.copy_repos - a.copy_repos || b.copies - a.copies).slice(0, n);
+    const topIds = new Set(top.map(s => s.id));
+    const nodes = [], idx = new Map();
+    const node = (id, attrs) => { if (!idx.has(id)) { idx.set(id, nodes.length); nodes.push({ id, ...attrs }); } return idx.get(id); };
+    const links = [];
+    const add = (s, tgt, v, attrs) => { if (v > 0) links.push({ source: s, target: tgt, value: v, ...attrs }); };
+    const restByVendor = new Map();
+    flows.forEach(s => {
+      const g = vendorGroup(s.vendor), rp = isRepack(s), k = rp ? ":repackaged" : "";
+      const vNode = node("v:" + g + k, { kind: "vendor", label: rp ? `Repackaged via ${g}` : g, group: g, repack: rp });
+      let mid;
+      if (topIds.has(s.id)) mid = node("s:" + s.id, { kind: "skill", label: s.label, group: g, skill: s, repack: rp });
+      else {
+        const label = rp ? `Other skills repackaged via ${g}` : g === "Other vendors" ? "Skills from other vendors" : `Other ${g} skills`;
+        mid = node("r:" + g + k, { kind: "rest", label, group: g, repack: rp, count: 0 });
+        nodes[mid].count = (nodes[mid].count || 0) + (s.rest ? s.skills : 1);
+      }
+      add(vNode, mid, s.copies, { group: g, repack: rp });
+      Object.entries(s.by_platform).forEach(([p, c]) => {
+        const pNode = node("p:" + p, { kind: "platform", label: PLATFORM_LABEL[p] || p, group: null });
+        add(mid, pNode, c.copies, { group: g, repack: rp });
+      });
+    });
+    // merge duplicate links (rest buckets)
+    const merged = new Map();
+    links.forEach(l => { const k = l.source + ">" + l.target; if (merged.has(k)) merged.get(k).value += l.value; else merged.set(k, { ...l }); });
+    const W = Math.max(720, host.clientWidth), H = Math.max(420, Math.min(1400, 22 * (top.length + groups.length + 4)));
+    const svg = d3.select(host).append("svg").attr("viewBox", [0, 0, W, H]).attr("width", "100%")
+      .attr("role", "img").attr("aria-label", "Sankey diagram of copies from vendor to skill to agent folder");
+    const hatch = hatches(svg, "sk");
+    const paint = d => d.group ? (d.repack ? hatch(d.group) : vendorFill(d.group)) : null;
+    // A vendor's own skills sit above what it repackaged.
+    const gOrder = g => { const i = groups.indexOf(g); return i < 0 ? 99 : i; };
+    const sankey = d3.sankey().nodeId(d => d.index).nodeWidth(10).nodePadding(8)
+      .nodeAlign(d3.sankeyJustify).extent([[150, 8], [W - 120, H - 8]])
+      .nodeSort((a, b) => a.kind === "platform" || b.kind === "platform"
+        ? (a.id === "p:other") - (b.id === "p:other") || b.value - a.value
+        : gOrder(a.group) - gOrder(b.group) || !!a.repack - !!b.repack || (a.kind === "rest") - (b.kind === "rest")
+          || (b.skill?.copy_repos ?? 0) - (a.skill?.copy_repos ?? 0) || b.value - a.value)
+      .linkSort((a, b) => gOrder(a.group) - gOrder(b.group) || !!a.repack - !!b.repack || b.value - a.value);
+    const graph = sankey({ nodes: nodes.map(d => ({ ...d })), links: [...merged.values()].map(d => ({ ...d })) });
+    svg.append("g").attr("fill", "none").selectAll("path").data(graph.links).join("path")
+      .attr("d", d3.sankeyLinkHorizontal())
+      .attr("stroke", d => paint(d) || "var(--link-neutral)")
+      .attr("stroke-opacity", d => d.repack ? 0.5 : 0.32).attr("stroke-width", d => Math.max(1, d.width))
+      .on("mousemove", (ev, d) => showTip(`${esc(d.source.label)} → ${esc(d.target.label)}<br><b>${fmt(d.value)}</b> files`, ev))
+      .on("mouseleave", hideTip);
+    svg.append("g").selectAll("rect").data(graph.nodes).join("rect")
+      .attr("x", d => d.x0).attr("y", d => d.y0).attr("width", d => d.x1 - d.x0)
+      .attr("height", d => Math.max(1, d.y1 - d.y0)).attr("rx", 2)
+      .attr("fill", d => paint(d) || "var(--neutral-node)")
+      .on("mousemove", (ev, d) => {
+        const body = d.kind === "skill" ? skillTip(d.skill)
+          : d.kind === "rest" ? `<b>${esc(d.label)}</b><br>${fmt(d.count)} skills · ${fmt(d.value)} files`
+          : `<b>${esc(d.label)}</b><br>${fmt(d.value)} files`;
+        showTip(body, ev);
+      }).on("mouseleave", hideTip);
+    svg.append("g").selectAll("text").data(graph.nodes).join("text")
+      .attr("x", d => d.x0 < W / 2 ? d.x0 - 6 : d.x1 + 6)
+      .attr("y", d => (d.y0 + d.y1) / 2).attr("dy", "0.35em")
+      .attr("text-anchor", d => d.x0 < W / 2 ? "end" : "start")
+      .attr("class", d => d.kind === "rest" ? "muted" : null)
+      .text(d => (d.y1 - d.y0) < 4 && (d.kind !== "vendor" || d.repack) ? "" : d.kind === "skill" ? `${d.label} · ${fmt(d.skill.copy_repos)} repos`
+        : d.kind === "rest" ? `${d.label} (${fmt(d.count)})` : d.label)
+      .each(function (d) { if (d.kind === "skill" && d.x0 > 150 && d.x1 < W - 120) d3.select(this).attr("x", d.x1 + 6).attr("text-anchor", "start"); });
+  }
+
+  function drawVendorSankey() {
+    const host = document.getElementById("sankey-vendors");
+    host.innerHTML = "";
+    const pairs = d3.rollups(data.cross_vendor, v => v.length, d => d.origin_vendor, d => d.copy_vendor);
+    if (!pairs.length) { host.innerHTML = '<p class="empty">No copies between vendors.</p>'; return; }
+    const nodes = [], idx = new Map(), links = [];
+    const node = (id, label, group) => { if (!idx.has(id)) { idx.set(id, nodes.length); nodes.push({ id, label, group }); } return idx.get(id); };
+    pairs.forEach(([o, cs]) => cs.forEach(([c, n]) => {
+      links.push({ source: node("o:" + o, o, o), target: node("c:" + c, c, c), value: n, group: o });
+    }));
+    const W = Math.max(600, host.clientWidth), H = 60 + 26 * nodes.length;
+    const svg = d3.select(host).append("svg").attr("viewBox", [0, 0, W, H]).attr("width", "100%")
+      .attr("role", "img").attr("aria-label", "Sankey diagram of copies between vendors");
+    const g = d3.sankey().nodeId(d => d.index).nodeWidth(10).nodePadding(14).extent([[140, 10], [W - 140, H - 10]])(
+      { nodes: nodes.map(d => ({ ...d })), links: links.map(d => ({ ...d })) });
+    svg.append("g").attr("fill", "none").selectAll("path").data(g.links).join("path")
+      .attr("d", d3.sankeyLinkHorizontal()).attr("stroke", d => colorVar(d.group))
+      .attr("stroke-opacity", 0.35).attr("stroke-width", d => Math.max(1, d.width))
+      .on("mousemove", (ev, d) => {
+        const rows = data.cross_vendor.filter(c => c.origin_vendor === d.source.label && c.copy_vendor === d.target.label);
+        const names = [...new Set(rows.map(r => r.copy_path.split("/").slice(-2, -1)[0]))];
+        showTip(`<b>${esc(d.source.label)} → ${esc(d.target.label)}</b><br>${d.value} copies<br><span class="k">${names.map(esc).join(", ")}</span>`, ev);
+      }).on("mouseleave", hideTip);
+    svg.append("g").selectAll("rect").data(g.nodes).join("rect")
+      .attr("x", d => d.x0).attr("y", d => d.y0).attr("width", d => d.x1 - d.x0)
+      .attr("height", d => Math.max(1, d.y1 - d.y0)).attr("rx", 2).attr("fill", d => colorVar(d.group));
+    svg.append("g").selectAll("text").data(g.nodes).join("text")
+      .attr("x", d => d.x0 < W / 2 ? d.x0 - 6 : d.x1 + 6).attr("y", d => (d.y0 + d.y1) / 2).attr("dy", "0.35em")
+      .attr("text-anchor", d => d.x0 < W / 2 ? "end" : "start")
+      .text(d => `${d.label} (${d.value})`);
+  }
+
+  // ---------------------------------------------------------------- graph
+  // Each vendor (and what it repackaged) gets its own cluster around a ring; repositories settle
+  // between the clusters they copy from, so a repository that bundles several vendors sits between
+  // them. The layout is computed before drawing and then zoomed to fit the frame.
+  let sim;
+  function drawGraph() {
+    const host = document.getElementById("graph");
+    if (host.closest("section").hidden) return;
+    host.innerHTML = "";
+    if (sim) sim.stop();
+    const nSk = +document.getElementById("g-sk").value;
+    const minSk = +document.getElementById("g-min").value;
+    const q = document.getElementById("g-q").value.trim().toLowerCase();
+    const skills = data.skills.filter(shownSkill).slice(0, nSk);
+    const skillSet = new Set(skills.map(s => s.id));
+    const edges = data.edges.filter(e => skillSet.has(e.skill));
+    const repoDeg = d3.rollup(edges, v => v.length, e => e.repo);
+    const repos = data.repos.filter(r => (repoDeg.get(r.repo) || 0) >= minSk);
+    const repoSet = new Set(repos.map(r => r.repo));
+    const E = edges.filter(e => repoSet.has(e.repo));
+    if (!E.length) { host.innerHTML = '<p class="empty">No repositories meet this threshold. Lower it or show more skills.</p>'; return; }
+    const usedSkills = new Set(E.map(e => e.skill));
+    const shown = skills.filter(s => usedSkills.has(s.id));
+    const W = Math.max(720, host.clientWidth), H = Math.round(Math.max(560, Math.min(820, W * 0.72)));
+
+    // Cluster anchors on a ring, largest cluster first, each vendor's repackaged cluster beside it.
+    const clusterKey = s => vendorGroup(s.vendor) + (isRepack(s) ? "|r" : "");
+    const sizes = d3.rollup(shown, v => d3.sum(v, s => s.copy_repos), clusterKey);
+    const keys = [...sizes.keys()].sort((x, y) => {
+      const [gx, rx] = x.split("|"), [gy, ry] = y.split("|");
+      const ix = groups.indexOf(gx), iy = groups.indexOf(gy);
+      return (ix < 0 ? 99 : ix) - (iy < 0 ? 99 : iy) || (rx ? 1 : 0) - (ry ? 1 : 0);
+    });
+    const ring = Math.min(W, H) * 0.34;
+    const anchor = new Map(keys.map((k, i) => {
+      const a = -Math.PI / 2 + (2 * Math.PI * i) / keys.length;
+      return [k, keys.length === 1 ? [W / 2, H / 2] : [W / 2 + ring * Math.cos(a) * (W / H), H / 2 + ring * Math.sin(a)]];
+    }));
+
+    const rSkill = d3.scaleSqrt().domain([0, d3.max(shown, s => s.copy_repos) || 1]).range([3, 18]);
+    const nodes = [
+      ...shown.map(s => ({ id: s.id, kind: "skill", s, key: clusterKey(s), r: rSkill(s.copy_repos) })),
+      ...repos.map(r => ({ id: "repo:" + r.repo, kind: "repo", repo: r, deg: repoDeg.get(r.repo), r: 2 })),
+    ];
+    const byId = new Map(nodes.map(n => [n.id, n]));
+    const links = E.map(e => ({ source: e.skill, target: "repo:" + e.repo, copies: e.copies }));
+    // Start every node at (or, for a repository, between) the clusters it belongs to.
+    const repoAnchors = d3.group(E, e => e.repo);
+    nodes.forEach((n, i) => {
+      let x, y;
+      if (n.kind === "skill") [x, y] = anchor.get(n.key);
+      else {
+        const pts = repoAnchors.get(n.repo.repo).map(e => anchor.get(byId.get(e.skill).key));
+        x = d3.mean(pts, p => p[0]); y = d3.mean(pts, p => p[1]);
+      }
+      const a = i * 2.39996, r = 3 * Math.sqrt(i % 60);
+      n.x = x + r * Math.cos(a); n.y = y + r * Math.sin(a);
+    });
+    sim = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id(d => d.id).distance(l => 18 + l.source.r).strength(0.03))
+      .force("charge", d3.forceManyBody().strength(d => d.kind === "skill" ? -18 - d.r * 3 : -3).distanceMax(160))
+      .force("collide", d3.forceCollide(d => d.r + (d.kind === "skill" ? 2 : 0.8)).iterations(2))
+      .force("x", d3.forceX(d => d.kind === "skill" ? anchor.get(d.key)[0] : W / 2).strength(d => d.kind === "skill" ? 0.4 : 0.005))
+      .force("y", d3.forceY(d => d.kind === "skill" ? anchor.get(d.key)[1] : H / 2).strength(d => d.kind === "skill" ? 0.4 : 0.005))
+      .stop();
+    for (let i = 0; i < 320; i++) sim.tick();
+
+    const svg = d3.select(host).append("svg").attr("viewBox", [0, 0, W, H]).attr("width", "100%")
+      .attr("role", "img").attr("aria-label", "Vendor skills clustered by vendor, linked to the repositories that copy them");
+    const hatch = hatches(svg, "gr");
+    const root = svg.append("g");
+    const zoom = d3.zoom().scaleExtent([0.3, 8]).on("zoom", ev => root.attr("transform", ev.transform));
+    svg.call(zoom);
+    const link = root.append("g").selectAll("line").data(links).join("line")
+      .attr("stroke", "var(--link-neutral)").attr("stroke-width", 0.6);
+    const node = root.append("g").selectAll("circle").data(nodes).join("circle")
+      .attr("r", d => d.r)
+      .attr("fill", d => d.kind !== "skill" ? "var(--neutral-node)"
+        : isRepack(d.s) ? hatch(vendorGroup(d.s.vendor)) : vendorFill(vendorGroup(d.s.vendor)))
+      .attr("stroke-width", d => d.kind === "skill" ? 1.2 : 0)
+      .on("mousemove", (ev, d) => showTip(d.kind === "skill" ? skillTip(d.s)
+        : `<b>${esc(d.repo.repo)}</b><br>holds ${fmt(d.repo.skills)} vendor skills (${fmt(d.deg)} shown)<br>${fmt(d.repo.copies)} files<br>
+           <span class="k">${Object.entries(d.repo.vendors).map(([v, n]) => `${esc(v)} ${fmt(n)}`).join(" · ")}</span>
+           ${d.repo.repackaged_copies ? `<br><span class="k">${fmt(d.repo.repackaged_copies)} of those files are repackaged skills</span>` : ""}`, ev))
+      .on("mouseleave", hideTip)
+      .call(d3.drag()
+        .on("start", (ev, d) => { if (!ev.active) sim.alphaTarget(0.15).restart(); d.fx = d.x; d.fy = d.y; })
+        .on("drag", (ev, d) => { d.fx = ev.x; d.fy = ev.y; })
+        .on("end", (ev, d) => { if (!ev.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+    // Cluster names sit outside the ring; skill names only for the biggest skill in each cluster
+    // and any others that fit without overlapping a label already placed.
+    const clusterLabel = k => { const [g, r] = k.split("|"); return r ? `Repackaged via ${g}` : g; };
+    const centre = k => { const m = shown.filter(s => clusterKey(s) === k).map(s => byId.get(s.id));
+      return [d3.mean(m, n => n.x), d3.mean(m, n => n.y), d3.max(m, n => Math.hypot(n.x - d3.mean(m, o => o.x), n.y - d3.mean(m, o => o.y)) + n.r)]; };
+    const cl = keys.map(k => { const [x, y, rad] = centre(k); const dx = x - W / 2, dy = y - H / 2, d = Math.hypot(dx, dy) || 1;
+      return { k, x: x + dx / d * (rad + 14), y: y + dy / d * (rad + 14), anchor: Math.abs(dx) < 40 ? "middle" : dx > 0 ? "start" : "end" }; });
+    root.append("g").selectAll("text").data(cl).join("text").attr("class", "cluster")
+      .attr("x", d => d.x).attr("y", d => d.y).attr("dy", "0.35em").attr("text-anchor", d => d.anchor)
+      .text(d => clusterLabel(d.k));
+    // Cluster labels and skill circles are obstacles a skill label must not cover.
+    const placed = cl.map(d => { const w = clusterLabel(d.k).length * 6.8;
+      const x0 = d.anchor === "end" ? d.x - w : d.anchor === "middle" ? d.x - w / 2 : d.x; return [x0, d.y - 9, x0 + w, d.y + 9]; });
+    const circles = nodes.filter(n => n.kind === "skill");
+    const fits = (x, y, w, self) => { const box = [x - 2, y - 7, x + w + 2, y + 7];
+      if (!firstOfCluster.has(self.id) && circles.some(c => c !== self && box[0] < c.x + c.r && box[2] > c.x - c.r && box[1] < c.y + c.r && box[3] > c.y - c.r)) return false;
+      if (placed.some(p => box[0] < p[2] && box[2] > p[0] && box[1] < p[3] && box[3] > p[1])) return false;
+      placed.push(box); return true; };
+    const ranked = nodes.filter(d => d.kind === "skill").sort((a, b) => b.s.copy_repos - a.s.copy_repos);
+    const firstOfCluster = new Set(keys.map(k => ranked.find(n => n.key === k)?.id));
+    const labelled = [...ranked.filter(n => firstOfCluster.has(n.id)), ...ranked.filter(n => !firstOfCluster.has(n.id))]
+      .filter(n => fits(n.x + n.r + 3, n.y, n.s.label.length * 6.2, n)).slice(0, 18);
+    const labels = root.append("g").selectAll("text").data(labelled)
+      .join("text").attr("dx", d => d.r + 3).attr("dy", "0.35em").text(d => d.s.label).attr("pointer-events", "none");
+
+    const neighbours = new Map(nodes.map(n => [n.id, new Set([n.id])]));
+    links.forEach(l => { neighbours.get(l.source.id).add(l.target.id); neighbours.get(l.target.id).add(l.source.id); });
+    let focus = null;
+    function applyFocus() {
+      const keep = focus ? neighbours.get(focus) : null;
+      const match = q ? new Set(nodes.filter(n => (n.kind === "skill" ? n.s.name + " " + n.s.repo : n.repo.repo).toLowerCase().includes(q)).map(n => n.id)) : null;
+      node.attr("opacity", d => (keep && !keep.has(d.id)) || (match && !match.has(d.id) && !(keep && keep.has(d.id))) ? 0.12 : d.kind === "repo" ? 0.7 : 1)
+        .attr("stroke", d => match && match.has(d.id) ? "var(--focus)" : "var(--surface-1)");
+      link.attr("stroke-opacity", l => keep ? (l.source.id === focus || l.target.id === focus ? 0.8 : 0.02) : 0.1);
+      labels.attr("opacity", d => keep && !keep.has(d.id) ? 0.15 : 1);
+    }
+    node.on("click", (ev, d) => { focus = focus === d.id ? null : d.id; applyFocus(); ev.stopPropagation(); });
+    svg.on("click", () => { focus = null; applyFocus(); });
+    const place = () => {
+      link.attr("x1", l => l.source.x).attr("y1", l => l.source.y).attr("x2", l => l.target.x).attr("y2", l => l.target.y);
+      node.attr("cx", d => d.x).attr("cy", d => d.y);
+      labels.attr("x", d => d.x).attr("y", d => d.y);
+    };
+    place();
+    applyFocus();
+    // Zoom to fit what was laid out, labels included.
+    const xs = nodes.flatMap(n => [n.x - n.r, n.x + n.r]).concat(placed.flatMap(p => [p[0], p[2]]));
+    const ys = nodes.flatMap(n => [n.y - n.r, n.y + n.r]).concat(placed.flatMap(p => [p[1], p[3]]));
+    const bb = { x: d3.min(xs), y: d3.min(ys), width: d3.max(xs) - d3.min(xs), height: d3.max(ys) - d3.min(ys) };
+    if (bb.width && bb.height) {
+      const k = Math.min(2.5, 0.94 * Math.min(W / bb.width, H / bb.height));
+      svg.call(zoom.transform, d3.zoomIdentity.translate(W / 2 - k * (bb.x + bb.width / 2), H / 2 - k * (bb.y + bb.height / 2)).scale(k));
+    }
+    sim.on("tick", place);
+  }
+
+  // ---------------------------------------------------------------- table
+  let sortKey = "copy_repos", sortDir = -1;
+  function drawTable() {
+    const cols = [["name", "Skill"], ["vendor", "Vendor"], ["credit", "Credit"], ["copy_repos", "Repositories", true], ["copies", "Files", true],
+      ["versions_copied", "Versions copied", true], ["claude", "In .claude", true], ["agents", "In .agents", true]];
+    const val = (s, k) => k === "claude" || k === "agents" ? (s.by_platform[k]?.copies || 0) : s[k];
+    const rows = data.skills.filter(shownSkill)
+      .slice().sort((a, b) => d3.ascending(val(a, sortKey), val(b, sortKey)) * -sortDir || d3.ascending(a.id, b.id)).slice(0, 200);
+    const host = document.getElementById("table");
+    host.innerHTML = `<table><thead><tr>${cols.map(([k, l, n]) =>
+      `<th class="${n ? "n" : ""}" data-k="${k}" aria-sort="${k === sortKey ? (sortDir < 0 ? "descending" : "ascending") : "none"}">${l}${k === sortKey ? (sortDir < 0 ? " ↓" : " ↑") : ""}</th>`).join("")}</tr></thead>
+      <tbody>${rows.map(s => `<tr><td title="${esc(s.repo)}/${esc(s.path)}">${esc(s.label)}${s.removal_listed_copies ? " *" : ""}</td><td>${esc(s.vendor)}</td>
+      <td title="${esc(s.manifest_author ?? "")}">${isRepack(s) ? `Repackaged (${esc(s.manifest_author ?? "partner")})` : "Vendor's own"}</td>
+      ${cols.slice(3).map(([k]) => `<td class="n">${fmt(val(s, k))}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    host.querySelectorAll("th").forEach(th => th.onclick = () => {
+      const k = th.dataset.k; if (k === sortKey) sortDir = -sortDir; else { sortKey = k; sortDir = -1; } drawTable();
+    });
+  }
+
+  // ---------------------------------------------------------------- wiring
+  function drawAll() {
+    legend(document.getElementById("legend-sankey"));
+    legend(document.getElementById("legend-graph"));
+    drawSankey(); drawVendorSankey(); drawGraph(); drawTable();
+  }
+  document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => {
+    document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
+    document.querySelectorAll("section[data-panel]").forEach(p => p.hidden = p.dataset.panel !== b.dataset.tab);
+    if (b.dataset.tab === "explore") drawGraph();
+  });
+  const bind = (id, fn) => { const el = document.getElementById(id); el.oninput = () => {
+    const out = document.getElementById(id + "-v"); if (out) out.textContent = el.value; fn(); }; };
+  bind("sk-n", drawSankey); bind("g-sk", drawGraph); bind("g-min", drawGraph); bind("g-q", drawGraph);
+  let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { drawSankey(); drawVendorSankey(); drawGraph(); }, 200); });
+
+  const m = data.meta || {};
+  document.getElementById("note").innerHTML =
+    `Exact copies only: a file counts when its git blob SHA equals a vendor version's. Repositories on the
+    removal list are left out; files whose text is on it are counted as pointers only (${fmt(t.copies_of_removal_listed_texts || 0)}).
+    ${esc(m.credit_rule ? m.credit_rule.charAt(0).toUpperCase() + m.credit_rule.slice(1) : "")}. Vendor repositories are those in
+    crawlers/atlas/vendors.json. GitSkills revision ${esc(m.gitskills_revision ? m.gitskills_revision.slice(0, 8) : "unknown")};
+    built ${esc(m.built_at || "unknown")}. ${esc(m.attribution || "")}`;
+  drawAll();
+})();
+</script>
+</body>
+</html>
