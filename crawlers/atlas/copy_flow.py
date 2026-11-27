@@ -14,9 +14,12 @@ aggregated, pointer-only JSON file for atlas-copies.html:
 
 A "skill" is a vendor repository and SKILL.md path; a copy is a GitSkills
 occurrence outside the vendor repositories whose text is byte-identical to one
-of that skill's versions. Each text is credited only to the earliest vendor
-path that published it, so a skill that was moved or republished elsewhere can
-show no copies. No skill text is read or written. Repositories on the removal
+of that skill's versions. Each text is credited to one vendor path: the
+earliest that published it as the vendor's own, else the earliest that names
+another author, whose copies count as repackaged (vendor_reference.py,
+credited_landings). Every vendor, skill and rest row splits its counts by
+credit ("vendor" or "repackaged"), so a vendor is never inflated by work it
+only repackaged. A skill that was moved or republished can show no copies. No skill text is read or written. Repositories on the removal
 list (data/exclusions.json) are dropped, and each copy whose text is on it is
 counted per skill.
 
@@ -45,7 +48,7 @@ import pyarrow.parquet as pq
 
 from crawlers import exclusions as removal
 
-METHOD_VERSION = "copy-flow/1.2.0"
+METHOD_VERSION = "copy-flow/1.3.0"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_IN = REPO_ROOT / "data" / "atlas" / "vendor_reference"
 DEFAULT_OUT = DEFAULT_IN / "copy_flow.json"
@@ -55,6 +58,7 @@ MAX_BYTES = 1_000_000
 MAX_REPOS, MAX_SKILLS = 500, 400
 # (max_repos, max_skills) tried in order when the output is over MAX_BYTES.
 FIT_STEPS = ((300, 300), (200, 300), (150, 200), (100, 150))
+CREDITS = ("vendor", "repackaged")
 PLATFORMS = ["claude", "agents", "codex", "cursor", "github", "opencode",
              "gemini", "kiro", "windsurf", "other"]
 
@@ -64,6 +68,11 @@ ATTRIBUTION = (
     "repositories and GitSkills (Destefanis, Graziotin, Vaccargiu and Ortu, "
     "doi:10.5281/zenodo.21875637), CC BY 4.0. Pointers only; no file text."
 )
+
+
+CREDIT_RULE = ("each text is credited to the earliest vendor path that published it as the "
+               "vendor's own; a text no vendor published as its own goes to the earliest path "
+               "that names another author, as repackaged")
 
 
 class StaleInputError(RuntimeError):
@@ -87,6 +96,8 @@ def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: l
     per_skill: dict[str, dict] = {}
     repo_skills: dict[str, Counter] = defaultdict(Counter)
     repo_vendors: dict[str, Counter] = defaultdict(Counter)
+    repo_credit: dict[str, Counter] = defaultdict(Counter)
+    repo_credit_vendor: dict[tuple[str, str], set] = defaultdict(set)
     dropped = listed_copies = 0
     for m in mirror:
         if ex.repo_excluded(m["copy_repo"]):
@@ -99,8 +110,9 @@ def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: l
             s = per_skill[sid] = {
                 "id": sid, "vendor": m["vendor"], "repo": m["vendor_repo"],
                 "path": m["vendor_path"], "name": skill_name(m["vendor_path"]),
-                "authorship": meta.get("authorship"),
-                "manifest_author": meta.get("manifest_author"),
+                "credit": None, "_credit": Counter(),
+                "authorship": m.get("vendor_authorship", meta.get("authorship")),
+                "manifest_author": m.get("vendor_manifest_author", meta.get("manifest_author")),
                 "versions": meta.get("versions"),
                 "first_landed_at": meta.get("first_landed_at"),
                 "present_at_head": meta.get("present_at_head"),
@@ -113,6 +125,8 @@ def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: l
         if folder not in PLATFORMS:
             folder = "other"
         repo = m["copy_repo"]
+        credit = m["credit"]
+        s["_credit"][credit] += 1
         s["copies"] += 1
         if ex.blob_excluded(m["blob_sha"]):
             s["removal_listed_copies"] += 1
@@ -123,9 +137,13 @@ def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: l
         s["_platform_repos"][folder].add(repo.lower())
         repo_skills[repo][sid] += 1
         repo_vendors[repo][m["vendor"]] += 1
+        repo_credit[repo][credit] += 1
+        repo_credit_vendor[(m["vendor"], credit)].add(repo)
 
     out_skills = []
     for s in per_skill.values():
+        # A path whose versions differ in authorship takes the credit most of its copies have.
+        s["credit"] = s.pop("_credit").most_common(1)[0][0]
         s["versions_copied"] = len(s.pop("_versions_copied"))
         s["copy_repos"] = len(s.pop("_repos"))
         pc, pr = s.pop("_platform_copies"), s.pop("_platform_repos")
@@ -138,18 +156,29 @@ def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: l
     for vendor in sorted(published):
         mine = [s for s in out_skills if s["vendor"] == vendor]
         repos = {r for r, vs in repo_vendors.items() if vs.get(vendor)}
+        by_credit = {}
+        for credit in CREDITS:
+            part = [s for s in mine if s["credit"] == credit]
+            by_credit[credit] = {
+                "skills_copied": len(part), "copies": sum(s["copies"] for s in part),
+                "copy_repos": len({r.lower() for (v, c), rs in repo_credit_vendor.items()
+                                   if v == vendor and c == credit for r in rs}),
+            }
         vendors.append({
             "vendor": vendor, "skills_published": published[vendor],
             "skills_copied": len(mine), "copies": sum(s["copies"] for s in mine),
             "copy_repos": len({r.lower() for r in repos}),
+            "by_credit": by_credit,
         })
-    vendors.sort(key=lambda v: (-v["copy_repos"], v["vendor"]))
+    # The vendor's own reach ranks it; repackaged work is shown beside it, not counted for it.
+    vendors.sort(key=lambda v: (-v["by_credit"]["vendor"]["copy_repos"], -v["copy_repos"], v["vendor"]))
 
     shown, tail = out_skills[:max_skills], out_skills[max_skills:]
-    rest: dict[str, dict] = {}
+    rest: dict[tuple[str, str], dict] = {}
     for t in tail:
-        r = rest.setdefault(t["vendor"], {"vendor": t["vendor"], "skills": 0, "copies": 0,
-                                          "removal_listed_copies": 0, "by_platform": Counter()})
+        r = rest.setdefault((t["vendor"], t["credit"]),
+                            {"vendor": t["vendor"], "credit": t["credit"], "skills": 0, "copies": 0,
+                             "removal_listed_copies": 0, "by_platform": Counter()})
         r["skills"] += 1
         r["copies"] += t["copies"]
         r["removal_listed_copies"] += t["removal_listed_copies"]
@@ -157,13 +186,14 @@ def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: l
             r["by_platform"][p] += c["copies"]
     skills_rest = [{**r, "by_platform": {p: {"copies": r["by_platform"][p]} for p in PLATFORMS
                                          if r["by_platform"][p]}}
-                   for r in sorted(rest.values(), key=lambda r: r["vendor"])]
+                   for r in sorted(rest.values(), key=lambda r: (r["vendor"], r["credit"]))]
 
     # Repositories ranked by how many distinct vendor skills they hold (all skills count).
     ranked = sorted(repo_skills.items(), key=lambda kv: (-len(kv[1]), -sum(kv[1].values()), kv[0]))
     top = [(r, c) for r, c in ranked if len(c) >= min_skills][:max_repos]
     repos_out = [{"repo": r, "skills": len(c), "copies": sum(c.values()),
-                  "vendors": dict(sorted(repo_vendors[r].items()))} for r, c in top]
+                  "vendors": dict(sorted(repo_vendors[r].items())),
+                  "repackaged_copies": repo_credit[r]["repackaged"]} for r, c in top]
     skill_index = {sk["id"]: i for i, sk in enumerate(shown)}
     edges = [[skill_index[sid], ri, n]
              for ri, (_r, c) in enumerate(top) for sid, n in sorted(c.items()) if sid in skill_index]
@@ -181,6 +211,8 @@ def build(versions: list[dict], skills: list[dict], mirror: list[dict], cross: l
         "edges": edges, "cross_vendor": cross_out,
         "totals": {
             "copies": sum(s["copies"] for s in out_skills),
+            "copies_by_credit": {c: sum(s["copies"] for s in out_skills if s["credit"] == c)
+                                 for c in CREDITS},
             "copy_repos": len({r.lower() for r in repo_skills}),
             "skills_copied": len(out_skills),
             "skills_published": len(skills),
@@ -204,6 +236,10 @@ def check_inputs(src: Path) -> tuple[dict, dict[str, str]]:
         raise StaleInputError(
             "the vendor reference manifest has no mirror section, so mirror.parquet on disk "
             "is from another run: rerun vendor_reference with --gitskills")
+    if "credit" not in pq.read_schema(src / "mirror.parquet").names:
+        raise StaleInputError(
+            "mirror.parquet has no credit column, so it predates the vendor-first credit rule: "
+            "rerun vendor_reference with --gitskills")
     recorded = {o["path"]: o["sha256"] for o in manifest.get("outputs") or []}
     hashes = {}
     for name in INPUTS:
@@ -252,7 +288,7 @@ def _meta(manifest: dict, hashes: dict, exclusions_path: Path, caps: dict) -> di
         "method_version": METHOD_VERSION,
         "built_at": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat(),
         "attribution": ATTRIBUTION,
-        "credit_rule": "each text is credited to the earliest vendor path that published it",
+        "credit_rule": manifest["mirror"].get("credit_rule") or CREDIT_RULE,
         "vendor_reference": {"method_version": manifest.get("method_version"),
                              "built_at": manifest.get("built_at")},
         "inputs_sha256": hashes,

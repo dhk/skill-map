@@ -291,6 +291,34 @@ def test_mirror_rows_skip_vendor_repos_and_unknown_blobs(vendor_repo):
     assert rows[1]["blob_sha"] == blob("beta v1\n")  # a since-deleted vendor version still counts
 
 
+def test_credit_prefers_the_vendors_own_publication():
+    a, b, c = "a" * 40, "b" * 40, "c" * 40
+    versions = [
+        # a: a partner path published it first; the vendor's own copy, later, still gets the credit.
+        _v("O", "o/plugins", "partner/x/SKILL.md", a, "2026-01-01T00:00:00Z",
+           author="Jesse Vincent", authorship="other-author"),
+        _v("A", "a/skills", "skills/x/SKILL.md", a, "2026-02-01T00:00:00Z",
+           author="A", authorship="first-party"),
+        # b: only ever published as someone else's work.
+        _v("O", "o/plugins", "plugins/sp/SKILL.md", b, "2026-01-05T00:00:00Z",
+           author="Jesse Vincent", authorship="other-author"),
+        # c: two own publications; the earliest wins.
+        _v("A", "a/skills", "late/SKILL.md", c, "2026-04-01T00:00:00Z"),
+        _v("O", "o/skills", "early/SKILL.md", c, "2026-03-01T00:00:00Z"),
+    ]
+    credited = vr.credited_landings(versions)
+    assert credited[a]["repo"] == "a/skills"
+    assert credited[b]["path"] == "plugins/sp/SKILL.md"
+    assert credited[c]["path"] == "early/SKILL.md"
+    occ = pa.table({"repo_full_name": ["u/1", "u/2", "u/3"], "path": ["SKILL.md"] * 3,
+                    "blob_sha": [a, b, c], "platform_folder": [None] * 3})
+    rows = {r["blob_sha"]: r for r in vr.mirror_rows(versions, occ)}
+    assert (rows[a]["vendor"], rows[a]["credit"], rows[a]["vendor_authorship"]) == ("A", "vendor", "first-party")
+    assert (rows[b]["vendor"], rows[b]["credit"], rows[b]["vendor_manifest_author"]) == (
+        "O", "repackaged", "Jesse Vincent")
+    assert rows[c]["credit"] == "vendor" and rows[c]["vendor_authorship"] == "unstated"
+
+
 # ---------------------------------------------------------------- config and run
 
 def test_load_vendors_rejects_duplicates(tmp_path):
@@ -334,7 +362,11 @@ def test_run_end_to_end(vendor_repo, tmp_path):
     assert m["removal_list"]["stats"]["repos_excluded"] == ["other/skills"]
     assert m["cross_vendor"]["copies"] == 0
     assert m["repos"][0]["head"] == vendor_repo["last"]
-    assert m["mirror"] == {"gitskills_revision": "abc", "copies": 1, "copy_repos": 1, "vendor_blobs_copied": 1}
+    assert {k: m["mirror"][k] for k in ("gitskills_revision", "copies", "copy_repos",
+                                        "vendor_blobs_copied", "copies_by_credit")} == {
+        "gitskills_revision": "abc", "copies": 1, "copy_repos": 1, "vendor_blobs_copied": 1,
+        "copies_by_credit": {"vendor": 1, "repackaged": 0}}
+    assert m["mirror"]["credit_rule"].startswith("each text is credited")
     assert {o["path"] for o in m["outputs"]} == {"version.parquet", "skill.parquet",
                                               "cross_vendor.parquet", "mirror.parquet"}
     t = pq.read_table(out / "version.parquet")

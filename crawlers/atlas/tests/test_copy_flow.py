@@ -29,9 +29,10 @@ SKILLS = [
 ]
 
 
-def m(sha, path, repo, copy_path, folder):
+def m(sha, path, repo, copy_path, folder, credit="vendor", authorship="first-party", author="Acme"):
     return {"blob_sha": sha, "vendor": "Acme", "vendor_repo": "acme/skills", "vendor_path": path,
-            "vendor_first_landed_at": "2026-01-01T00:00:00Z", "copy_repo": repo,
+            "vendor_first_landed_at": "2026-01-01T00:00:00Z", "vendor_authorship": authorship,
+            "vendor_manifest_author": author, "credit": credit, "copy_repo": repo,
             "copy_path": copy_path, "copy_platform_folder": folder}
 
 
@@ -40,7 +41,7 @@ MIRROR = [
     m(B, "s/alpha/SKILL.md", "u/one", ".agents/skills/alpha/SKILL.md", "agents"),
     m(A, "s/alpha/SKILL.md", "U/Two", ".claude/skills/alpha/SKILL.md", "claude"),
     m(A, "s/alpha/SKILL.md", "bad/fork", "SKILL.md", None),
-    m(C, "s/secret/SKILL.md", "u/one", "x/SKILL.md", "weird"),
+    m(C, "s/secret/SKILL.md", "u/one", "x/SKILL.md", "weird", authorship="unstated", author=None),
 ]
 CROSS = [{"origin_vendor": "Acme", "origin_repo": "acme/skills", "origin_path": "s/alpha/SKILL.md",
           "origin_landed_at": "2026-01-01T00:00:00Z", "copy_vendor": "Globex", "copy_repo": "globex/p",
@@ -85,7 +86,9 @@ def test_removal_listed_texts_are_counted_per_copy():
 def test_vendor_rows_include_vendors_with_no_copies():
     v = {r["vendor"]: r for r in built()["vendors"]}
     assert v["Acme"] == {"vendor": "Acme", "skills_published": 2, "skills_copied": 2,
-                         "copies": 4, "copy_repos": 2}
+                         "copies": 4, "copy_repos": 2,
+                         "by_credit": {"vendor": {"skills_copied": 2, "copies": 4, "copy_repos": 2},
+                                       "repackaged": {"skills_copied": 0, "copies": 0, "copy_repos": 0}}}
     assert v["Globex"]["skills_copied"] == 0
 
 
@@ -101,10 +104,30 @@ def test_repos_and_edges_respect_min_skills_and_cap():
 def test_skills_beyond_the_cap_are_summed_per_vendor():
     d = built(min_skills=1, max_skills=1)
     assert [s["name"] for s in d["skills"]] == ["alpha"]
-    assert d["skills_rest"] == [{"vendor": "Acme", "skills": 1, "copies": 1, "removal_listed_copies": 1,
+    assert d["skills_rest"] == [{"vendor": "Acme", "credit": "vendor", "skills": 1, "copies": 1, "removal_listed_copies": 1,
                                  "by_platform": {"other": {"copies": 1}}}]
     assert all(si == 0 for si, _, _ in d["edges"])  # edges only to skills shown
     assert d["totals"]["skills_copied"] == 2 and d["totals"]["skills_shown"] == 1
+
+
+def test_repackaged_skills_are_split_out_and_rank_below_the_vendors_own():
+    guest = "e" * 40
+    skills = SKILLS + [{"vendor": "Globex", "repo": "globex/p", "path": "sp/SKILL.md",
+                        "authorship": "other-author", "manifest_author": "Jesse Vincent", "versions": 1,
+                        "first_landed_at": "2026-01-01T00:00:00Z", "present_at_head": True}]
+    extra = [{**m(guest, "sp/SKILL.md", f"u/r{i}", "SKILL.md", "claude", credit="repackaged",
+                  authorship="other-author", author="Jesse Vincent"),
+              "vendor": "Globex", "vendor_repo": "globex/p"} for i in range(5)]
+    d = cf.build(VERSIONS, skills, MIRROR + extra, CROSS, EX, min_skills=1, max_skills=1)
+    sp = d["skills"][0]  # five repositories: shown first, flagged as repackaged
+    assert (sp["name"], sp["credit"], sp["manifest_author"]) == ("sp", "repackaged", "Jesse Vincent")
+    g = {r["vendor"]: r for r in d["vendors"]}["Globex"]
+    assert g["by_credit"]["repackaged"] == {"skills_copied": 1, "copies": 5, "copy_repos": 5}
+    assert g["by_credit"]["vendor"]["copies"] == 0
+    assert [v["vendor"] for v in d["vendors"]] == ["Acme", "Globex"]  # ranked by own reach
+    assert d["totals"]["copies_by_credit"] == {"vendor": 4, "repackaged": 5}
+    assert {(r["vendor"], r["credit"]) for r in d["skills_rest"]} == {("Acme", "vendor")}
+    assert all(r["repackaged_copies"] == (1 if r["repo"].startswith("u/r") else 0) for r in d["repos"])
 
 
 def test_cross_vendor_passthrough():
@@ -112,9 +135,9 @@ def test_cross_vendor_passthrough():
     assert c["origin_skill"] == "acme/skills:s/alpha/SKILL.md" and c["copy_vendor"] == "Globex"
 
 
-def write_inputs(tmp_path, mirror_section=True, **override):
+def write_inputs(tmp_path, mirror_section=True, mirror=MIRROR, **override):
     outputs = []
-    for name, rows in (("version", VERSIONS), ("skill", SKILLS), ("mirror", MIRROR), ("cross_vendor", CROSS)):
+    for name, rows in (("version", VERSIONS), ("skill", SKILLS), ("mirror", mirror), ("cross_vendor", CROSS)):
         path = tmp_path / f"{name}.parquet"
         pq.write_table(pa.Table.from_pylist(rows), path)
         outputs.append({"path": path.name, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
@@ -129,7 +152,7 @@ def write_inputs(tmp_path, mirror_section=True, **override):
 
 
 TOP_KEYS = {"vendors", "skills", "skills_rest", "repos", "edges", "cross_vendor", "totals", "meta"}
-SKILL_KEYS = {"id", "vendor", "repo", "path", "name", "authorship", "manifest_author", "versions",
+SKILL_KEYS = {"id", "vendor", "repo", "path", "name", "credit", "authorship", "manifest_author", "versions",
               "first_landed_at", "present_at_head", "removal_listed_copies", "copies",
               "versions_copied", "copy_repos", "by_platform"}
 
@@ -142,7 +165,9 @@ def test_run_writes_only_allowed_keys(tmp_path):
     saved = json.loads(out.read_text())
     assert set(saved) == TOP_KEYS
     assert all(set(s) == SKILL_KEYS for s in saved["skills"])
-    assert all(set(r) == {"repo", "skills", "copies", "vendors"} for r in saved["repos"])
+    assert all(set(r) == {"repo", "skills", "copies", "vendors", "repackaged_copies"}
+               for r in saved["repos"])
+    assert saved["meta"]["credit_rule"] == cf.CREDIT_RULE
     assert all(len(e) == 3 and all(isinstance(x, int) for x in e) for e in saved["edges"])
     assert all(set(c) == {"origin_vendor", "origin_skill", "origin_landed_at", "copy_vendor", "copy_repo",
                           "copy_path", "copy_landed_at", "copy_authorship", "same_day"}
@@ -169,6 +194,14 @@ def test_run_refuses_stale_mirror(tmp_path):
         cf.run(tmp_path, tmp_path / "x.json", exc)
     assert cf.main(["--src", str(tmp_path), "--out", str(tmp_path / "x.json"),
                     "--exclusions", str(exc)]) == 2
+
+
+def test_run_refuses_mirror_without_credit(tmp_path):
+    old = [{k: v for k, v in r.items() if k not in ("credit", "vendor_authorship", "vendor_manifest_author")}
+           for r in MIRROR]
+    exc = write_inputs(tmp_path, mirror=old)
+    with pytest.raises(cf.StaleInputError, match="credit"):
+        cf.run(tmp_path, tmp_path / "x.json", exc)
 
 
 def test_caps_step_down_to_fit(tmp_path, monkeypatch):

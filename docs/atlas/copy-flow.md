@@ -34,10 +34,22 @@ root (for example `python -m http.server`), because browsers block `fetch` from
 - **Copy:** a GitSkills occurrence outside the vendor repositories whose text is
   byte-identical to any version of that skill (`vendor_mirror`). Edited copies
   are not counted, so every number is a floor.
-- **Credit:** each text is credited only to the earliest vendor path that
-  published it. When a vendor moves a skill or republishes the same text at
+- **Credit:** a vendor's own publication comes first, because that is the
+  worked example people meet and reuse (DHK, 27 Nov 2026). Each text is
+  credited to the earliest path where a vendor published it as its own
+  (authorship first-party or unstated). Only a text no vendor published as its
+  own goes to the earliest path whose plugin manifest or partner folder names
+  another author, and its copies are tagged `credit: "repackaged"`, keeping
+  that author in `manifest_author`. So OpenAI's plugins repository shipping
+  Jesse Vincent's superpowers skills shows as "repackaged via OpenAI", not as
+  OpenAI's work. When a vendor moves a skill or republishes the same text at
   another path, the copies stay with the first path, so the newer path can show
   zero copies even though its text is widely found.
+- **Repackaged is strict for now:** a manifest that names a person counts as
+  another author even in a vendor's own repository (for example three plugins
+  in `anthropics/claude-code` that name individuals), because nothing in the
+  repository says whether they are staff. A reviewed list of vendor staff would
+  move those back; that waits on DHK.
 - **Platform folder:** the agent folder the copy sits under (`.claude`,
   `.agents`, `.codex` and so on), from GitSkills' `platform_folder`.
 - **Between vendors:** a skill first landing in one vendor repository and later
@@ -45,8 +57,12 @@ root (for example `python -m http.server`), because browsers block `fetch` from
 
 ## What the file holds
 
-Counts and pointers only: repository names, paths, dates, authorship labels and
-copy counts. No skill text. Repositories on the removal list are dropped. Each
+Counts and pointers only: repository names, paths, dates, authorship labels,
+credit and copy counts. Every vendor row splits its skills, files and copying
+repositories by credit in `by_credit`, and vendors are ranked by the reach of
+their own skills; `skills_rest` has one row per vendor and credit;
+`totals.copies_by_credit` gives the split overall; each repository carries
+`repackaged_copies`. No skill text. Repositories on the removal list are dropped. Each
 file whose own text is on the removal list is counted in its skill's
 `removal_listed_copies` (and `totals.copies_of_removal_listed_texts`), rather
 than flagging a whole skill because one of its versions is listed.
@@ -73,6 +89,11 @@ are uncapped.
   sized by copying repositories) and the repositories that copy them. Zoom,
   drag, search, and click a node to isolate its neighbours.
 - **Table:** the 200 skills found in the most repositories, sortable.
+
+Repackaged skills keep the colour of the vendor that shipped them, striped, and
+sit below that vendor's own skills; the "Repackaged by a vendor" chip hides
+them. The export refuses a `mirror.parquet` with no `credit` column, so an
+export from before this rule can't be mixed in.
 
 Colours follow a fixed vendor order (Anthropic, OpenAI, Microsoft, Google,
 Hugging Face, Vercel, Cloudflare; others gray), so a vendor keeps its colour
