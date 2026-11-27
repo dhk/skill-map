@@ -422,6 +422,8 @@ td.n, th.n { text-align: right; }
     }
     node.on("click", (ev, d) => { focus = focus === d.id ? null : d.id; applyFocus(); ev.stopPropagation(); });
     svg.on("click", () => { focus = null; applyFocus(); });
+    // Start from a spiral around the centre so the layout settles in view, not from the corner.
+    nodes.forEach((n, i) => { const a = i * 2.39996, r = 6 * Math.sqrt(i); n.x = W / 2 + r * Math.cos(a); n.y = H / 2 + r * Math.sin(a); });
     sim = d3.forceSimulation(nodes)
       .force("link", d3.forceLink(links).id(d => d.id).distance(l => 30 + l.source.r).strength(0.25))
       .force("charge", d3.forceManyBody().strength(d => d.kind === "skill" ? -40 - d.r * 6 : -10))
