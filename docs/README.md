@@ -61,6 +61,7 @@ over time. Its decisions are ADRs 0004 to 0007.
 |---|---|
 | [`atlas/plan.md`](atlas/plan.md) | Question, corpus, dating, dimensions, data tables, phases and FAQ |
 | [`atlas/gitskills-import.md`](atlas/gitskills-import.md) | How GitSkills metadata becomes the base catalogue |
+| [`atlas/delta-crawl.md`](atlas/delta-crawl.md) | How the August to November 2026 delta is found and diffed against GitSkills |
 
 ## Planning and outreach
 
