@@ -83,6 +83,7 @@ h1 { font-size: 24px; font-weight: 650; margin: 0 0 6px; letter-spacing: -0.01em
   border: 1px solid var(--text-secondary); box-sizing: border-box; }
 svg text { fill: var(--text-primary); font-size: 11.5px; paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; stroke-linejoin: round; }
 svg text.muted { fill: var(--text-secondary); }
+svg text.cluster { font-size: 12.5px; font-weight: 600; fill: var(--text-secondary); }
 .tooltip { position: fixed; pointer-events: none; background: var(--surface-1); color: var(--text-primary);
   border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; line-height: 1.4;
   box-shadow: 0 4px 16px rgba(0,0,0,0.12); max-width: 320px; opacity: 0; transition: opacity 80ms; z-index: 10; }
@@ -140,11 +141,12 @@ td.n, th.n { text-align: right; }
   <section data-panel="explore" hidden>
     <div class="panel">
       <h2>Skills and the repositories that copy them</h2>
-      <p class="sub">Coloured circles are vendor skills, sized by how many repositories copy them.
-      Grey dots are repositories; an arrow runs from a skill to each repository holding a copy.
-      Drag to move, scroll to zoom, click a node to focus on its neighbours.</p>
+      <p class="sub">Coloured circles are vendor skills, grouped by vendor and sized by how many
+      repositories copy them; striped ones are skills a vendor repackaged. Grey dots are repositories,
+      drawn between the vendors they copy from, so a dot between two clusters holds skills from both.
+      Hover for names, click a node to see its links, scroll to zoom.</p>
       <div class="controls">
-        <label>Top skills <input type="range" id="g-sk" min="10" max="300" value="80"><span id="g-sk-v">80</span></label>
+        <label>Top skills <input type="range" id="g-sk" min="10" max="300" value="60"><span id="g-sk-v">60</span></label>
         <label>Repos copying at least <input type="range" id="g-min" min="3" max="40" value="8"><span id="g-min-v">8</span> skills</label>
         <label><input type="search" id="g-q" placeholder="Find a skill or repository"></label>
       </div>
@@ -388,6 +390,9 @@ td.n, th.n { text-align: right; }
   }
 
   // ---------------------------------------------------------------- graph
+  // Each vendor (and what it repackaged) gets its own cluster around a ring; repositories settle
+  // between the clusters they copy from, so a repository that bundles several vendors sits between
+  // them. The layout is computed before drawing and then zoomed to fit the frame.
   let sim;
   function drawGraph() {
     const host = document.getElementById("graph");
@@ -407,71 +412,127 @@ td.n, th.n { text-align: right; }
     if (!E.length) { host.innerHTML = '<p class="empty">No repositories meet this threshold. Lower it or show more skills.</p>'; return; }
     const usedSkills = new Set(E.map(e => e.skill));
     const shown = skills.filter(s => usedSkills.has(s.id));
-    const rSkill = d3.scaleSqrt().domain([0, d3.max(shown, s => s.copy_repos) || 1]).range([3, 20]);
-    const rRepo = d3.scaleSqrt().domain([0, d3.max(repos, r => repoDeg.get(r.repo)) || 1]).range([1.5, 6]);
+    const W = Math.max(720, host.clientWidth), H = Math.round(Math.max(560, Math.min(820, W * 0.72)));
+
+    // Cluster anchors on a ring, largest cluster first, each vendor's repackaged cluster beside it.
+    const clusterKey = s => vendorGroup(s.vendor) + (isRepack(s) ? "|r" : "");
+    const sizes = d3.rollup(shown, v => d3.sum(v, s => s.copy_repos), clusterKey);
+    const keys = [...sizes.keys()].sort((x, y) => {
+      const [gx, rx] = x.split("|"), [gy, ry] = y.split("|");
+      const ix = groups.indexOf(gx), iy = groups.indexOf(gy);
+      return (ix < 0 ? 99 : ix) - (iy < 0 ? 99 : iy) || (rx ? 1 : 0) - (ry ? 1 : 0);
+    });
+    const ring = Math.min(W, H) * 0.34;
+    const anchor = new Map(keys.map((k, i) => {
+      const a = -Math.PI / 2 + (2 * Math.PI * i) / keys.length;
+      return [k, keys.length === 1 ? [W / 2, H / 2] : [W / 2 + ring * Math.cos(a) * (W / H), H / 2 + ring * Math.sin(a)]];
+    }));
+
+    const rSkill = d3.scaleSqrt().domain([0, d3.max(shown, s => s.copy_repos) || 1]).range([3, 18]);
     const nodes = [
-      ...shown.map(s => ({ id: s.id, kind: "skill", s, r: rSkill(s.copy_repos) })),
-      ...repos.map(r => ({ id: "repo:" + r.repo, kind: "repo", repo: r, deg: repoDeg.get(r.repo), r: rRepo(repoDeg.get(r.repo)) })),
+      ...shown.map(s => ({ id: s.id, kind: "skill", s, key: clusterKey(s), r: rSkill(s.copy_repos) })),
+      ...repos.map(r => ({ id: "repo:" + r.repo, kind: "repo", repo: r, deg: repoDeg.get(r.repo), r: 2 })),
     ];
+    const byId = new Map(nodes.map(n => [n.id, n]));
     const links = E.map(e => ({ source: e.skill, target: "repo:" + e.repo, copies: e.copies }));
-    const W = Math.max(720, host.clientWidth), H = 640;
+    // Start every node at (or, for a repository, between) the clusters it belongs to.
+    const repoAnchors = d3.group(E, e => e.repo);
+    nodes.forEach((n, i) => {
+      let x, y;
+      if (n.kind === "skill") [x, y] = anchor.get(n.key);
+      else {
+        const pts = repoAnchors.get(n.repo.repo).map(e => anchor.get(byId.get(e.skill).key));
+        x = d3.mean(pts, p => p[0]); y = d3.mean(pts, p => p[1]);
+      }
+      const a = i * 2.39996, r = 3 * Math.sqrt(i % 60);
+      n.x = x + r * Math.cos(a); n.y = y + r * Math.sin(a);
+    });
+    sim = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id(d => d.id).distance(l => 18 + l.source.r).strength(0.03))
+      .force("charge", d3.forceManyBody().strength(d => d.kind === "skill" ? -18 - d.r * 3 : -3).distanceMax(160))
+      .force("collide", d3.forceCollide(d => d.r + (d.kind === "skill" ? 2 : 0.8)).iterations(2))
+      .force("x", d3.forceX(d => d.kind === "skill" ? anchor.get(d.key)[0] : W / 2).strength(d => d.kind === "skill" ? 0.4 : 0.005))
+      .force("y", d3.forceY(d => d.kind === "skill" ? anchor.get(d.key)[1] : H / 2).strength(d => d.kind === "skill" ? 0.4 : 0.005))
+      .stop();
+    for (let i = 0; i < 320; i++) sim.tick();
+
     const svg = d3.select(host).append("svg").attr("viewBox", [0, 0, W, H]).attr("width", "100%")
-      .attr("role", "img").attr("aria-label", "Network of vendor skills and the repositories that copy them");
-    svg.append("defs").append("marker").attr("id", "arrow").attr("viewBox", "0 -4 8 8").attr("refX", 8).attr("refY", 0)
-      .attr("markerWidth", 5).attr("markerHeight", 5).attr("orient", "auto")
-      .append("path").attr("d", "M0,-4L8,0L0,4").attr("fill", "var(--link-neutral)");
+      .attr("role", "img").attr("aria-label", "Vendor skills clustered by vendor, linked to the repositories that copy them");
     const hatch = hatches(svg, "gr");
     const root = svg.append("g");
-    svg.call(d3.zoom().scaleExtent([0.2, 6]).on("zoom", ev => root.attr("transform", ev.transform)));
+    const zoom = d3.zoom().scaleExtent([0.3, 8]).on("zoom", ev => root.attr("transform", ev.transform));
+    svg.call(zoom);
     const link = root.append("g").selectAll("line").data(links).join("line")
-      .attr("stroke", "var(--link-neutral)").attr("stroke-width", 0.8).attr("stroke-opacity", 0.55)
-      .attr("marker-end", links.length < 2500 ? "url(#arrow)" : null);
+      .attr("stroke", "var(--link-neutral)").attr("stroke-width", 0.6);
     const node = root.append("g").selectAll("circle").data(nodes).join("circle")
       .attr("r", d => d.r)
       .attr("fill", d => d.kind !== "skill" ? "var(--neutral-node)"
         : isRepack(d.s) ? hatch(vendorGroup(d.s.vendor)) : vendorFill(vendorGroup(d.s.vendor)))
-      .attr("stroke", "var(--surface-1)").attr("stroke-width", d => d.kind === "skill" ? 1.5 : 0.8)
+      .attr("stroke-width", d => d.kind === "skill" ? 1.2 : 0)
       .on("mousemove", (ev, d) => showTip(d.kind === "skill" ? skillTip(d.s)
         : `<b>${esc(d.repo.repo)}</b><br>holds ${fmt(d.repo.skills)} vendor skills (${fmt(d.deg)} shown)<br>${fmt(d.repo.copies)} files<br>
            <span class="k">${Object.entries(d.repo.vendors).map(([v, n]) => `${esc(v)} ${fmt(n)}`).join(" · ")}</span>
            ${d.repo.repackaged_copies ? `<br><span class="k">${fmt(d.repo.repackaged_copies)} of those files are repackaged skills</span>` : ""}`, ev))
       .on("mouseleave", hideTip)
       .call(d3.drag()
-        .on("start", (ev, d) => { if (!ev.active) sim.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y; })
+        .on("start", (ev, d) => { if (!ev.active) sim.alphaTarget(0.15).restart(); d.fx = d.x; d.fy = d.y; })
         .on("drag", (ev, d) => { d.fx = ev.x; d.fy = ev.y; })
         .on("end", (ev, d) => { if (!ev.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
-    const labels = root.append("g").selectAll("text").data(nodes.filter(d => d.kind === "skill").sort((a, b) => b.s.copy_repos - a.s.copy_repos).slice(0, 12))
+
+    // Cluster names sit outside the ring; skill names only for the biggest skill in each cluster
+    // and any others that fit without overlapping a label already placed.
+    const clusterLabel = k => { const [g, r] = k.split("|"); return r ? `Repackaged via ${g}` : g; };
+    const centre = k => { const m = shown.filter(s => clusterKey(s) === k).map(s => byId.get(s.id));
+      return [d3.mean(m, n => n.x), d3.mean(m, n => n.y), d3.max(m, n => Math.hypot(n.x - d3.mean(m, o => o.x), n.y - d3.mean(m, o => o.y)) + n.r)]; };
+    const cl = keys.map(k => { const [x, y, rad] = centre(k); const dx = x - W / 2, dy = y - H / 2, d = Math.hypot(dx, dy) || 1;
+      return { k, x: x + dx / d * (rad + 14), y: y + dy / d * (rad + 14), anchor: Math.abs(dx) < 40 ? "middle" : dx > 0 ? "start" : "end" }; });
+    root.append("g").selectAll("text").data(cl).join("text").attr("class", "cluster")
+      .attr("x", d => d.x).attr("y", d => d.y).attr("dy", "0.35em").attr("text-anchor", d => d.anchor)
+      .text(d => clusterLabel(d.k));
+    // Cluster labels and skill circles are obstacles a skill label must not cover.
+    const placed = cl.map(d => { const w = clusterLabel(d.k).length * 6.8;
+      const x0 = d.anchor === "end" ? d.x - w : d.anchor === "middle" ? d.x - w / 2 : d.x; return [x0, d.y - 9, x0 + w, d.y + 9]; });
+    const circles = nodes.filter(n => n.kind === "skill");
+    const fits = (x, y, w, self) => { const box = [x - 2, y - 7, x + w + 2, y + 7];
+      if (!firstOfCluster.has(self.id) && circles.some(c => c !== self && box[0] < c.x + c.r && box[2] > c.x - c.r && box[1] < c.y + c.r && box[3] > c.y - c.r)) return false;
+      if (placed.some(p => box[0] < p[2] && box[2] > p[0] && box[1] < p[3] && box[3] > p[1])) return false;
+      placed.push(box); return true; };
+    const ranked = nodes.filter(d => d.kind === "skill").sort((a, b) => b.s.copy_repos - a.s.copy_repos);
+    const firstOfCluster = new Set(keys.map(k => ranked.find(n => n.key === k)?.id));
+    const labelled = [...ranked.filter(n => firstOfCluster.has(n.id)), ...ranked.filter(n => !firstOfCluster.has(n.id))]
+      .filter(n => fits(n.x + n.r + 3, n.y, n.s.label.length * 6.2, n)).slice(0, 18);
+    const labels = root.append("g").selectAll("text").data(labelled)
       .join("text").attr("dx", d => d.r + 3).attr("dy", "0.35em").text(d => d.s.label).attr("pointer-events", "none");
+
     const neighbours = new Map(nodes.map(n => [n.id, new Set([n.id])]));
-    links.forEach(l => { neighbours.get(l.source).add(l.target); neighbours.get(l.target).add(l.source); });
+    links.forEach(l => { neighbours.get(l.source.id).add(l.target.id); neighbours.get(l.target.id).add(l.source.id); });
     let focus = null;
     function applyFocus() {
       const keep = focus ? neighbours.get(focus) : null;
       const match = q ? new Set(nodes.filter(n => (n.kind === "skill" ? n.s.name + " " + n.s.repo : n.repo.repo).toLowerCase().includes(q)).map(n => n.id)) : null;
-      node.attr("opacity", d => (keep && !keep.has(d.id)) || (match && !match.has(d.id) && !(keep && keep.has(d.id))) ? 0.12 : 1)
+      node.attr("opacity", d => (keep && !keep.has(d.id)) || (match && !match.has(d.id) && !(keep && keep.has(d.id))) ? 0.12 : d.kind === "repo" ? 0.7 : 1)
         .attr("stroke", d => match && match.has(d.id) ? "var(--focus)" : "var(--surface-1)");
-      link.attr("stroke-opacity", l => keep ? (keep.has(l.source.id) && keep.has(l.target.id) && (l.source.id === focus || l.target.id === focus) ? 0.9 : 0.04) : 0.55);
+      link.attr("stroke-opacity", l => keep ? (l.source.id === focus || l.target.id === focus ? 0.8 : 0.02) : 0.1);
       labels.attr("opacity", d => keep && !keep.has(d.id) ? 0.15 : 1);
     }
     node.on("click", (ev, d) => { focus = focus === d.id ? null : d.id; applyFocus(); ev.stopPropagation(); });
     svg.on("click", () => { focus = null; applyFocus(); });
-    // Start from a spiral around the centre so the layout settles in view, not from the corner.
-    nodes.forEach((n, i) => { const a = i * 2.39996, r = 6 * Math.sqrt(i); n.x = W / 2 + r * Math.cos(a); n.y = H / 2 + r * Math.sin(a); });
-    sim = d3.forceSimulation(nodes)
-      .force("link", d3.forceLink(links).id(d => d.id).distance(l => 30 + l.source.r).strength(0.25))
-      .force("charge", d3.forceManyBody().strength(d => d.kind === "skill" ? -40 - d.r * 6 : -10))
-      .force("collide", d3.forceCollide(d => d.r + 1.5))
-      .force("x", d3.forceX(W / 2).strength(0.04)).force("y", d3.forceY(H / 2).strength(0.05))
-      .on("tick", () => {
-        link.each(function (l) {
-          const dx = l.target.x - l.source.x, dy = l.target.y - l.source.y, dist = Math.hypot(dx, dy) || 1;
-          d3.select(this).attr("x1", l.source.x).attr("y1", l.source.y)
-            .attr("x2", l.target.x - dx / dist * (l.target.r + 1)).attr("y2", l.target.y - dy / dist * (l.target.r + 1));
-        });
-        node.attr("cx", d => d.x).attr("cy", d => d.y);
-        labels.attr("x", d => d.x).attr("y", d => d.y);
-      });
+    const place = () => {
+      link.attr("x1", l => l.source.x).attr("y1", l => l.source.y).attr("x2", l => l.target.x).attr("y2", l => l.target.y);
+      node.attr("cx", d => d.x).attr("cy", d => d.y);
+      labels.attr("x", d => d.x).attr("y", d => d.y);
+    };
+    place();
     applyFocus();
+    // Zoom to fit what was laid out, labels included.
+    const xs = nodes.flatMap(n => [n.x - n.r, n.x + n.r]).concat(placed.flatMap(p => [p[0], p[2]]));
+    const ys = nodes.flatMap(n => [n.y - n.r, n.y + n.r]).concat(placed.flatMap(p => [p[1], p[3]]));
+    const bb = { x: d3.min(xs), y: d3.min(ys), width: d3.max(xs) - d3.min(xs), height: d3.max(ys) - d3.min(ys) };
+    if (bb.width && bb.height) {
+      const k = Math.min(2.5, 0.94 * Math.min(W / bb.width, H / bb.height));
+      svg.call(zoom.transform, d3.zoomIdentity.translate(W / 2 - k * (bb.x + bb.width / 2), H / 2 - k * (bb.y + bb.height / 2)).scale(k));
+    }
+    sim.on("tick", place);
   }
 
   // ---------------------------------------------------------------- table
